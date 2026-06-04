@@ -1,0 +1,145 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper: check if user is authenticated
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Helper: check if user is admin
+    function isAdmin() {
+      return isAuth() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    // Helper: check if user owns the document
+    function isOwner(userId) {
+      return isAuth() && request.auth.uid == userId;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own profile
+      // Admins can read any profile
+      allow read: if isAuth() && (request.auth.uid == userId || isAdmin());
+
+      // Users can create their own profile
+      allow create: if isAuth() && request.auth.uid == userId;
+
+      // Users can update their own profile
+      allow update: if isAuth() && request.auth.uid == userId;
+
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+
+    // Products collection
+    match /products/{productId} {
+      // Anyone can read active products
+      allow read: if resource.data.status == 'active' || resource.data.status == 'pending' || isAdmin();
+
+      // Authenticated users can create products
+      allow create: if isAuth() && request.resource.data.sellerId == request.auth.uid;
+
+      // Sellers can update their own products
+      // Admins can update any product (moderation)
+      allow update: if isAuth() && (
+        resource.data.sellerId == request.auth.uid || isAdmin()
+      );
+
+      // Sellers can soft-delete (set status to inactive)
+      allow delete: if isAuth() && (
+        resource.data.sellerId == request.auth.uid
+      );
+    }
+
+    // Luthiers collection
+    match /luthiers/{luthierId} {
+      // Anyone can read luthier profiles
+      allow read: if true;
+
+      // Only authenticated luthiers can create their profile
+      allow create: if isAuth() && request.auth.uid == luthierId;
+
+      // Luthiers can update their own profile
+      allow update: if isAuth() && request.auth.uid == luthierId;
+
+      allow delete: if isAdmin();
+    }
+
+    // Appointments collection
+    match /appointments/{appointmentId} {
+      // Users can read their own appointments (as client or luthier)
+      allow read: if isAuth() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.luthierId == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Authenticated users can create appointments
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+
+      // Clients or luthiers can update their appointments
+      allow update: if isAuth() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.luthierId == request.auth.uid
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // Chats collection
+    match /chats/{chatId} {
+      // Only participants can read the chat
+      allow read: if isAuth() && request.auth.uid in resource.data.participants;
+
+      // Authenticated users can create chats
+      allow create: if isAuth() && request.auth.uid in request.resource.data.participants;
+
+      // Participants can update the chat
+      allow update: if isAuth() && request.auth.uid in resource.data.participants;
+
+      allow delete: if false;
+
+      // Messages subcollection
+      match /messages/{messageId} {
+        // Only chat participants can read messages
+        allow read: if isAuth() && get(/databases/$(database)/documents/chats/$(chatId)).data.participants.hasAny([request.auth.uid]);
+
+        // Participants can send messages
+        allow create: if isAuth() &&
+          request.resource.data.senderId == request.auth.uid &&
+          get(/databases/$(database)/documents/chats/$(chatId)).data.participants.hasAny([request.auth.uid]);
+
+        allow update, delete: if false;
+      }
+    }
+
+    // Proposals collection
+    match /proposals/{proposalId} {
+      // Sender or receiver can read the proposal
+      allow read: if isAuth() && (
+        resource.data.senderId == request.auth.uid ||
+        resource.data.receiverId == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Authenticated users can create proposals
+      allow create: if isAuth() && request.resource.data.senderId == request.auth.uid;
+
+      // Sender or receiver can update proposal status
+      allow update: if isAuth() && (
+        resource.data.senderId == request.auth.uid ||
+        resource.data.receiverId == request.auth.uid
+      );
+
+      allow delete: if false;
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

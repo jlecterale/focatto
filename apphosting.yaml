@@ -1,0 +1,17 @@
+# Settings for Firebase App Hosting
+# For more info: https://firebase.google.com/docs/app-hosting/configure
+
+# Environment variables for the build and runtime environments
+env:
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: "AIzaSyAAIZ9IcXqAGPSrGJh5sVTBbmcwRlBfyuU"
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: "focatto.firebaseapp.com"
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: "focatto"
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: "focatto.firebasestorage.app"
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "469248226385"
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: "1:469248226385:web:1afe958e02ed6abf783470"
