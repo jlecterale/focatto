@@ -8,6 +8,8 @@ import {
   signOut,
   updateProfile,
   User,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { createOrUpdateUserProfile, getUserProfile } from "@/lib/db";
@@ -19,6 +21,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -73,13 +76,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const loginWithGoogle = useCallback(async () => {
+    if (!auth) throw new Error("Firebase not configured");
+    const provider = new GoogleAuthProvider();
+    const cred = await signInWithPopup(auth, provider);
+    const existingProfile = await getUserProfile(cred.user.uid);
+    if (!existingProfile) {
+      await createOrUpdateUserProfile(cred.user.uid, {
+        uid: cred.user.uid,
+        name: cred.user.displayName || "Usuário",
+        email: cred.user.email || "",
+        photo: cred.user.photoURL || undefined,
+        favorites: [],
+        createdAt: Date.now(),
+      });
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     if (!auth) return;
     await signOut(auth);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, register, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, login, register, loginWithGoogle, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
