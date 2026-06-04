@@ -2,18 +2,45 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+
+    // ==========================================
+    // Helper Functions
+    // ==========================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.admin == true ||
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin == true
+      );
+    }
+    
+    // Validates if the file is an image and stays below a maximum size limit (in MB)
+    function isValidImage(maxSizeMB) {
+      return request.resource.contentType.matches('image/.*') 
+             && request.resource.size < maxSizeMB * 1024 * 1024;
+    }
+
+    // ==========================================
+    // Path-specific Rules (Marketplace)
+    // ==========================================
+
     // Product images
     match /products/{productId}/{imageId} {
       // Anyone can read product images
       allow read: if true;
 
-      // Only authenticated users who own the product can upload
-      // Allow create if user is authenticated
-      allow create: if request.auth != null;
+      // Only authenticated users can upload product images (validated size & type)
+      allow create: if isAuthenticated() && isValidImage(10);
 
-      // Owner can update/delete
-      allow update, delete: if request.auth != null
-        && request.auth.uid == firestore.get(/databases/(default)/documents/products/$(productId)).data.sellerId;
+      // Only the product seller (owner) or an admin can update or delete product images
+      allow update, delete: if isAdmin() || (
+        isAuthenticated() && 
+        request.auth.uid == firestore.get(/databases/(default)/documents/products/$(productId)).data.sellerId
+      );
     }
 
     // User avatars
@@ -21,8 +48,8 @@ service firebase.storage {
       // Anyone can read avatars
       allow read: if true;
 
-      // Only the user can upload their avatar
-      allow write: if request.auth != null && request.auth.uid == userId;
+      // Only the user or an admin can upload/update/delete their avatar
+      allow write: if isAdmin() || (isAuthenticated() && request.auth.uid == userId && isValidImage(5));
     }
 
     // Luthier portfolio images
@@ -30,24 +57,28 @@ service firebase.storage {
       // Anyone can read portfolio images
       allow read: if true;
 
-      // Only the luthier can upload portfolio images
-      allow write: if request.auth != null && request.auth.uid == luthierId;
+      // Only the luthier or an admin can upload portfolio images
+      allow write: if isAdmin() || (isAuthenticated() && request.auth.uid == luthierId && isValidImage(10));
     }
 
     // Chat images
     match /chats/{chatId}/{messageId}/{fileName} {
-      // Only chat participants can read
-      allow read: if request.auth != null
-        && firestore.get(/databases/(default)/documents/chats/$(chatId)).data.participants.hasAny([request.auth.uid]);
+      // Only chat participants or admins can read
+      allow read: if isAdmin() || (
+        isAuthenticated() && 
+        firestore.get(/databases/(default)/documents/chats/$(chatId)).data.participants.hasAny([request.auth.uid])
+      );
 
-      // Participants can upload images
-      allow create: if request.auth != null
-        && firestore.get(/databases/(default)/documents/chats/$(chatId)).data.participants.hasAny([request.auth.uid]);
+      // Only chat participants can upload images to the chat
+      allow create: if isAuthenticated() && 
+        firestore.get(/databases/(default)/documents/chats/$(chatId)).data.participants.hasAny([request.auth.uid]) &&
+        isValidImage(10);
 
-      allow update, delete: if false;
+      // Deletes and updates are disabled for security/integrity
+      allow update, delete: if isAdmin();
     }
 
-    // Deny all other access
+    // Deny all other access by default
     match /{allPaths=**} {
       allow read, write: if false;
     }

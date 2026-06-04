@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Providers } from "@/components/layout/Providers";
 import { Header } from "@/components/layout/Header";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { Footer } from "@/components/layout/Footer";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 
 import "@/globals.css";
 
@@ -43,7 +45,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main className="pt-16 md:pt-18 pb-20 md:pb-0 min-h-screen">
             {children}
           </main>
+          <Footer />
           <MobileBottomNav />
+          <CookieConsent />
         </Providers>
       </body>
     </html>

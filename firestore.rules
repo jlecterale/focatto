@@ -13,10 +13,6 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    // Helper: check if user owns the document
-    function isOwner(userId) {
-      return isAuth() && request.auth.uid == userId;
-    }
 
     // Users collection
     match /users/{userId} {
