@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   House,
-  MagnifyingGlass,
+  Tag,
   PlusCircle,
   Heart,
   User,
@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/", label: "Início", icon: House },
-  { href: "/?busca=1", label: "Buscar", icon: MagnifyingGlass },
+  { href: "/anuncios", label: "Anúncios", icon: Tag },
   { href: "/anunciar", label: "Anunciar", icon: PlusCircle },
   { href: "/perfil?tab=favoritos", label: "Favoritos", icon: Heart },
   { href: "/perfil", label: "Perfil", icon: User },

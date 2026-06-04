@@ -14,47 +14,27 @@ import { useProducts } from "@/hooks/useProdutos";
 import { cn } from "@/lib/utils";
 import type { ProductFilters as Filters } from "@/types";
 
-const categories = [
-  { key: "instrumentos", label: "Instrumentos", icon: Guitar, color: "from-accent to-amber-600" },
-  { key: "acessorios", label: "Acessórios", icon: Headphones, color: "from-blue-500 to-cyan-500" },
-  { key: "luthier", label: "Luthiers", icon: Wrench, color: "from-emerald-500 to-teal-500" },
-];
-
 function HomeContent() {
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState<Filters>({});
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const queryCategory = searchParams.get("categoria");
   const querySearch = searchParams.get("search");
   const loginParam = searchParams.get("login");
   const registerParam = searchParams.get("register");
 
   useEffect(() => {
-    if (queryCategory) {
-      setActiveCategory(queryCategory);
-      setFilters((f) => ({ ...f, category: queryCategory as any }));
-    }
     if (querySearch) {
       setFilters((f) => ({ ...f, search: querySearch }));
+    } else {
+      setFilters({});
     }
     if (loginParam) { setAuthMode("login"); setShowAuth(true); }
     if (registerParam) { setAuthMode("register"); setShowAuth(true); }
-  }, [queryCategory, querySearch, loginParam, registerParam]);
+  }, [querySearch, loginParam, registerParam]);
 
   const { products, loading } = useProducts(filters);
-
-  const handleCategoryClick = (key: string) => {
-    if (activeCategory === key) {
-      setActiveCategory(null);
-      setFilters({});
-    } else {
-      setActiveCategory(key);
-      setFilters({ category: key as any });
-    }
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-10">
@@ -69,42 +49,14 @@ function HomeContent() {
             </p>
           </div>
         </div>
-
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
-          {categories.map((cat) => {
-            const Icon = cat.icon;
-            const isActive = activeCategory === cat.key;
-            return (
-              <button
-                key={cat.key}
-                onClick={() => handleCategoryClick(cat.key)}
-                className={cn(
-                  "flex items-center gap-2.5 px-4 py-3 rounded-xl border transition-all flex-shrink-0",
-                  isActive
-                    ? "border-accent/30 bg-accent/10"
-                    : "border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/10"
-                )}
-              >
-                <div className={cn("w-9 h-9 rounded-lg bg-gradient-to-br flex items-center justify-center", cat.color)}>
-                  <Icon size={18} weight="fill" className="text-white" />
-                </div>
-                <span className="text-sm font-medium whitespace-nowrap">{cat.label}</span>
-              </button>
-            );
-          })}
-        </div>
       </section>
 
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">
-            {activeCategory
-              ? categories.find((c) => c.key === activeCategory)?.label
-              : "Destaques"}
+            Anúncios Recentes
           </h2>
-          {!activeCategory && (
-            <p className="text-xs text-surface-400">{products.length} anúncios</p>
-          )}
+          <p className="text-xs text-surface-400">{products.length} anúncios</p>
         </div>
 
         <ProductFilters filters={filters} onChange={setFilters} />

@@ -39,8 +39,7 @@ export function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      router.push(`/?search=${encodeURIComponent(searchTerm.trim())}`);
-      setSearchOpen(false);
+      router.push(`/anuncios?search=${encodeURIComponent(searchTerm.trim())}`);
       setSearchTerm("");
     }
   };
@@ -58,36 +57,36 @@ export function Header() {
             </span>
           </Link>
 
+          {/* Desktop Sticky Search Bar */}
+          <form onSubmit={handleSearch} className="hidden md:flex items-center max-w-sm lg:max-w-md w-full mx-6 relative">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar instrumentos, marcas..."
+              className="input-field py-1.5 pl-3 pr-10 text-sm w-full bg-white/[0.03] border-white/10 focus:bg-white/[0.07] focus:border-accent/40 rounded-xl"
+            />
+            <button type="submit" className="absolute right-3 text-surface-400 hover:text-white transition-colors" aria-label="Pesquisar">
+              <MagnifyingGlass size={16} />
+            </button>
+          </form>
+
           <nav className="hidden md:flex items-center gap-1">
             <Link
-              href="/?categoria=instrumentos"
-              className="btn-ghost text-sm px-3 py-2 rounded-lg"
+              href="/anuncios"
+              className="btn-ghost text-sm px-3 py-2 rounded-lg font-medium"
             >
-              Instrumentos
-            </Link>
-            <Link
-              href="/?categoria=acessorios"
-              className="btn-ghost text-sm px-3 py-2 rounded-lg"
-            >
-              Acessórios
+              Anúncios
             </Link>
             <Link
               href="/luthier"
-              className="btn-ghost text-sm px-3 py-2 rounded-lg"
+              className="btn-ghost text-sm px-3 py-2 rounded-lg font-medium"
             >
               Luthiers
             </Link>
           </nav>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="btn-ghost p-2 rounded-lg"
-              aria-label="Buscar"
-            >
-              <MagnifyingGlass size={20} />
-            </button>
-
             {user ? (
               <>
                 <Link href="/perfil" className="hidden sm:block">
@@ -181,40 +180,30 @@ export function Header() {
         </div>
       </div>
 
-      {searchOpen && (
-        <div className="border-t border-white/5 p-3 animate-slide-up">
-          <form onSubmit={handleSearch} className="max-w-2xl mx-auto flex gap-2">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar instrumentos, marcas, luthiers..."
-              className="input-field flex-1"
-              autoFocus
-            />
-            <Button type="submit" size="md">
-              <MagnifyingGlass size={18} />
-              Buscar
-            </Button>
-          </form>
-        </div>
-      )}
+      {/* Mobile Sticky Search Bar Row */}
+      <div className="md:hidden border-t border-white/5 p-2 bg-background/80 backdrop-blur-md">
+        <form onSubmit={handleSearch} className="flex gap-2 max-w-2xl mx-auto">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar instrumentos, marcas..."
+            className="input-field py-1.5 px-3 text-xs flex-1 bg-white/[0.03] border-white/10 rounded-xl"
+          />
+          <Button type="submit" size="sm" className="px-3">
+            <MagnifyingGlass size={14} />
+          </Button>
+        </form>
+      </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-white/5 p-4 animate-slide-up space-y-1">
+        <div className="md:hidden border-t border-white/5 p-4 animate-slide-up space-y-1 bg-background/95 backdrop-blur-lg">
           <Link
-            href="/?categoria=instrumentos"
+            href="/anuncios"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3 py-2.5 text-sm rounded-lg hover:bg-white/5 transition-colors"
           >
-            Instrumentos
-          </Link>
-          <Link
-            href="/?categoria=acessorios"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2.5 text-sm rounded-lg hover:bg-white/5 transition-colors"
-          >
-            Acessórios
+            Anúncios
           </Link>
           <Link
             href="/luthier"

@@ -5,7 +5,7 @@ import { Heart, MapPin, ArrowRight } from "@phosphor-icons/react";
 import { Card } from "@/components/ui/Card";
 import { ConditionBadge } from "@/components/ui/Badge";
 import { useFavoritos } from "@/hooks/useFavoritos";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, isNewProduct } from "@/lib/utils";
 import type { Product } from "@/types";
 import { useState } from "react";
 
@@ -19,6 +19,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const [imgLoading, setImgLoading] = useState(true);
   const fav = isFavorite(product.id);
   const image = product.images?.[0]?.thumb || product.images?.[0]?.url;
+  const isNew = isNewProduct(product.createdAt);
 
   return (
     <Link href={`/produtos/${product.id}`}>
@@ -40,8 +41,13 @@ export function ProductCard({ product }: ProductCardProps) {
               <span className="font-heading text-4xl opacity-30">F</span>
             </div>
           )}
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-2 left-2 flex gap-1.5 flex-wrap items-center">
             <ConditionBadge condition={product.condition} />
+            {isNew && (
+              <span className="px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider rounded-md bg-gradient-to-r from-amber-500 to-accent text-white shadow-md border border-white/10">
+                Novidade
+              </span>
+            )}
           </div>
           <button
             onClick={(e) => {

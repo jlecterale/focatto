@@ -11,17 +11,29 @@ export function formatCurrency(value: number): string {
   }).format(value);
 }
 
-export function formatDate(timestamp: number): string {
+export function getJsDate(timestamp: any): Date {
+  if (!timestamp) return new Date();
+  if (typeof timestamp.toDate === "function") {
+    return timestamp.toDate();
+  }
+  if (timestamp.seconds !== undefined) {
+    return new Date(timestamp.seconds * 1000);
+  }
+  return new Date(timestamp);
+}
+
+export function formatDate(timestamp: any): string {
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "short",
     year: "numeric",
-  }).format(new Date(timestamp));
+  }).format(getJsDate(timestamp));
 }
 
-export function formatRelativeTime(timestamp: number): string {
+export function formatRelativeTime(timestamp: any): string {
   const now = Date.now();
-  const diff = now - timestamp;
+  const date = getJsDate(timestamp);
+  const diff = now - date.getTime();
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
@@ -31,6 +43,15 @@ export function formatRelativeTime(timestamp: number): string {
   if (hours < 24) return `${hours}h atrás`;
   if (days < 7) return `${days}d atrás`;
   return formatDate(timestamp);
+}
+
+export function isNewProduct(createdAt: any): boolean {
+  if (!createdAt) return false;
+  const date = getJsDate(createdAt);
+  const now = new Date();
+  const diffInMs = now.getTime() - date.getTime();
+  const diffInHours = diffInMs / (1000 * 60 * 60);
+  return diffInHours <= 48; // Posted within the last 48 hours
 }
 
 export function conditionLabel(condition: Condition): string {
