@@ -252,6 +252,11 @@
     color: var(--color-surface-400);
   }
 
+  .input-field option {
+    background-color: var(--color-surface-800);
+    color: var(--color-surface-50);
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
