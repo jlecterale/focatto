@@ -15,6 +15,7 @@ import {
 } from "@phosphor-icons/react";
 import { useAuth } from "../contexts/AuthContext";
 import LoginModal from "../components/LoginModal";
+import { ROLES } from "../lib/roles";
 
 // Dynamically import the Map component to prevent SSR issues with Leaflet
 const Map = dynamic(() => import("../Map"), { 
@@ -54,7 +55,7 @@ const mockLuthiers: ItemLocation[] = [
 ];
 
 export default function HomePage() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, userRole, loading: authLoading, logout } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
   const [activeTab, setActiveTab] = useState<"produtos" | "luthiers">("produtos");
   const [items, setItems] = useState<ItemLocation[]>([]);
@@ -156,14 +157,27 @@ export default function HomePage() {
           <div className="flex items-center gap-3">
             {user ? (
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center text-xs font-bold text-white">
-                  {user.displayName
-                    ? user.displayName.charAt(0).toUpperCase()
-                    : user.email?.charAt(0).toUpperCase() || "U"}
-                </div>
-                <span className="text-sm text-surface-300 hidden sm:block max-w-[120px] truncate">
-                  {user.displayName || user.email}
-                </span>
+                {userRole === ROLES.ADMIN && (
+                  <a
+                    href="/admin"
+                    className="text-xs text-[#ef7c2c] hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#ef7c2c]/30 hover:border-[#ef7c2c]/60"
+                  >
+                    Admin
+                  </a>
+                )}
+                <a
+                  href="/profile"
+                  className="flex items-center gap-2 group"
+                >
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center text-xs font-bold text-white">
+                    {user.displayName
+                      ? user.displayName.charAt(0).toUpperCase()
+                      : user.email?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                  <span className="text-sm text-surface-300 hidden sm:block max-w-[120px] truncate group-hover:text-white transition-colors">
+                    {user.displayName || user.email}
+                  </span>
+                </a>
                 <button
                   onClick={logout}
                   className="text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
@@ -345,8 +359,21 @@ export default function HomePage() {
       <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
 
       {/* Footer */}
-      <footer className="border-t border-[#1c1a19]/60 mt-16 py-6 text-center text-xs text-surface-500 font-body">
-        <p>&copy; {new Date().getFullYear()} Focatto. Todos os direitos reservados.</p>
+      <footer className="border-t border-[#1c1a19]/60 mt-16 py-8 text-center text-xs text-surface-500 font-body">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-4">
+          <div className="flex items-center gap-6">
+            <a href="/termos" className="hover:text-surface-300 transition-colors">
+              Termos de Uso
+            </a>
+            <a href="/cookies" className="hover:text-surface-300 transition-colors">
+              Política de Cookies
+            </a>
+            <a href="/suporte" className="hover:text-surface-300 transition-colors">
+              Contato de Suporte
+            </a>
+          </div>
+          <p>&copy; {new Date().getFullYear()} Focatto. Todos os direitos reservados.</p>
+        </div>
       </footer>
     </div>
   );

@@ -10,7 +10,7 @@ service cloud.firestore {
     // Helper: check if user is admin
     function isAdmin() {
       return isAuth() &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
 
@@ -23,8 +23,13 @@ service cloud.firestore {
       // Users can create their own profile
       allow create: if isAuth() && request.auth.uid == userId;
 
-      // Users can update their own profile
-      allow update: if isAuth() && request.auth.uid == userId;
+      // Users can update their own non-role fields
+      // Only admins can change roles
+      allow update: if isAuth() && request.auth.uid == userId && (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])
+      );
+      // Admins can update any field including role
+      allow update: if isAdmin();
 
       // Only admins can delete users
       allow delete: if isAdmin();
@@ -129,6 +134,23 @@ service cloud.firestore {
         resource.data.senderId == request.auth.uid ||
         resource.data.receiverId == request.auth.uid
       );
+
+      allow delete: if false;
+    }
+
+    // Verifications collection
+    match /verifications/{verificationId} {
+      // Users can read their own verification
+      // Admins can read all verifications
+      allow read: if isAuth() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+
+      // Authenticated users can create their own verification request
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+
+      // Only admins can update verification status
+      allow update: if isAdmin();
 
       allow delete: if false;
     }

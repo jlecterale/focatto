@@ -14,7 +14,7 @@ service firebase.storage {
     function isAdmin() {
       return isAuthenticated() && (
         request.auth.token.admin == true ||
-        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin == true
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin'
       );
     }
     
@@ -76,6 +76,18 @@ service firebase.storage {
 
       // Deletes and updates are disabled for security/integrity
       allow update, delete: if isAdmin();
+    }
+
+    // Verification documents (ID + selfie)
+    match /verifications/{userId}/{fileName} {
+      // Only the user and admins can read verification documents
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+
+      // Only the user can upload verification documents
+      allow create: if isAuthenticated() && request.auth.uid == userId && isValidImage(10);
+
+      // Only admins can delete
+      allow delete: if isAdmin();
     }
 
     // Deny all other access by default

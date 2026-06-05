@@ -1,0 +1,551 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { getUserData, updateUserProfile, uploadProfilePhoto, submitVerificationRequest } from "../../lib/userService";
+import type { UserData } from "../../lib/roles";
+import Link from "next/link";
+import {
+  Compass,
+  SignOut,
+  User,
+  Phone,
+  IdentificationCard,
+  MapPin,
+  PencilSimple,
+  CheckCircle,
+  Clock,
+  XCircle,
+  ShieldCheck,
+  Camera,
+  FileImage,
+  Spinner,
+} from "@phosphor-icons/react";
+import { toast } from "sonner";
+
+const UF_LIST = [
+  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO",
+  "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI",
+  "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO",
+];
+
+export default function ProfilePage() {
+  const { user, logout } = useAuth();
+  const [profile, setProfile] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const [displayName, setDisplayName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [cpfCnpj, setCpfCnpj] = useState("");
+  const [bio, setBio] = useState("");
+  const [cep, setCep] = useState("");
+  const [street, setStreet] = useState("");
+  const [number, setNumber] = useState("");
+  const [complement, setComplement] = useState("");
+  const [neighborhood, setNeighborhood] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  // Verification
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
+  const [faceFile, setFaceFile] = useState<File | null>(null);
+  const [documentPreview, setDocumentPreview] = useState<string>("");
+  const [facePreview, setFacePreview] = useState<string>("");
+  const [submittingVerification, setSubmittingVerification] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const data = await getUserData(user.uid);
+      if (data) {
+        setProfile(data);
+        setDisplayName(data.displayName);
+        setPhone(data.phone);
+        setCpfCnpj(data.cpfCnpj);
+        setBio(data.bio);
+        setCep(data.address.cep);
+        setStreet(data.address.street);
+        setNumber(data.address.number);
+        setComplement(data.address.complement);
+        setNeighborhood(data.address.neighborhood);
+        setCity(data.address.city);
+        setState(data.address.state);
+      }
+      setLoading(false);
+    })();
+  }, [user]);
+
+  async function handleSave() {
+    if (!user || !profile) return;
+    setSaving(true);
+    try {
+      await updateUserProfile(user.uid, {
+        displayName,
+        phone,
+        cpfCnpj,
+        bio,
+        address: { cep, street, number, complement, neighborhood, city, state },
+      });
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              displayName,
+              phone,
+              cpfCnpj,
+              bio,
+              address: { cep, street, number, complement, neighborhood, city, state },
+              updatedAt: Date.now(),
+            }
+          : prev,
+      );
+      toast.success("Perfil atualizado com sucesso!");
+    } catch {
+      toast.error("Erro ao salvar perfil.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setUploadingPhoto(true);
+    try {
+      const url = await uploadProfilePhoto(user.uid, file);
+      setProfile((prev) => (prev ? { ...prev, photoURL: url } : prev));
+      toast.success("Foto atualizada!");
+    } catch {
+      toast.error("Erro ao enviar foto.");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  }
+
+  function handleDocumentSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setDocumentFile(file);
+      setDocumentPreview(URL.createObjectURL(file));
+    }
+  }
+
+  function handleFaceSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFaceFile(file);
+      setFacePreview(URL.createObjectURL(file));
+    }
+  }
+
+  async function handleSubmitVerification() {
+    if (!user || !documentFile || !faceFile) {
+      toast.error("Selecione o documento e a foto do rosto.");
+      return;
+    }
+    setSubmittingVerification(true);
+    try {
+      await submitVerificationRequest(
+        user.uid,
+        user.email || "",
+        profile?.displayName || "",
+        documentFile,
+        faceFile,
+      );
+      setProfile((prev) => (prev ? { ...prev, verificationStatus: "pending" } : prev));
+      toast.success("Solicitação de verificação enviada!");
+      setShowVerificationModal(false);
+      setDocumentFile(null);
+      setFaceFile(null);
+      setDocumentPreview("");
+      setFacePreview("");
+    } catch {
+      toast.error("Erro ao enviar verificação.");
+    } finally {
+      setSubmittingVerification(false);
+    }
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
+        <p className="text-surface-400">Faça login para acessar seu perfil.</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
+        <Spinner size={24} className="animate-spin text-[#ef7c2c]" />
+      </div>
+    );
+  }
+
+  const inputBase =
+    "w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
+
+  const verificationBadge = () => {
+    switch (profile?.verificationStatus) {
+      case "approved":
+        return (
+          <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
+            <CheckCircle size={14} weight="fill" />
+            Verificado
+          </span>
+        );
+      case "pending":
+        return (
+          <span className="flex items-center gap-1.5 text-xs text-amber-400 font-semibold">
+            <Clock size={14} weight="fill" />
+            Pendente
+          </span>
+        );
+      case "rejected":
+        return (
+          <span className="flex items-center gap-1.5 text-xs text-red-400 font-semibold">
+            <XCircle size={14} weight="fill" />
+            Reprovado
+          </span>
+        );
+      default:
+        return (
+          <span className="flex items-center gap-1.5 text-xs text-surface-400 font-semibold">
+            <ShieldCheck size={14} />
+            Não verificado
+          </span>
+        );
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
+      {/* Header */}
+      <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center">
+              <Compass size={20} weight="bold" className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white">Meu Perfil</h1>
+              <p className="text-[10px] text-surface-400">Focatto</p>
+            </div>
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827]"
+            >
+              Voltar
+            </Link>
+            <button
+              onClick={logout}
+              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+            >
+              <SignOut size={14} />
+              Sair
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-3xl mx-auto px-6 py-8 space-y-6">
+        {/* Photo + Name Section */}
+        <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] flex items-center gap-5">
+          <div className="relative group">
+            <div className="h-20 w-20 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center overflow-hidden">
+              {profile?.photoURL ? (
+                <img src={profile.photoURL} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <span className="text-2xl font-bold text-white">
+                  {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || "U"}
+                </span>
+              )}
+            </div>
+            <button
+              onClick={() => photoInputRef.current?.click()}
+              disabled={uploadingPhoto}
+              className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-[#ef7c2c] flex items-center justify-center hover:bg-[#d96e1f] transition-colors disabled:opacity-60"
+            >
+              {uploadingPhoto ? (
+                <Spinner size={14} className="animate-spin" />
+              ) : (
+                <Camera size={14} weight="fill" />
+              )}
+            </button>
+            <input
+              ref={photoInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoUpload}
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-bold text-white truncate">{profile?.displayName || "Sem nome"}</h2>
+            <p className="text-sm text-surface-400 truncate">{user.email}</p>
+            <div className="mt-1.5">{verificationBadge()}</div>
+          </div>
+        </div>
+
+        {/* Profile Form */}
+        <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-5">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Dados Pessoais</h3>
+            <PencilSimple size={16} className="text-surface-400" />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="sm:col-span-2">
+              <label className="block text-xs text-surface-400 mb-1.5">Nome completo</label>
+              <div className="relative">
+                <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
+                <input
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  className={`${inputBase} pl-10`}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs text-surface-400 mb-1.5">Telefone / WhatsApp</label>
+              <div className="relative">
+                <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
+                <input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="(11) 99999-9999"
+                  className={`${inputBase} pl-10`}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs text-surface-400 mb-1.5">CPF / CNPJ</label>
+              <div className="relative">
+                <IdentificationCard size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
+                <input
+                  type="text"
+                  value={cpfCnpj}
+                  onChange={(e) => setCpfCnpj(e.target.value)}
+                  placeholder="000.000.000-00"
+                  className={`${inputBase} pl-10`}
+                />
+              </div>
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-xs text-surface-400 mb-1.5">Bio / Descrição</label>
+              <textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Conte um pouco sobre você..."
+                rows={3}
+                className={`${inputBase} resize-none`}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Address */}
+        <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-5">
+          <div className="flex items-center gap-2">
+            <MapPin size={16} className="text-[#ef7c2c]" />
+            <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Endereço</h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs text-surface-400 mb-1.5">CEP</label>
+              <input
+                type="text"
+                value={cep}
+                onChange={(e) => setCep(e.target.value)}
+                placeholder="00000-000"
+                className={inputBase}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-xs text-surface-400 mb-1.5">Rua</label>
+              <input
+                type="text"
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                className={inputBase}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-surface-400 mb-1.5">Número</label>
+              <input
+                type="text"
+                value={number}
+                onChange={(e) => setNumber(e.target.value)}
+                className={inputBase}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-surface-400 mb-1.5">Complemento</label>
+              <input
+                type="text"
+                value={complement}
+                onChange={(e) => setComplement(e.target.value)}
+                className={inputBase}
+              />
+            </div>
+            <div className="sm:col-span-1">
+              <label className="block text-xs text-surface-400 mb-1.5">Bairro</label>
+              <input
+                type="text"
+                value={neighborhood}
+                onChange={(e) => setNeighborhood(e.target.value)}
+                className={inputBase}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-surface-400 mb-1.5">Cidade</label>
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className={inputBase}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-surface-400 mb-1.5">Estado</label>
+              <select
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                className={inputBase}
+              >
+                <option value="">Selecione</option>
+                {UF_LIST.map((uf) => (
+                  <option key={uf} value={uf}>
+                    {uf}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Save Button */}
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {saving ? <Spinner size={16} className="animate-spin" /> : null}
+          Salvar Alterações
+        </button>
+
+        {/* Verification Section */}
+        <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShieldCheck size={18} className="text-[#ef7c2c]" />
+              <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Verificação de Conta</h3>
+            </div>
+            {verificationBadge()}
+          </div>
+
+          <p className="text-xs text-surface-400 leading-relaxed">
+            Envie uma foto do seu documento (RG, CNH ou CPF) e uma selfie para confirmar sua identidade.
+            A verificação é analisada manualmente pela nossa equipe.
+          </p>
+
+          {profile?.verificationStatus === "none" || profile?.verificationStatus === "rejected" ? (
+            <button
+              onClick={() => setShowVerificationModal(true)}
+              className="py-2.5 px-5 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 text-xs font-semibold hover:bg-[#ef7c2c]/20 transition-colors"
+            >
+              {profile?.verificationStatus === "rejected" ? "Reenviar Documentos" : "Solicitar Verificação"}
+            </button>
+          ) : null}
+        </div>
+      </main>
+
+      {/* Verification Modal */}
+      {showVerificationModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg bg-[#0c0a09] border border-[#2a2827] rounded-2xl shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 pt-6 pb-2">
+              <h2 className="text-lg font-bold text-white">Enviar Documentos</h2>
+              <button
+                onClick={() => {
+                  setShowVerificationModal(false);
+                  setDocumentFile(null);
+                  setFaceFile(null);
+                  setDocumentPreview("");
+                  setFacePreview("");
+                }}
+                className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[#181615]"
+              >
+                <XCircle size={18} />
+              </button>
+            </div>
+
+            <div className="px-6 pb-6 pt-4 space-y-5">
+              <p className="text-xs text-surface-400">
+                Suas fotos serão analisadas e armazenadas com segurança. Apenas a equipe Focatto terá acesso.
+              </p>
+
+              {/* Document Upload */}
+              <div>
+                <label className="block text-xs text-surface-400 mb-2 font-medium">
+                  Foto do Documento (RG, CNH ou CPF)
+                </label>
+                <label className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[#2a2827] bg-[#181615] cursor-pointer hover:border-[#ef7c2c]/50 transition-colors">
+                  {documentPreview ? (
+                    <img src={documentPreview} alt="Documento" className="h-full object-contain rounded-lg" />
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-surface-400">
+                      <FileImage size={28} />
+                      <span className="text-xs">Clique para selecionar</span>
+                    </div>
+                  )}
+                  <input type="file" accept="image/*" className="hidden" onChange={handleDocumentSelect} />
+                </label>
+              </div>
+
+              {/* Face Upload */}
+              <div>
+                <label className="block text-xs text-surface-400 mb-2 font-medium">
+                  Selfie com o Documento (rosto visível)
+                </label>
+                <label className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[#2a2827] bg-[#181615] cursor-pointer hover:border-[#ef7c2c]/50 transition-colors">
+                  {facePreview ? (
+                    <img src={facePreview} alt="Selfie" className="h-full object-contain rounded-lg" />
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-surface-400">
+                      <Camera size={28} />
+                      <span className="text-xs">Clique para selecionar</span>
+                    </div>
+                  )}
+                  <input type="file" accept="image/*" className="hidden" onChange={handleFaceSelect} />
+                </label>
+              </div>
+
+              <button
+                onClick={handleSubmitVerification}
+                disabled={submittingVerification || !documentFile || !faceFile}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {submittingVerification ? <Spinner size={16} className="animate-spin" /> : null}
+                Enviar para Análise
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
