@@ -50,8 +50,9 @@ service cloud.firestore {
       );
 
       // Sellers can soft-delete (set status to inactive)
+      // Admins can delete any product
       allow delete: if isAuth() && (
-        resource.data.sellerId == request.auth.uid
+        resource.data.sellerId == request.auth.uid || isAdmin()
       );
     }
 
