@@ -21,7 +21,7 @@ export async function ensureUserDocument(uid: string, email: string | null, disp
   const userSnap = await getDoc(userRef);
 
   if (userSnap.exists()) {
-    return userSnap.data() as { role: UserRole };
+    return { role: userSnap.data().role as UserRole, isNew: false };
   }
 
   const isAdmin = email ? ADMIN_EMAILS.includes(email.toLowerCase()) : false;
@@ -45,7 +45,7 @@ export async function ensureUserDocument(uid: string, email: string | null, disp
 
   await setDoc(userRef, userData);
 
-  return { role: userData.role };
+  return { role: userData.role, isNew: true };
 }
 
 export async function getUserData(uid: string): Promise<UserData | null> {

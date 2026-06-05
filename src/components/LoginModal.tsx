@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { X, Envelope, Lock, Eye, EyeSlash, GoogleLogo, Spinner, User } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { useAuth } from "../contexts/AuthContext";
@@ -14,6 +15,7 @@ interface LoginModalProps {
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const { login, loginWithGoogle, register, resetPassword } = useAuth();
+  const router = useRouter();
   const [mode, setMode] = useState<Mode>("login");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -93,6 +95,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       await register(name.trim(), email.trim(), password);
       toast.success("Conta criada com sucesso!");
       onClose();
+      router.push("/profile");
     } catch (err: unknown) {
       const error = err as { code?: string };
       const messages: Record<string, string> = {
@@ -132,9 +135,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   async function handleGoogleLogin() {
     setLoading(true);
     try {
-      await loginWithGoogle();
-      toast.success("Login com Google realizado!");
+      const isNew = await loginWithGoogle();
+      toast.success(isNew ? "Conta criada com sucesso!" : "Login com Google realizado!");
       onClose();
+      if (isNew) {
+        router.push("/profile");
+      }
     } catch (err: unknown) {
       const error = err as { code?: string };
       if (error.code !== "auth/popup-closed-by-user") {

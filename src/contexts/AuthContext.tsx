@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -20,8 +20,8 @@ interface AuthContextType {
   userRole: UserRole | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<boolean>;
+  register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
 }
@@ -32,19 +32,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
+  const _skipEnsure = useRef(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
 
-      if (firebaseUser) {
+      if (firebaseUser && !_skipEnsure.current) {
         const { role } = await ensureUserDocument(
           firebaseUser.uid,
           firebaseUser.email,
           firebaseUser.displayName
         );
         setUserRole(role);
-      } else {
+      } else if (!firebaseUser) {
         setUserRole(null);
       }
 
@@ -63,25 +64,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUserRole(role);
   }
 
-  async function loginWithGoogle() {
-    const cred = await signInWithPopup(auth, googleProvider);
-    const { role } = await ensureUserDocument(
-      cred.user.uid,
-      cred.user.email,
-      cred.user.displayName
-    );
-    setUserRole(role);
+  async function loginWithGoogle(): Promise<boolean> {
+    _skipEnsure.current = true;
+    try {
+      const cred = await signInWithPopup(auth, googleProvider);
+      const { role, isNew } = await ensureUserDocument(
+        cred.user.uid,
+        cred.user.email,
+        cred.user.displayName
+      );
+      setUserRole(role);
+      return isNew;
+    } finally {
+      _skipEnsure.current = false;
+    }
   }
 
-  async function register(name: string, email: string, password: string) {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(cred.user, { displayName: name });
-    const { role } = await ensureUserDocument(
-      cred.user.uid,
-      cred.user.email,
-      name
-    );
-    setUserRole(role);
+  async function register(name: string, email: string, password: string): Promise<boolean> {
+    _skipEnsure.current = true;
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(cred.user, { displayName: name });
+      const { role, isNew } = await ensureUserDocument(
+        cred.user.uid,
+        cred.user.email,
+        name
+      );
+      setUserRole(role);
+      return isNew;
+    } finally {
+      _skipEnsure.current = false;
+    }
   }
 
   async function logout() {
