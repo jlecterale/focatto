@@ -640,6 +640,10 @@ export default function AdminPage() {
                           toggling={togglingUser}
                         />
                       ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Acessórios */}
               {activeTab === "acessorios" && (
