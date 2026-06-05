@@ -12,7 +12,9 @@ import {
   Circle, 
   Compass,
   User,
-  MagnifyingGlass
+  MagnifyingGlass,
+  Faders,
+  X
 } from "@phosphor-icons/react";
 import { useAuth } from "../contexts/AuthContext";
 import LoginModal from "../components/LoginModal";
@@ -22,7 +24,7 @@ import { ROLES } from "../lib/roles";
 const Map = dynamic(() => import("../Map"), { 
   ssr: false,
   loading: () => (
-    <div className="h-[480px] w-full rounded-xl bg-surface-900/40 flex items-center justify-center border border-surface-800/60">
+    <div className="h-[280px] md:h-[480px] w-full rounded-xl bg-surface-900/40 flex items-center justify-center border border-surface-800/60">
       <div className="flex flex-col items-center gap-3">
         <Circle size={28} className="animate-spin text-accent" />
         <p className="text-xs text-surface-400">Carregando mapa...</p>
@@ -80,6 +82,7 @@ export default function HomePage() {
   const [searchRadius, setSearchRadius] = useState(false);
   const [sortBy, setSortBy] = useState<"priceAsc" | "priceDesc" | null>(null);
   const [viewMode, setViewMode] = useState<"photo" | "map">("photo");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Handle dropdown category changes and sync with activeTab
   const handleCategoryChange = (cat: "todas" | "instrumentos" | "acessorios" | "luthier") => {
@@ -287,30 +290,258 @@ export default function HomePage() {
     setViewMode("photo");
   }, [filteredItems, selectedItem]);
 
+  const filterContent = (
+    <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] flex flex-col gap-5 shadow-xl">
+      
+      {/* Search input with icon */}
+      <div className="relative">
+        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-surface-400">
+          <MagnifyingGlass size={16} />
+        </span>
+        <input
+          type="text"
+          id="search-input"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Ex: Fender, Gibson, Regulagem..."
+          aria-label="Pesquisar por instrumentos, acessórios ou luthiers"
+          className="w-full bg-[#181615] border border-[#2a2827] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]"
+        />
+      </div>
+
+      {/* VER RESULTADOS DE */}
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="category-select" className="text-[10px] font-bold uppercase tracking-wider text-[#ef7c2c] opacity-90">
+          Ver resultados de:
+        </label>
+        <div className="relative">
+          <select
+            id="category-select"
+            value={selectedCategory}
+            onChange={(e) => handleCategoryChange(e.target.value as any)}
+            className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-2.5 text-xs text-white outline-none appearance-none transition-all duration-200 focus:border-[#ef7c2c] cursor-pointer"
+          >
+            <option value="todas">🎸 Todas as Categorias</option>
+            <option value="instrumentos">🎸 Instrumentos</option>
+            <option value="acessorios">🔌 Acessórios</option>
+            <option value="luthier">🛠️ Luthier</option>
+          </select>
+          <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-surface-400">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* OFERTAS RÁPIDAS */}
+      {selectedCategory !== "luthier" && (
+        <div className="flex flex-col gap-2">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-surface-400">
+            Ofertas rápidas
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setQuickPriceFilter(null)}
+              id="quick-price-all"
+              className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
+                quickPriceFilter === null
+                  ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
+                  : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
+              }`}
+            >
+              Todas as Ofertas
+            </button>
+            <button
+              onClick={() => setQuickPriceFilter(1000)}
+              id="quick-price-1000"
+              className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
+                quickPriceFilter === 1000
+                  ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
+                  : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
+              }`}
+            >
+              Até R$ 1.000
+            </button>
+            <button
+              onClick={() => setQuickPriceFilter(3000)}
+              id="quick-price-3000"
+              className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
+                quickPriceFilter === 3000
+                  ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
+                  : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
+              }`}
+            >
+              Até R$ 3.000
+            </button>
+            <button
+              onClick={() => setQuickPriceFilter(5000)}
+              id="quick-price-5000"
+              className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
+                quickPriceFilter === 5000
+                  ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
+                  : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
+              }`}
+            >
+              Até R$ 5.000
+            </button>
+          </div>
+        </div>
+      )}
+
+      <hr className="border-[#22201e]" />
+
+      {/* PRICE MIN / MAX INPUTS */}
+      {selectedCategory !== "luthier" && (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="min-price-input" className="text-[10px] font-bold uppercase tracking-wider text-surface-400">
+              Preço Mín. (R$)
+            </label>
+            <input
+              type="number"
+              id="min-price-input"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              placeholder="Mínimo"
+              className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="max-price-input" className="text-[10px] font-bold uppercase tracking-wider text-surface-400">
+              Preço Máx. (R$)
+            </label>
+            <input
+              type="number"
+              id="max-price-input"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              placeholder="Máximo"
+              className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* LOCALIZAÇÃO (Estado, Município, Bairro) */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-1.5 text-surface-300 font-semibold text-xs">
+          <MapPin size={14} className="text-[#ef7c2c]" />
+          Localização
+        </div>
+        
+        <label htmlFor="search-radius-checkbox" className="flex items-center gap-2 text-xs text-surface-400 select-none cursor-pointer">
+          <input
+            type="checkbox"
+            id="search-radius-checkbox"
+            checked={searchRadius}
+            onChange={(e) => setSearchRadius(e.target.checked)}
+            className="rounded border-[#2a2827] bg-[#181615] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
+          />
+          Pesquisar por raio
+        </label>
+
+        <div className="flex flex-col gap-2.5">
+          <input
+            type="text"
+            id="state-filter-input"
+            value={stateFilter}
+            onChange={(e) => setStateFilter(e.target.value)}
+            placeholder="Estado (Ex: SP, RJ, MG)"
+            aria-label="Filtrar por Estado (UF)"
+            className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
+          />
+          <input
+            type="text"
+            id="city-filter-input"
+            value={cityFilter}
+            onChange={(e) => setCityFilter(e.target.value)}
+            placeholder="Município (Cidade)"
+            aria-label="Filtrar por Município (Cidade)"
+            className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
+          />
+          <input
+            type="text"
+            id="neighborhood-filter-input"
+            value={neighborhoodFilter}
+            onChange={(e) => setNeighborhoodFilter(e.target.value)}
+            placeholder="Bairro"
+            aria-label="Filtrar por Bairro"
+            className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
+          />
+        </div>
+      </div>
+
+      <hr className="border-[#22201e]" />
+
+      {/* ORDENAR POR PREÇO */}
+      {selectedCategory !== "luthier" && (
+        <div className="flex flex-col gap-2">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-surface-400">
+            Ordenar por preço
+          </label>
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => setSortBy(sortBy === "priceAsc" ? null : "priceAsc")}
+              id="sort-price-asc"
+              className={`w-full py-2 px-4 rounded-xl border text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
+                sortBy === "priceAsc"
+                  ? "bg-[#ef7c2c]/10 border-[#ef7c2c] text-[#ef7c2c]"
+                  : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
+              }`}
+            >
+              📈 Mais baixo
+            </button>
+            <button
+              onClick={() => setSortBy(sortBy === "priceDesc" ? null : "priceDesc")}
+              id="sort-price-desc"
+              className={`w-full py-2 px-4 rounded-xl border text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
+                sortBy === "priceDesc"
+                  ? "bg-[#ef7c2c]/10 border-[#ef7c2c] text-[#ef7c2c]"
+                  : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
+              }`}
+            >
+              📉 Mais caro
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* LIMPAR FILTROS */}
+      <button
+        onClick={clearFilters}
+        id="clear-filters-btn"
+        className="w-full py-2.5 rounded-xl border border-[#2a2827] hover:border-[#ef7c2c] text-surface-400 hover:text-[#ef7c2c] text-xs font-bold transition-all duration-200 cursor-pointer flex items-center justify-center"
+      >
+        Limpar filtros
+      </button>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans relative overflow-x-hidden">
       {/* Premium Top Glow */}
       <div className="absolute top-0 left-0 w-full h-[600px] bg-[radial-gradient(ellipse_at_top_left,rgba(239,124,44,0.07),transparent_50%)] pointer-events-none z-0" />
 
       {/* Header */}
-      <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-row items-center justify-between gap-4">
+      <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-row items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center">
             <img 
               src="/focattolecter.png" 
               alt="Focattolecter Logo" 
-              className="h-16 md:h-20 w-auto object-contain invert brightness-110 mix-blend-screen" 
+              className="h-10 sm:h-14 md:h-20 w-auto object-contain invert brightness-110 mix-blend-screen" 
             />
           </div>
 
           {/* Auth */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {user ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <a
                   href="/meus-anuncios"
                   id="nav-anunciar"
-                  className="text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+                  className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
                 >
                   Anunciar
                 </a>
@@ -318,7 +549,7 @@ export default function HomePage() {
                   <a
                     href="/admin"
                     id="nav-admin"
-                    className="text-xs text-[#ef7c2c] hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#ef7c2c]/30 hover:border-[#ef7c2c]/60"
+                    className="text-xs text-[#ef7c2c] hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#ef7c2c]/30 hover:border-[#ef7c2c]/60"
                   >
                     Admin
                   </a>
@@ -340,7 +571,7 @@ export default function HomePage() {
                 <button
                   onClick={logout}
                   id="btn-logout"
-                  className="text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+                  className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
                 >
                   Sair
                 </button>
@@ -349,7 +580,7 @@ export default function HomePage() {
               <button
                 onClick={() => setShowLogin(true)}
                 id="btn-login-modal-trigger"
-                className="flex items-center gap-2 py-2 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold transition-all duration-200 hover:shadow-[0_4px_15px_rgba(239,124,44,0.3)] active:scale-[0.97]"
+                className="flex items-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold transition-all duration-200 hover:shadow-[0_4px_15px_rgba(239,124,44,0.3)] active:scale-[0.97]"
               >
                 <User size={14} />
                 Entrar
@@ -360,7 +591,7 @@ export default function HomePage() {
       </header>
 
       {/* Main Content Dashboard */}
-      <main className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 relative z-10">
         
         {/* Navigation Tabs */}
         <div className="flex flex-wrap gap-3 mb-6">
@@ -390,235 +621,44 @@ export default function HomePage() {
           </button>
         </div>
 
+        {/* Mobile Filter Toggle */}
+        <div className="lg:hidden flex items-center gap-2 mb-4">
+          <button onClick={() => setShowMobileFilters(true)}
+            id="mobile-filter-toggle"
+            className="flex items-center gap-2 py-2.5 px-4 rounded-xl bg-[#181615] border border-[#2a2827] text-xs font-semibold text-surface-300 hover:text-white transition-all cursor-pointer"
+          >
+            <Faders size={14} />
+            Filtros
+          </button>
+          {filteredItems.length > 0 && (
+            <span className="text-[10px] text-surface-500">({filteredItems.length} resultados)</span>
+          )}
+        </div>
+
+        {/* Mobile Filter Drawer */}
+        {showMobileFilters && (
+          <div className="fixed inset-0 z-[60] lg:hidden">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowMobileFilters(false)} />
+            <div className="absolute left-0 top-0 bottom-0 w-[85vw] max-w-[380px] bg-[#0b0908] border-r border-[#22201e] p-6 overflow-y-auto animate-slide-right">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-surface-400">Filtros</h3>
+                <button onClick={() => setShowMobileFilters(false)}
+                  id="mobile-filter-close"
+                  className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[#181615] transition-all"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              {filterContent}
+            </div>
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-12 gap-8">
           
-          {/* Left Panel: Search & Filters */}
-          <div className="lg:col-span-3 flex flex-col gap-4">
-            <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] flex flex-col gap-5 shadow-xl">
-              
-              {/* Search input with icon */}
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-surface-400">
-                  <MagnifyingGlass size={16} />
-                </span>
-                <input
-                  type="text"
-                  id="search-input"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Ex: Fender, Gibson, Regulagem..."
-                  aria-label="Pesquisar por instrumentos, acessórios ou luthiers"
-                  className="w-full bg-[#181615] border border-[#2a2827] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]"
-                />
-              </div>
-
-              {/* VER RESULTADOS DE */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="category-select" className="text-[10px] font-bold uppercase tracking-wider text-[#ef7c2c] opacity-90">
-                  Ver resultados de:
-                </label>
-                <div className="relative">
-                  <select
-                    id="category-select"
-                    value={selectedCategory}
-                    onChange={(e) => handleCategoryChange(e.target.value as any)}
-                    className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-2.5 text-xs text-white outline-none appearance-none transition-all duration-200 focus:border-[#ef7c2c] cursor-pointer"
-                  >
-                    <option value="todas">🎸 Todas as Categorias</option>
-                    <option value="instrumentos">🎸 Instrumentos</option>
-                    <option value="acessorios">🔌 Acessórios</option>
-                    <option value="luthier">🛠️ Luthier</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-surface-400">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              {/* OFERTAS RÁPIDAS */}
-              {selectedCategory !== "luthier" && (
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-surface-400">
-                    Ofertas rápidas
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => setQuickPriceFilter(null)}
-                      id="quick-price-all"
-                      className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
-                        quickPriceFilter === null
-                          ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
-                          : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
-                      }`}
-                    >
-                      Todas as Ofertas
-                    </button>
-                    <button
-                      onClick={() => setQuickPriceFilter(1000)}
-                      id="quick-price-1000"
-                      className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
-                        quickPriceFilter === 1000
-                          ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
-                          : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
-                      }`}
-                    >
-                      Até R$ 1.000
-                    </button>
-                    <button
-                      onClick={() => setQuickPriceFilter(3000)}
-                      id="quick-price-3000"
-                      className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
-                        quickPriceFilter === 3000
-                          ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
-                          : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
-                      }`}
-                    >
-                      Até R$ 3.000
-                    </button>
-                    <button
-                      onClick={() => setQuickPriceFilter(5000)}
-                      id="quick-price-5000"
-                      className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
-                        quickPriceFilter === 5000
-                          ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
-                          : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
-                      }`}
-                    >
-                      Até R$ 5.000
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <hr className="border-[#22201e]" />
-
-              {/* PRICE MIN / MAX INPUTS */}
-              {selectedCategory !== "luthier" && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="min-price-input" className="text-[10px] font-bold uppercase tracking-wider text-surface-400">
-                      Preço Mín. (R$)
-                    </label>
-                    <input
-                      type="number"
-                      id="min-price-input"
-                      value={minPrice}
-                      onChange={(e) => setMinPrice(e.target.value)}
-                      placeholder="Mínimo"
-                      className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="max-price-input" className="text-[10px] font-bold uppercase tracking-wider text-surface-400">
-                      Preço Máx. (R$)
-                    </label>
-                    <input
-                      type="number"
-                      id="max-price-input"
-                      value={maxPrice}
-                      onChange={(e) => setMaxPrice(e.target.value)}
-                      placeholder="Máximo"
-                      className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* LOCALIZAÇÃO (Estado, Município, Bairro) */}
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-1.5 text-surface-300 font-semibold text-xs">
-                  <MapPin size={14} className="text-[#ef7c2c]" />
-                  Localização
-                </div>
-                
-                <label htmlFor="search-radius-checkbox" className="flex items-center gap-2 text-xs text-surface-400 select-none cursor-pointer">
-                  <input
-                    type="checkbox"
-                    id="search-radius-checkbox"
-                    checked={searchRadius}
-                    onChange={(e) => setSearchRadius(e.target.checked)}
-                    className="rounded border-[#2a2827] bg-[#181615] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
-                  />
-                  Pesquisar por raio
-                </label>
-
-                <div className="flex flex-col gap-2.5">
-                  <input
-                    type="text"
-                    id="state-filter-input"
-                    value={stateFilter}
-                    onChange={(e) => setStateFilter(e.target.value)}
-                    placeholder="Estado (Ex: SP, RJ, MG)"
-                    aria-label="Filtrar por Estado (UF)"
-                    className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
-                  />
-                  <input
-                    type="text"
-                    id="city-filter-input"
-                    value={cityFilter}
-                    onChange={(e) => setCityFilter(e.target.value)}
-                    placeholder="Município (Cidade)"
-                    aria-label="Filtrar por Município (Cidade)"
-                    className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
-                  />
-                  <input
-                    type="text"
-                    id="neighborhood-filter-input"
-                    value={neighborhoodFilter}
-                    onChange={(e) => setNeighborhoodFilter(e.target.value)}
-                    placeholder="Bairro"
-                    aria-label="Filtrar por Bairro"
-                    className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
-                  />
-                </div>
-              </div>
-
-              <hr className="border-[#22201e]" />
-
-              {/* ORDENAR POR PREÇO */}
-              {selectedCategory !== "luthier" && (
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-surface-400">
-                    Ordenar por preço
-                  </label>
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => setSortBy(sortBy === "priceAsc" ? null : "priceAsc")}
-                      id="sort-price-asc"
-                      className={`w-full py-2 px-4 rounded-xl border text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
-                        sortBy === "priceAsc"
-                          ? "bg-[#ef7c2c]/10 border-[#ef7c2c] text-[#ef7c2c]"
-                          : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
-                      }`}
-                    >
-                      📈 Mais baixo
-                    </button>
-                    <button
-                      onClick={() => setSortBy(sortBy === "priceDesc" ? null : "priceDesc")}
-                      id="sort-price-desc"
-                      className={`w-full py-2 px-4 rounded-xl border text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
-                        sortBy === "priceDesc"
-                          ? "bg-[#ef7c2c]/10 border-[#ef7c2c] text-[#ef7c2c]"
-                          : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
-                      }`}
-                    >
-                      📉 Mais caro
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* LIMPAR FILTROS */}
-              <button
-                onClick={clearFilters}
-                id="clear-filters-btn"
-                className="w-full py-2.5 rounded-xl border border-[#2a2827] hover:border-[#ef7c2c] text-surface-400 hover:text-[#ef7c2c] text-xs font-bold transition-all duration-200 cursor-pointer flex items-center justify-center"
-              >
-                Limpar filtros
-              </button>
-            </div>
+          {/* Left Panel: Desktop */}
+          <div className="hidden lg:block lg:col-span-3">
+            {filterContent}
           </div>
 
           {/* Right Panel: Content Grid */}
@@ -636,7 +676,7 @@ export default function HomePage() {
                   )}
                 </div>
 
-                <div className="flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
+                <div className="flex flex-col gap-3 max-h-[280px] sm:max-h-[360px] md:max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
                   {loading ? (
                     Array.from({ length: 3 }).map((_, i) => (
                       <div key={i} className="shimmer h-[76px] rounded-xl border border-surface-800/50" />
@@ -767,7 +807,7 @@ export default function HomePage() {
                   viewMode === "photo" ? (
                     <div className="flex flex-col gap-4">
                       {/* Photo Container */}
-                      <div className="relative h-[360px] w-full rounded-xl overflow-hidden bg-[#0d0b0a] border border-[#22201e] flex items-center justify-center">
+                      <div className="relative h-[220px] sm:h-[300px] md:h-[360px] w-full rounded-xl overflow-hidden bg-[#0d0b0a] border border-[#22201e] flex items-center justify-center">
                         {selectedItem.photo ? (
                           <img
                             src={selectedItem.photo}
@@ -845,11 +885,11 @@ export default function HomePage() {
                           : `${selectedItem.title} - Luthier (${selectedItem.rating?.toFixed(1)} ★)`
                       }
                       zoom={12}
-                      className="h-[480px] w-full rounded-xl overflow-hidden shadow-inner border border-[#282523]"
+                      className="h-[280px] md:h-[480px] w-full rounded-xl overflow-hidden shadow-inner border border-[#282523]"
                     />
                   )
                 ) : (
-                  <div className="h-[480px] w-full rounded-xl bg-[#0e0d0c] flex items-center justify-center border border-[#1f1d1c]">
+                  <div className="h-[280px] md:h-[480px] w-full rounded-xl bg-[#0e0d0c] flex items-center justify-center border border-[#1f1d1c]">
                     <p className="text-sm text-surface-400 font-body">Nenhum item selecionado</p>
                   </div>
                 )}
@@ -864,9 +904,9 @@ export default function HomePage() {
       <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
 
       {/* Footer */}
-      <footer className="border-t border-[#1c1a19]/60 mt-16 py-8 text-center text-xs text-surface-500 font-body">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-4">
-          <div className="flex items-center gap-6">
+      <footer className="border-t border-[#1c1a19]/60 mt-12 sm:mt-16 py-6 sm:py-8 text-center text-xs text-surface-500 font-body">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
             <a href="/termos" id="footer-link-termos" className="hover:text-surface-300 transition-colors">
               Termos de Uso
             </a>

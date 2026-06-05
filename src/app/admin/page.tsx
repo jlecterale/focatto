@@ -66,7 +66,7 @@ function ProductCard({
         <div className="flex gap-2 overflow-x-auto pb-1">
           {product.photos.map((photo, idx) => (
             <a key={idx} href={photo} target="_blank" rel="noopener noreferrer"
-              className="h-24 w-24 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden flex-shrink-0 hover:border-[#ef7c2c]/30 transition-colors"
+              className="h-20 sm:h-24 w-20 sm:w-24 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden flex-shrink-0 hover:border-[#ef7c2c]/30 transition-colors"
             >
               <img src={photo} alt="" className="h-full w-full object-cover" />
             </a>
@@ -145,14 +145,14 @@ function VerificationCard({
         </span>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <a href={ver.documentPhoto} target="_blank" rel="noopener noreferrer"
-          className="h-32 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
+          className="h-28 sm:h-32 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
         >
           <img src={ver.documentPhoto} alt="Documento" className="h-full w-full object-cover" />
         </a>
         <a href={ver.facePhoto} target="_blank" rel="noopener noreferrer"
-          className="h-32 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
+          className="h-28 sm:h-32 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
         >
           <img src={ver.facePhoto} alt="Selfie" className="h-full w-full object-cover" />
         </a>
@@ -212,8 +212,8 @@ function UserCard({
   toggling: string | null;
 }) {
   return (
-    <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] flex items-center gap-4">
-      <div className="h-12 w-12 rounded-full bg-[#181615] border border-[#2a2827] overflow-hidden flex-shrink-0">
+    <div className="bg-[#141211] rounded-2xl p-4 sm:p-5 border border-[#22201e] flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+      <div className="h-10 sm:h-12 w-10 sm:w-12 rounded-full bg-[#181615] border border-[#2a2827] overflow-hidden flex-shrink-0">
         {u.photoURL ? (
           <img src={u.photoURL} alt="" className="h-full w-full object-cover" />
         ) : (
@@ -237,11 +237,11 @@ function UserCard({
           )}
         </div>
       </div>
-      <div className="flex gap-2 flex-shrink-0">
+      <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2 flex-shrink-0">
         <button onClick={() => onToggleRole(u.uid)}
           disabled={toggling === u.uid}
           id={`toggle-role-${u.uid}`}
-          className={`text-[10px] font-semibold py-1.5 px-2.5 rounded-lg border transition-all disabled:opacity-60 ${
+          className={`text-[10px] font-semibold py-2 px-3 rounded-lg border transition-all disabled:opacity-60 ${
             u.role === "admin"
               ? "bg-[#ef7c2c]/10 text-[#ef7c2c] border-[#ef7c2c]/20 hover:bg-[#ef7c2c]/20"
               : "bg-[#181615] text-surface-400 border-[#2a2827] hover:border-[#ef7c2c]/30"
@@ -252,7 +252,7 @@ function UserCard({
         <button onClick={() => onToggleVerified(u.uid, !u.isVerified)}
           disabled={toggling === u.uid}
           id={`toggle-verif-${u.uid}`}
-          className={`text-[10px] font-semibold py-1.5 px-2.5 rounded-lg border transition-all disabled:opacity-60 ${
+          className={`text-[10px] font-semibold py-2 px-3 rounded-lg border transition-all disabled:opacity-60 ${
             u.isVerified
               ? "bg-emerald-400/10 text-emerald-400 border-emerald-400/20 hover:bg-emerald-400/20"
               : "bg-[#181615] text-surface-400 border-[#2a2827] hover:border-emerald-400/30"
@@ -263,7 +263,7 @@ function UserCard({
         <button onClick={() => onToggleProfessional(u.uid, !u.isProfessional)}
           disabled={toggling === u.uid}
           id={`toggle-prof-${u.uid}`}
-          className={`text-[10px] font-semibold py-1.5 px-2.5 rounded-lg border transition-all disabled:opacity-60 ${
+          className={`text-[10px] font-semibold py-2 px-3 rounded-lg border transition-all disabled:opacity-60 ${
             u.isProfessional
               ? "bg-[#d4ae12]/10 text-[#d4ae12] border-[#d4ae12]/20 hover:bg-[#d4ae12]/20"
               : "bg-[#181615] text-surface-400 border-[#2a2827] hover:border-[#d4ae12]/30"
@@ -429,28 +429,29 @@ export default function AdminPage() {
   return (
     <AdminGuard>
       <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
-        <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center">
-                <Compass size={20} weight="bold" className="text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-white">Painel Admin</h1>
-                <p className="text-[10px] text-surface-400">Focattolecter</p>
-              </div>
+        <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
+            <Link href="/" className="flex flex-col items-start gap-0">
+              <img 
+                src="/focattolecter.png" 
+                alt="Focattolecter Logo" 
+                className="h-10 sm:h-12 w-auto object-contain invert brightness-110 mix-blend-screen" 
+              />
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#ef7c2c] pl-1.5 -mt-2 sm:-mt-2.5">
+                Admin
+              </span>
             </Link>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3">
               <Link
                 href="/profile"
-                className="text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827]"
+                className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827]"
               >
                 Perfil
               </Link>
               <button
                 onClick={logout}
-                className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+                className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
               >
                 <SignOut size={14} />
                 Sair
@@ -459,7 +460,7 @@ export default function AdminPage() {
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto px-6 py-8">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-white font-heading">Dashboard</h2>
             <p className="text-sm text-surface-400 mt-1">Gerencie sua plataforma Focattolecter</p>

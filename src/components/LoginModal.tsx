@@ -162,9 +162,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       onClick={handleOverlayClick}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-3 sm:p-4"
     >
-      <div className="w-full max-w-[420px] bg-[#0c0a09] border border-[#2a2827] rounded-2xl shadow-2xl animate-slide-up overflow-hidden">
+      <div className="w-full max-w-[90vw] sm:max-w-[420px] bg-[#0c0a09] border border-[#2a2827] rounded-2xl shadow-2xl animate-slide-up overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-2">
           <h2 className="text-lg font-bold text-white font-heading">

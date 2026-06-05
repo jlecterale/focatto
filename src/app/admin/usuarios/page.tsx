@@ -88,30 +88,30 @@ export default function AdminUsuariosPage() {
   return (
     <AdminGuard>
       <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
-        <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Link href="/admin" id="admin-users-back-btn" className="text-surface-400 hover:text-white transition-colors">
+        <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <Link href="/admin" id="admin-users-back-btn" className="text-surface-400 hover:text-white transition-colors flex-shrink-0">
                 <ArrowLeft size={18} />
               </Link>
-              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center">
-                <Compass size={20} weight="bold" className="text-white" />
+              <div className="h-8 sm:h-9 w-8 sm:w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center flex-shrink-0">
+                <Compass size={18} weight="bold" className="text-white" />
               </div>
-              <div>
-                <h1 className="text-lg font-bold text-white">Usuários</h1>
-                <p className="text-[10px] text-surface-400">Gerencie permissões e badges</p>
+              <div className="min-w-0">
+                <h1 className="text-sm sm:text-lg font-bold text-white truncate">Usuários</h1>
+                <p className="text-[10px] text-surface-400 hidden sm:block">Gerencie permissões e badges</p>
               </div>
             </div>
             <button onClick={logout}
               id="admin-users-logout-btn"
-              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
             >
               <SignOut size={14} /> Sair
             </button>
           </div>
         </header>
 
-        <main className="max-w-4xl mx-auto px-6 py-8 space-y-6">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
             id="admin-user-search-input"
             placeholder="Buscar por nome ou email..."
@@ -131,9 +131,9 @@ export default function AdminUsuariosPage() {
           ) : (
             <div className="space-y-4">
               {filtered.map((u) => (
-                <div key={u.uid} className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
+                <div key={u.uid} className="bg-[#141211] rounded-2xl p-4 sm:p-5 border border-[#22201e] space-y-4">
+                  <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+                    <div className="h-10 sm:h-12 w-10 sm:w-12 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
                       {u.displayName?.charAt(0).toUpperCase() || u.email?.charAt(0).toUpperCase() || "U"}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -162,7 +162,7 @@ export default function AdminUsuariosPage() {
                     <button onClick={() => handleToggleRole(u.uid, u.role)}
                       disabled={processingUid === u.uid}
                       id={`toggle-role-${u.uid}`}
-                      className={`flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
+                      className={`flex items-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
                         u.role === "admin"
                           ? "bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 hover:bg-[#ef7c2c]/20"
                           : "bg-[#181615] text-surface-400 border border-[#2a2827] hover:text-white"
@@ -176,7 +176,7 @@ export default function AdminUsuariosPage() {
                     <button onClick={() => handleToggleVerified(u.uid, u.isVerified)}
                       disabled={processingUid === u.uid}
                       id={`toggle-verif-${u.uid}`}
-                      className={`flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
+                      className={`flex items-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
                         u.isVerified
                           ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
                           : "bg-[#181615] text-surface-400 border border-[#2a2827] hover:text-white"
@@ -190,7 +190,7 @@ export default function AdminUsuariosPage() {
                     <button onClick={() => handleToggleProfessional(u.uid, u.isProfessional)}
                       disabled={processingUid === u.uid}
                       id={`toggle-prof-${u.uid}`}
-                      className={`flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
+                      className={`flex items-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
                         u.isProfessional
                           ? "bg-amber-400/10 text-amber-400 border border-amber-400/20 hover:bg-amber-400/20"
                           : "bg-[#181615] text-surface-400 border border-[#2a2827] hover:text-white"

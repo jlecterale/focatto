@@ -56,30 +56,30 @@ export default function AdminProdutosPage() {
   return (
     <AdminGuard>
       <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
-        <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Link href="/admin" id="admin-products-back-btn" className="text-surface-400 hover:text-white transition-colors">
+        <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <Link href="/admin" id="admin-products-back-btn" className="text-surface-400 hover:text-white transition-colors flex-shrink-0">
                 <ArrowLeft size={18} />
               </Link>
-              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center">
-                <Compass size={20} weight="bold" className="text-white" />
+              <div className="h-8 sm:h-9 w-8 sm:w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center flex-shrink-0">
+                <Compass size={18} weight="bold" className="text-white" />
               </div>
-              <div>
-                <h1 className="text-lg font-bold text-white">Produtos / Anúncios</h1>
-                <p className="text-[10px] text-surface-400">Revise anúncios de usuários</p>
+              <div className="min-w-0">
+                <h1 className="text-sm sm:text-lg font-bold text-white truncate">Produtos / Anúncios</h1>
+                <p className="text-[10px] text-surface-400 hidden sm:block">Revise anúncios de usuários</p>
               </div>
             </div>
             <button onClick={logout}
               id="admin-products-logout-btn"
-              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
             >
               <SignOut size={14} /> Sair
             </button>
           </div>
         </header>
 
-        <main className="max-w-4xl mx-auto px-6 py-8 space-y-6">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
           <div className="flex items-center gap-3">
             <button onClick={() => setFilter("pending")}
               id="filter-pending-btn"

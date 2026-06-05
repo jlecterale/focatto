@@ -227,46 +227,47 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
       {/* Header */}
-      <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center">
-              <Compass size={20} weight="bold" className="text-white" />
+      <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3">
+            <div className="h-8 sm:h-9 w-8 sm:w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center flex-shrink-0">
+              <Compass size={18} weight="bold" className="text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white">Meu Perfil</h1>
-              <p className="text-[10px] text-surface-400">Focattolecter</p>
+              <h1 className="text-sm sm:text-lg font-bold text-white">Meu Perfil</h1>
+              <p className="text-[10px] text-surface-400 hidden sm:block">Focattolecter</p>
             </div>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <Link
               href="/"
               id="profile-back-btn"
-              className="text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827]"
+              className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827]"
             >
               Voltar
             </Link>
             <Link
               href="/meus-anuncios"
               id="profile-anuncios-btn"
-              className="flex items-center gap-1.5 text-xs text-[#ef7c2c] hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#ef7c2c]/30 hover:border-[#ef7c2c]/60"
+              className="flex items-center gap-1.5 text-xs text-[#ef7c2c] hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#ef7c2c]/30 hover:border-[#ef7c2c]/60"
             >
               <Package size={14} />
-              Meus Anúncios
+              <span className="hidden sm:inline">Meus Anúncios</span>
+              <span className="sm:hidden">Anúncios</span>
             </Link>
             <button
               onClick={logout}
               id="profile-logout-btn"
-              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
             >
               <SignOut size={14} />
-              Sair
+              <span className="hidden sm:inline">Sair</span>
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-8 space-y-6">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
         {/* Photo + Name Section */}
         <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] flex items-center gap-5">
           <div className="relative group">
@@ -503,8 +504,8 @@ export default function ProfilePage() {
 
       {/* Verification Modal */}
       {showVerificationModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg bg-[#0c0a09] border border-[#2a2827] rounded-2xl shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-4">
+          <div className="w-full max-w-[90vw] sm:max-w-lg bg-[#0c0a09] border border-[#2a2827] rounded-2xl shadow-2xl overflow-hidden">
             <div className="flex items-center justify-between px-6 pt-6 pb-2">
               <h2 className="text-lg font-bold text-white">Enviar Documentos</h2>
               <button
