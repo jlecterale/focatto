@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, Playfair_Display } from "next/font/google";
 import "../index.css";
+import AuthProviderWrapper from "../components/AuthProviderWrapper";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -29,7 +30,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${outfit.variable} ${playfair.variable}`}>
       <body className="min-h-screen bg-surface-950 text-surface-50 antialiased selection:bg-accent/30 selection:text-white noise-overlay">
-        {children}
+        <AuthProviderWrapper>
+          {children}
+        </AuthProviderWrapper>
       </body>
     </html>
   );

@@ -10,8 +10,11 @@ import {
   Tag, 
   Star, 
   Circle, 
-  Compass 
+  Compass,
+  User
 } from "@phosphor-icons/react";
+import { useAuth } from "../contexts/AuthContext";
+import LoginModal from "../components/LoginModal";
 
 // Dynamically import the Map component to prevent SSR issues with Leaflet
 const Map = dynamic(() => import("../Map"), { 
@@ -51,6 +54,8 @@ const mockLuthiers: ItemLocation[] = [
 ];
 
 export default function HomePage() {
+  const { user, loading: authLoading, logout } = useAuth();
+  const [showLogin, setShowLogin] = useState(false);
   const [activeTab, setActiveTab] = useState<"produtos" | "luthiers">("produtos");
   const [items, setItems] = useState<ItemLocation[]>([]);
   const [selectedItem, setSelectedItem] = useState<ItemLocation | null>(null);
@@ -145,6 +150,36 @@ export default function HomePage() {
                 Marketplace de Instrumentos Musicais
               </p>
             </div>
+          </div>
+
+          {/* Auth */}
+          <div className="flex items-center gap-3">
+            {user ? (
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center text-xs font-bold text-white">
+                  {user.displayName
+                    ? user.displayName.charAt(0).toUpperCase()
+                    : user.email?.charAt(0).toUpperCase() || "U"}
+                </div>
+                <span className="text-sm text-surface-300 hidden sm:block max-w-[120px] truncate">
+                  {user.displayName || user.email}
+                </span>
+                <button
+                  onClick={logout}
+                  className="text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+                >
+                  Sair
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowLogin(true)}
+                className="flex items-center gap-2 py-2 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold transition-all duration-200 hover:shadow-[0_4px_15px_rgba(239,124,44,0.3)] active:scale-[0.97]"
+              >
+                <User size={14} />
+                Entrar
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -305,6 +340,9 @@ export default function HomePage() {
 
         </div>
       </main>
+
+      {/* Login Modal */}
+      <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
 
       {/* Footer */}
       <footer className="border-t border-[#1c1a19]/60 mt-16 py-6 text-center text-xs text-surface-500 font-body">
