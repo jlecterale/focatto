@@ -41,8 +41,8 @@
   --color-accent-light: #f59e0b;
   --color-accent-dark: #d97706;
 
-  --font-heading: "Playfair Display", Georgia, serif;
-  --font-body: "Outfit", system-ui, sans-serif;
+  --font-heading: var(--font-playfair), Georgia, serif;
+  --font-body: var(--font-outfit), system-ui, sans-serif;
 
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;

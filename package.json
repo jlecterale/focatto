@@ -13,9 +13,9 @@
     "firebase": "^12.14.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.460.0",
-    "next": "^15.1.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "next": "16.2.7",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
     "sonner": "^1.7.1"
   },
   "devDependencies": {
