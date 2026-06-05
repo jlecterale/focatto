@@ -77,6 +77,34 @@ export async function getUserProducts(userId: string): Promise<ProductData[]> {
   }
 }
 
+export async function getProductsByCategory(category: string): Promise<ProductData[]> {
+  try {
+    const q = query(
+      collection(db, "products"),
+      where("category", "==", category),
+      orderBy("createdAt", "desc"),
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() } as ProductData));
+  } catch {
+    return [];
+  }
+}
+
+export async function getProductsByCategories(categories: string[]): Promise<ProductData[]> {
+  try {
+    const q = query(
+      collection(db, "products"),
+      where("category", "in", categories),
+      orderBy("createdAt", "desc"),
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() } as ProductData));
+  } catch {
+    return [];
+  }
+}
+
 export async function reviewProduct(
   productId: string,
   status: "approved" | "rejected",

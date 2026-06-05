@@ -148,6 +148,20 @@ export async function getAllVerifications(): Promise<VerificationRequest[]> {
   }
 }
 
+export async function getProfessionalUsers(): Promise<UserData[]> {
+  try {
+    const q = query(
+      collection(db, "users"),
+      where("isProfessional", "==", true),
+      orderBy("createdAt", "desc"),
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ uid: d.id, ...d.data() } as unknown as UserData));
+  } catch {
+    return [];
+  }
+}
+
 export async function getAllUsers(): Promise<UserData[]> {
   try {
     const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
