@@ -67,7 +67,7 @@ export default function AdminVerificacoesPage() {
         <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link href="/admin" className="text-surface-400 hover:text-white transition-colors">
+              <Link href="/admin" id="admin-verifications-back-btn" className="text-surface-400 hover:text-white transition-colors">
                 <ArrowLeft size={18} />
               </Link>
               <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center">
@@ -80,6 +80,7 @@ export default function AdminVerificacoesPage() {
             </div>
             <button
               onClick={logout}
+              id="admin-verifications-logout-btn"
               className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
             >
               <SignOut size={14} />
@@ -93,6 +94,7 @@ export default function AdminVerificacoesPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setFilter("pending")}
+              id="filter-pending-btn"
               className={`text-xs font-semibold py-2 px-4 rounded-xl transition-all ${
                 filter === "pending"
                   ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white"
@@ -103,6 +105,7 @@ export default function AdminVerificacoesPage() {
             </button>
             <button
               onClick={() => setFilter("all")}
+              id="filter-all-btn"
               className={`text-xs font-semibold py-2 px-4 rounded-xl transition-all ${
                 filter === "all"
                   ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white"
@@ -132,7 +135,7 @@ export default function AdminVerificacoesPage() {
                   {/* User Info */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-white">{ver.userName}</h3>
+                      <h4 className="text-sm font-bold text-white">{ver.userName}</h4>
                       <p className="text-xs text-surface-400">{ver.userEmail}</p>
                     </div>
                     <span
@@ -193,6 +196,8 @@ export default function AdminVerificacoesPage() {
                         value={adminNotes}
                         onChange={(e) => setAdminNotes(e.target.value)}
                         placeholder="Observações (opcional)..."
+                        id={`admin-notes-ver-${ver.id}`}
+                        aria-label="Observações do administrador para aprovação ou rejeição da verificação"
                         rows={2}
                         className={inputBase}
                       />
@@ -200,6 +205,7 @@ export default function AdminVerificacoesPage() {
                         <button
                           onClick={() => handleReview(ver.id, ver.userId, "approved")}
                           disabled={reviewingId === ver.id}
+                          id={`approve-ver-${ver.id}`}
                           className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold hover:bg-emerald-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
                         >
                           {reviewingId === ver.id ? (
@@ -212,6 +218,7 @@ export default function AdminVerificacoesPage() {
                         <button
                           onClick={() => handleReview(ver.id, ver.userId, "rejected")}
                           disabled={reviewingId === ver.id}
+                          id={`reject-ver-${ver.id}`}
                           className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
                         >
                           {reviewingId === ver.id ? (

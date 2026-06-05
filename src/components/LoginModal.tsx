@@ -168,6 +168,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </h2>
           <button
             onClick={onClose}
+            id="close-login-modal-btn"
+            aria-label="Fechar modal de autenticação"
             className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[#181615] transition-all"
           >
             <X size={18} />
@@ -182,10 +184,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 <Envelope size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
                 <input
                   type="email"
+                  id="login-email-input"
                   placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className={`${inputClasses} pl-10`}
+                  aria-label="Endereço de e-mail"
                   autoFocus
                 />
               </div>
@@ -193,14 +197,18 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
                 <input
                   type={showPassword ? "text" : "password"}
+                  id="login-password-input"
                   placeholder="Senha"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={`${inputClasses} pl-10 pr-10`}
+                  aria-label="Senha"
                 />
                 <button
                   type="button"
+                  id="login-toggle-password-btn"
                   onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-surface-400 hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
@@ -209,6 +217,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
               <button
                 type="button"
+                id="login-forgot-password-btn"
                 onClick={() => setMode("forgot")}
                 className="self-end text-xs text-surface-400 hover:text-[#ef7c2c] transition-colors -mt-1"
               >
@@ -217,6 +226,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
               <button
                 type="submit"
+                id="login-submit-btn"
                 disabled={loading}
                 className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
@@ -232,6 +242,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
               <button
                 type="button"
+                id="google-login-btn"
                 onClick={handleGoogleLogin}
                 disabled={loading}
                 className="w-full py-3 rounded-xl bg-white text-[#1a1a1a] font-semibold text-sm transition-all duration-200 hover:bg-gray-100 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -244,6 +255,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 Não tem uma conta?{" "}
                 <button
                   type="button"
+                  id="toggle-to-register-btn"
                   onClick={() => setMode("register")}
                   className="text-[#ef7c2c] hover:underline font-medium"
                 >
@@ -260,10 +272,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
                 <input
                   type="text"
+                  id="register-name-input"
                   placeholder="Nome completo"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className={`${inputClasses} pl-10`}
+                  aria-label="Nome completo"
                   autoFocus
                 />
               </div>
@@ -271,24 +285,30 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 <Envelope size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
                 <input
                   type="email"
+                  id="register-email-input"
                   placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className={`${inputClasses} pl-10`}
+                  aria-label="Endereço de e-mail"
                 />
               </div>
               <div className="relative">
                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
                 <input
                   type={showPassword ? "text" : "password"}
+                  id="register-password-input"
                   placeholder="Senha"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={`${inputClasses} pl-10 pr-10`}
+                  aria-label="Senha"
                 />
                 <button
                   type="button"
+                  id="register-toggle-password-btn"
                   onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-surface-400 hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
@@ -298,14 +318,18 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
                 <input
                   type={showConfirmPassword ? "text" : "password"}
+                  id="register-confirm-password-input"
                   placeholder="Confirmar senha"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className={`${inputClasses} pl-10 pr-10`}
+                  aria-label="Confirmar senha"
                 />
                 <button
                   type="button"
+                  id="register-toggle-confirm-password-btn"
                   onClick={() => setShowConfirmPassword((v) => !v)}
+                  aria-label={showConfirmPassword ? "Ocultar confirmação de senha" : "Mostrar confirmação de senha"}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-surface-400 hover:text-white transition-colors"
                 >
                   {showConfirmPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
@@ -314,6 +338,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
               <button
                 type="submit"
+                id="register-submit-btn"
                 disabled={loading}
                 className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
@@ -329,6 +354,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
               <button
                 type="button"
+                id="google-register-btn"
                 onClick={handleGoogleLogin}
                 disabled={loading}
                 className="w-full py-3 rounded-xl bg-white text-[#1a1a1a] font-semibold text-sm transition-all duration-200 hover:bg-gray-100 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -341,6 +367,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 Já tem uma conta?{" "}
                 <button
                   type="button"
+                  id="toggle-to-login-btn"
                   onClick={() => setMode("login")}
                   className="text-[#ef7c2c] hover:underline font-medium"
                 >
@@ -360,16 +387,19 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 <Envelope size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
                 <input
                   type="email"
+                  id="forgot-email-input"
                   placeholder="Seu email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className={`${inputClasses} pl-10`}
+                  aria-label="Seu endereço de e-mail"
                   autoFocus
                 />
               </div>
 
               <button
                 type="submit"
+                id="forgot-submit-btn"
                 disabled={loading}
                 className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
@@ -379,6 +409,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
               <button
                 type="button"
+                id="forgot-back-to-login-btn"
                 onClick={() => setMode("login")}
                 className="text-xs text-surface-400 hover:text-[#ef7c2c] transition-colors text-center"
               >

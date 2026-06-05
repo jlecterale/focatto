@@ -38,7 +38,7 @@ function ProductCard({
     <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
       <div className="flex items-center justify-between">
         <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-bold text-white truncate">{product.title}</h3>
+          <h4 className="text-sm font-bold text-white truncate">{product.title}</h4>
           <p className="text-xs text-surface-400">
             {product.userName} &middot; {product.userEmail}
           </p>
@@ -78,11 +78,14 @@ function ProductCard({
         <div className="space-y-3 pt-2 border-t border-[#22201e]">
           <textarea value={adminNotes} onChange={(e) => setAdminNotes(e.target.value)}
             placeholder="Observações (opcional)..."
+            id={`admin-notes-prod-${product.id}`}
+            aria-label="Observações do administrador para aprovação ou rejeição do produto"
             rows={2} className={inputBase}
           />
           <div className="flex gap-3">
             <button onClick={() => onReview(product.id!, "approved")}
               disabled={reviewingId === product.id}
+              id={`approve-prod-${product.id}`}
               className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold hover:bg-emerald-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
             >
               {reviewingId === product.id ? <Spinner size={14} className="animate-spin" /> : <CheckCircle size={14} />}
@@ -90,6 +93,7 @@ function ProductCard({
             </button>
             <button onClick={() => onReview(product.id!, "rejected")}
               disabled={reviewingId === product.id}
+              id={`reject-prod-${product.id}`}
               className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
             >
               {reviewingId === product.id ? <Spinner size={14} className="animate-spin" /> : <XCircle size={14} />}
@@ -127,7 +131,7 @@ function VerificationCard({
     <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-bold text-white">{ver.userName}</h3>
+          <h4 className="text-sm font-bold text-white">{ver.userName}</h4>
           <p className="text-xs text-surface-400">{ver.userEmail}</p>
         </div>
         <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
@@ -158,11 +162,14 @@ function VerificationCard({
         <div className="space-y-3 pt-2 border-t border-[#22201e]">
           <textarea value={adminNotes} onChange={(e) => setAdminNotes(e.target.value)}
             placeholder="Observações (opcional)..."
+            id={`admin-notes-ver-${ver.id}`}
+            aria-label="Observações do administrador para aprovação ou rejeição da verificação"
             rows={2} className={inputBase}
           />
           <div className="flex gap-3">
             <button onClick={() => onReview(ver.id, ver.userId, "approved")}
               disabled={reviewingId === ver.id}
+              id={`approve-ver-${ver.id}`}
               className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold hover:bg-emerald-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
             >
               {reviewingId === ver.id ? <Spinner size={14} className="animate-spin" /> : <CheckCircle size={14} />}
@@ -170,6 +177,7 @@ function VerificationCard({
             </button>
             <button onClick={() => onReview(ver.id, ver.userId, "rejected")}
               disabled={reviewingId === ver.id}
+              id={`reject-ver-${ver.id}`}
               className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
             >
               {reviewingId === ver.id ? <Spinner size={14} className="animate-spin" /> : <XCircle size={14} />}
@@ -215,7 +223,7 @@ function UserCard({
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <h3 className="text-sm font-bold text-white truncate">{u.displayName}</h3>
+        <h4 className="text-sm font-bold text-white truncate">{u.displayName}</h4>
         <p className="text-xs text-surface-400 truncate">{u.email}</p>
         <div className="flex gap-1.5 mt-1.5 flex-wrap">
           {u.role === "admin" && (
@@ -232,6 +240,7 @@ function UserCard({
       <div className="flex gap-2 flex-shrink-0">
         <button onClick={() => onToggleRole(u.uid)}
           disabled={toggling === u.uid}
+          id={`toggle-role-${u.uid}`}
           className={`text-[10px] font-semibold py-1.5 px-2.5 rounded-lg border transition-all disabled:opacity-60 ${
             u.role === "admin"
               ? "bg-[#ef7c2c]/10 text-[#ef7c2c] border-[#ef7c2c]/20 hover:bg-[#ef7c2c]/20"
@@ -242,6 +251,7 @@ function UserCard({
         </button>
         <button onClick={() => onToggleVerified(u.uid, !u.isVerified)}
           disabled={toggling === u.uid}
+          id={`toggle-verif-${u.uid}`}
           className={`text-[10px] font-semibold py-1.5 px-2.5 rounded-lg border transition-all disabled:opacity-60 ${
             u.isVerified
               ? "bg-emerald-400/10 text-emerald-400 border-emerald-400/20 hover:bg-emerald-400/20"
@@ -252,6 +262,7 @@ function UserCard({
         </button>
         <button onClick={() => onToggleProfessional(u.uid, !u.isProfessional)}
           disabled={toggling === u.uid}
+          id={`toggle-prof-${u.uid}`}
           className={`text-[10px] font-semibold py-1.5 px-2.5 rounded-lg border transition-all disabled:opacity-60 ${
             u.isProfessional
               ? "bg-[#d4ae12]/10 text-[#d4ae12] border-[#d4ae12]/20 hover:bg-[#d4ae12]/20"
@@ -460,6 +471,7 @@ export default function AdminPage() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
+                id={`admin-tab-btn-${tab.key}`}
                 className={`flex items-center gap-2 text-xs font-semibold py-2.5 px-4 rounded-xl transition-all ${
                   activeTab === tab.key
                     ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white shadow-lg shadow-[#ef7c2c]/20"
@@ -636,6 +648,8 @@ export default function AdminPage() {
                     value={userSearch}
                     onChange={(e) => setUserSearch(e.target.value)}
                     placeholder="Buscar por nome ou email..."
+                    id="admin-user-search-input"
+                    aria-label="Buscar usuários por nome ou e-mail"
                     className={inputBase + " mb-4"}
                   />
 

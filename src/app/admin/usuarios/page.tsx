@@ -91,7 +91,7 @@ export default function AdminUsuariosPage() {
         <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link href="/admin" className="text-surface-400 hover:text-white transition-colors">
+              <Link href="/admin" id="admin-users-back-btn" className="text-surface-400 hover:text-white transition-colors">
                 <ArrowLeft size={18} />
               </Link>
               <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center">
@@ -103,6 +103,7 @@ export default function AdminUsuariosPage() {
               </div>
             </div>
             <button onClick={logout}
+              id="admin-users-logout-btn"
               className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
             >
               <SignOut size={14} /> Sair
@@ -112,7 +113,9 @@ export default function AdminUsuariosPage() {
 
         <main className="max-w-4xl mx-auto px-6 py-8 space-y-6">
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+            id="admin-user-search-input"
             placeholder="Buscar por nome ou email..."
+            aria-label="Buscar usuários por nome ou e-mail"
             className={inputBase}
           />
 
@@ -134,7 +137,7 @@ export default function AdminUsuariosPage() {
                       {u.displayName?.charAt(0).toUpperCase() || u.email?.charAt(0).toUpperCase() || "U"}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-bold text-white truncate">{u.displayName}</h3>
+                      <h4 className="text-sm font-bold text-white truncate">{u.displayName}</h4>
                       <p className="text-xs text-surface-400 truncate">{u.email}</p>
                       <div className="flex flex-wrap items-center gap-2 mt-1.5">
                         {u.role === "admin" && (
@@ -158,6 +161,7 @@ export default function AdminUsuariosPage() {
                     {/* Toggle Admin */}
                     <button onClick={() => handleToggleRole(u.uid, u.role)}
                       disabled={processingUid === u.uid}
+                      id={`toggle-role-${u.uid}`}
                       className={`flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
                         u.role === "admin"
                           ? "bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 hover:bg-[#ef7c2c]/20"
@@ -171,6 +175,7 @@ export default function AdminUsuariosPage() {
                     {/* Toggle Verified */}
                     <button onClick={() => handleToggleVerified(u.uid, u.isVerified)}
                       disabled={processingUid === u.uid}
+                      id={`toggle-verif-${u.uid}`}
                       className={`flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
                         u.isVerified
                           ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
@@ -184,6 +189,7 @@ export default function AdminUsuariosPage() {
                     {/* Toggle Professional */}
                     <button onClick={() => handleToggleProfessional(u.uid, u.isProfessional)}
                       disabled={processingUid === u.uid}
+                      id={`toggle-prof-${u.uid}`}
                       className={`flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
                         u.isProfessional
                           ? "bg-amber-400/10 text-amber-400 border border-amber-400/20 hover:bg-amber-400/20"

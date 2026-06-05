@@ -241,12 +241,14 @@ export default function ProfilePage() {
           <div className="flex items-center gap-3">
             <Link
               href="/"
+              id="profile-back-btn"
               className="text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827]"
             >
               Voltar
             </Link>
             <Link
               href="/meus-anuncios"
+              id="profile-anuncios-btn"
               className="flex items-center gap-1.5 text-xs text-[#ef7c2c] hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#ef7c2c]/30 hover:border-[#ef7c2c]/60"
             >
               <Package size={14} />
@@ -254,6 +256,7 @@ export default function ProfilePage() {
             </Link>
             <button
               onClick={logout}
+              id="profile-logout-btn"
               className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
             >
               <SignOut size={14} />
@@ -279,6 +282,8 @@ export default function ProfilePage() {
             <button
               onClick={() => photoInputRef.current?.click()}
               disabled={uploadingPhoto}
+              id="profile-photo-upload-trigger-btn"
+              aria-label="Alterar foto de perfil"
               className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-[#ef7c2c] flex items-center justify-center hover:bg-[#d96e1f] transition-colors disabled:opacity-60"
             >
               {uploadingPhoto ? (
@@ -289,10 +294,12 @@ export default function ProfilePage() {
             </button>
             <input
               ref={photoInputRef}
+              id="profile-photo-upload-input"
               type="file"
               accept="image/*"
               className="hidden"
               onChange={handlePhotoUpload}
+              aria-label="Alterar foto de perfil"
             />
           </div>
           <div className="flex-1 min-w-0">
@@ -311,11 +318,12 @@ export default function ProfilePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-xs text-surface-400 mb-1.5">Nome completo</label>
+              <label htmlFor="profile-name-input" className="block text-xs text-surface-400 mb-1.5">Nome completo</label>
               <div className="relative">
                 <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
                 <input
                   type="text"
+                  id="profile-name-input"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   className={`${inputBase} pl-10`}
@@ -324,11 +332,12 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-xs text-surface-400 mb-1.5">Telefone / WhatsApp</label>
+              <label htmlFor="profile-phone-input" className="block text-xs text-surface-400 mb-1.5">Telefone / WhatsApp</label>
               <div className="relative">
                 <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
                 <input
                   type="text"
+                  id="profile-phone-input"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="(11) 99999-9999"
@@ -338,11 +347,12 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-xs text-surface-400 mb-1.5">CPF / CNPJ</label>
+              <label htmlFor="profile-cpf-cnpj-input" className="block text-xs text-surface-400 mb-1.5">CPF / CNPJ</label>
               <div className="relative">
                 <IdentificationCard size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
                 <input
                   type="text"
+                  id="profile-cpf-cnpj-input"
                   value={cpfCnpj}
                   onChange={(e) => setCpfCnpj(e.target.value)}
                   placeholder="000.000.000-00"
@@ -352,8 +362,9 @@ export default function ProfilePage() {
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-xs text-surface-400 mb-1.5">Bio / Descrição</label>
+              <label htmlFor="profile-bio-textarea" className="block text-xs text-surface-400 mb-1.5">Bio / Descrição</label>
               <textarea
+                id="profile-bio-textarea"
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 placeholder="Conte um pouco sobre você..."
@@ -373,9 +384,10 @@ export default function ProfilePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs text-surface-400 mb-1.5">CEP</label>
+              <label htmlFor="profile-cep-input" className="block text-xs text-surface-400 mb-1.5">CEP</label>
               <input
                 type="text"
+                id="profile-cep-input"
                 value={cep}
                 onChange={(e) => setCep(e.target.value)}
                 placeholder="00000-000"
@@ -383,53 +395,59 @@ export default function ProfilePage() {
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-xs text-surface-400 mb-1.5">Rua</label>
+              <label htmlFor="profile-street-input" className="block text-xs text-surface-400 mb-1.5">Rua</label>
               <input
                 type="text"
+                id="profile-street-input"
                 value={street}
                 onChange={(e) => setStreet(e.target.value)}
                 className={inputBase}
               />
             </div>
             <div>
-              <label className="block text-xs text-surface-400 mb-1.5">Número</label>
+              <label htmlFor="profile-number-input" className="block text-xs text-surface-400 mb-1.5">Número</label>
               <input
                 type="text"
+                id="profile-number-input"
                 value={number}
                 onChange={(e) => setNumber(e.target.value)}
                 className={inputBase}
               />
             </div>
             <div>
-              <label className="block text-xs text-surface-400 mb-1.5">Complemento</label>
+              <label htmlFor="profile-complement-input" className="block text-xs text-surface-400 mb-1.5">Complemento</label>
               <input
                 type="text"
+                id="profile-complement-input"
                 value={complement}
                 onChange={(e) => setComplement(e.target.value)}
                 className={inputBase}
               />
             </div>
             <div className="sm:col-span-1">
-              <label className="block text-xs text-surface-400 mb-1.5">Bairro</label>
+              <label htmlFor="profile-neighborhood-input" className="block text-xs text-surface-400 mb-1.5">Bairro</label>
               <input
                 type="text"
+                id="profile-neighborhood-input"
                 value={neighborhood}
                 onChange={(e) => setNeighborhood(e.target.value)}
                 className={inputBase}
               />
             </div>
             <div>
-              <label className="block text-xs text-surface-400 mb-1.5">Cidade</label>
+              <label htmlFor="profile-city-input" className="block text-xs text-surface-400 mb-1.5">Cidade</label>
               <input
                 type="text"
+                id="profile-city-input"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 className={inputBase}
               />
             </div>
             <div>
-              <label className="block text-xs text-surface-400 mb-1.5">Estado</label>
+              <label htmlFor="profile-state-select" className="block text-xs text-surface-400 mb-1.5">Estado</label>
               <select
+                id="profile-state-select"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
                 className={inputBase}
@@ -449,6 +467,7 @@ export default function ProfilePage() {
         <button
           onClick={handleSave}
           disabled={saving}
+          id="profile-save-btn"
           className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {saving ? <Spinner size={16} className="animate-spin" /> : null}
@@ -473,6 +492,7 @@ export default function ProfilePage() {
           {profile?.verificationStatus === "none" || profile?.verificationStatus === "rejected" ? (
             <button
               onClick={() => setShowVerificationModal(true)}
+              id="profile-request-verif-btn"
               className="py-2.5 px-5 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 text-xs font-semibold hover:bg-[#ef7c2c]/20 transition-colors"
             >
               {profile?.verificationStatus === "rejected" ? "Reenviar Documentos" : "Solicitar Verificação"}
@@ -495,6 +515,8 @@ export default function ProfilePage() {
                   setDocumentPreview("");
                   setFacePreview("");
                 }}
+                id="profile-close-verif-modal-btn"
+                aria-label="Fechar modal de verificação"
                 className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[#181615]"
               >
                 <XCircle size={18} />
@@ -508,10 +530,10 @@ export default function ProfilePage() {
 
               {/* Document Upload */}
               <div>
-                <label className="block text-xs text-surface-400 mb-2 font-medium">
+                <label htmlFor="document-photo-file-input" className="block text-xs text-surface-400 mb-2 font-medium">
                   Foto do Documento (RG, CNH ou CPF)
                 </label>
-                <label className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[#2a2827] bg-[#181615] cursor-pointer hover:border-[#ef7c2c]/50 transition-colors">
+                <label htmlFor="document-photo-file-input" className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[#2a2827] bg-[#181615] cursor-pointer hover:border-[#ef7c2c]/50 transition-colors">
                   {documentPreview ? (
                     <img src={documentPreview} alt="Documento" className="h-full object-contain rounded-lg" />
                   ) : (
@@ -520,16 +542,16 @@ export default function ProfilePage() {
                       <span className="text-xs">Clique para selecionar</span>
                     </div>
                   )}
-                  <input type="file" accept="image/*" className="hidden" onChange={handleDocumentSelect} />
+                  <input type="file" id="document-photo-file-input" accept="image/*" className="hidden" onChange={handleDocumentSelect} />
                 </label>
               </div>
 
               {/* Face Upload */}
               <div>
-                <label className="block text-xs text-surface-400 mb-2 font-medium">
+                <label htmlFor="face-photo-file-input" className="block text-xs text-surface-400 mb-2 font-medium">
                   Selfie com o Documento (rosto visível)
                 </label>
-                <label className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[#2a2827] bg-[#181615] cursor-pointer hover:border-[#ef7c2c]/50 transition-colors">
+                <label htmlFor="face-photo-file-input" className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[#2a2827] bg-[#181615] cursor-pointer hover:border-[#ef7c2c]/50 transition-colors">
                   {facePreview ? (
                     <img src={facePreview} alt="Selfie" className="h-full object-contain rounded-lg" />
                   ) : (
@@ -538,13 +560,14 @@ export default function ProfilePage() {
                       <span className="text-xs">Clique para selecionar</span>
                     </div>
                   )}
-                  <input type="file" accept="image/*" className="hidden" onChange={handleFaceSelect} />
+                  <input type="file" id="face-photo-file-input" accept="image/*" className="hidden" onChange={handleFaceSelect} />
                 </label>
               </div>
 
               <button
                 onClick={handleSubmitVerification}
                 disabled={submittingVerification || !documentFile || !faceFile}
+                id="profile-submit-verif-btn"
                 className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {submittingVerification ? <Spinner size={16} className="animate-spin" /> : null}

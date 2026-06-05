@@ -138,7 +138,7 @@ export default function MeusAnunciosPage() {
       <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/profile" className="text-surface-400 hover:text-white transition-colors">
+            <Link href="/profile" id="announcements-back-btn" className="text-surface-400 hover:text-white transition-colors">
               <ArrowLeft size={18} />
             </Link>
             <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center">
@@ -151,11 +151,13 @@ export default function MeusAnunciosPage() {
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => setShowForm(true)}
+              id="announcements-create-modal-trigger"
               className="flex items-center gap-1.5 py-2 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold transition-all hover:shadow-[0_4px_15px_rgba(239,124,44,0.3)]"
             >
               <Plus size={14} /> Novo Anúncio
             </button>
             <button onClick={logout}
+              id="announcements-logout-btn"
               className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827]"
             >
               <SignOut size={14} /> Sair
@@ -170,7 +172,11 @@ export default function MeusAnunciosPage() {
           <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-5">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold uppercase tracking-wider text-surface-400">Criar Anúncio</h2>
-              <button onClick={() => setShowForm(false)} className="text-surface-400 hover:text-white">
+              <button onClick={() => setShowForm(false)}
+                id="announcements-close-form-btn"
+                aria-label="Fechar formulário de anúncio"
+                className="text-surface-400 hover:text-white"
+              >
                 <XCircle size={18} />
               </button>
             </div>
@@ -179,54 +185,54 @@ export default function MeusAnunciosPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label className="block text-xs text-surface-400 mb-1.5">Título do anúncio *</label>
-                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}
+                <label htmlFor="announcement-title-input" className="block text-xs text-surface-400 mb-1.5">Título do anúncio *</label>
+                <input type="text" id="announcement-title-input" value={title} onChange={(e) => setTitle(e.target.value)}
                   placeholder="Ex: Fender Stratocaster 2022"
                   className={inputBase}
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-xs text-surface-400 mb-1.5">Descrição</label>
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)}
+                <label htmlFor="announcement-description-textarea" className="block text-xs text-surface-400 mb-1.5">Descrição</label>
+                <textarea id="announcement-description-textarea" value={description} onChange={(e) => setDescription(e.target.value)}
                   placeholder="Descreva o produto, estado, motivo da venda..."
                   rows={3} className={`${inputBase} resize-none`}
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-surface-400 mb-1.5">Preço (R$) *</label>
-                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)}
+                <label htmlFor="announcement-price-input" className="block text-xs text-surface-400 mb-1.5">Preço (R$) *</label>
+                <input type="number" id="announcement-price-input" value={price} onChange={(e) => setPrice(e.target.value)}
                   placeholder="10000"
                   className={inputBase}
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-surface-400 mb-1.5">Categoria</label>
-                <select value={category} onChange={(e) => setCategory(e.target.value)} className={inputBase}>
+                <label htmlFor="announcement-category-select" className="block text-xs text-surface-400 mb-1.5">Categoria</label>
+                <select id="announcement-category-select" value={category} onChange={(e) => setCategory(e.target.value)} className={inputBase}>
                   {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs text-surface-400 mb-1.5">Estado do produto</label>
-                <select value={condition} onChange={(e) => setCondition(e.target.value)} className={inputBase}>
+                <label htmlFor="announcement-condition-select" className="block text-xs text-surface-400 mb-1.5">Estado do produto</label>
+                <select id="announcement-condition-select" value={condition} onChange={(e) => setCondition(e.target.value)} className={inputBase}>
                   {CONDITIONS.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs text-surface-400 mb-1.5">Cidade *</label>
-                <input type="text" value={city} onChange={(e) => setCity(e.target.value)}
+                <label htmlFor="announcement-city-input" className="block text-xs text-surface-400 mb-1.5">Cidade *</label>
+                <input type="text" id="announcement-city-input" value={city} onChange={(e) => setCity(e.target.value)}
                   placeholder="São Paulo"
                   className={inputBase}
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-surface-400 mb-1.5">Estado (UF) *</label>
-                <input type="text" value={state} onChange={(e) => setState(e.target.value)}
+                <label htmlFor="announcement-state-input" className="block text-xs text-surface-400 mb-1.5">Estado (UF) *</label>
+                <input type="text" id="announcement-state-input" value={state} onChange={(e) => setState(e.target.value)}
                   placeholder="SP"
                   className={inputBase}
                 />
@@ -234,7 +240,7 @@ export default function MeusAnunciosPage() {
 
               {/* Photos */}
               <div className="sm:col-span-2">
-                <label className="block text-xs text-surface-400 mb-1.5">Fotos (máx. 6)</label>
+                <label htmlFor="announcement-photos-input" className="block text-xs text-surface-400 mb-1.5">Fotos (máx. 6)</label>
                 <div className="flex flex-wrap gap-2">
                   {photoPreviews.map((preview, idx) => (
                     <div key={idx} className="relative h-20 w-20 rounded-xl border border-[#2a2827] overflow-hidden">
@@ -248,17 +254,20 @@ export default function MeusAnunciosPage() {
                   ))}
                   {photos.length < 6 && (
                     <button onClick={() => photoInputRef.current?.click()}
+                      id="announcement-photos-trigger-btn"
+                      aria-label="Adicionar fotos"
                       className="h-20 w-20 rounded-xl border-2 border-dashed border-[#2a2827] bg-[#181615] flex items-center justify-center text-surface-400 hover:border-[#ef7c2c]/50 transition-colors"
                     >
                       <FileImage size={20} />
                     </button>
                   )}
                 </div>
-                <input ref={photoInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handlePhotosSelect} />
+                <input ref={photoInputRef} id="announcement-photos-input" type="file" accept="image/*" multiple className="hidden" onChange={handlePhotosSelect} />
               </div>
             </div>
 
             <button onClick={handleSubmit} disabled={submitting}
+              id="announcements-submit-btn"
               className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white font-semibold text-sm transition-all hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {submitting ? <Spinner size={16} className="animate-spin" /> : null}
@@ -270,7 +279,7 @@ export default function MeusAnunciosPage() {
         {/* My Products List */}
         <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Meus Anúncios ({products.length})</h3>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-surface-400">Meus Anúncios ({products.length})</h2>
             {loading && <Spinner size={14} className="animate-spin text-[#ef7c2c]" />}
           </div>
 
@@ -279,6 +288,7 @@ export default function MeusAnunciosPage() {
               <Package size={40} className="mx-auto text-surface-500 mb-3" />
               <p className="text-sm text-surface-400">Você ainda não tem anúncios.</p>
               <button onClick={() => setShowForm(true)}
+                id="announcements-create-first-btn"
                 className="mt-3 py-2 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold"
               >
                 Criar primeiro anúncio
@@ -292,7 +302,7 @@ export default function MeusAnunciosPage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <h4 className="text-sm font-bold text-white">{product.title}</h4>
+                      <h3 className="text-sm font-bold text-white">{product.title}</h3>
                       <p className="text-xs text-surface-400 mt-0.5">
                         <MapPin size={10} className="inline mr-0.5" />
                         {product.city}, {product.state}

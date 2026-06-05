@@ -315,6 +315,7 @@ export default function HomePage() {
               <div className="flex items-center gap-3">
                 <a
                   href="/meus-anuncios"
+                  id="nav-anunciar"
                   className="text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
                 >
                   Anunciar
@@ -322,6 +323,7 @@ export default function HomePage() {
                 {userRole === ROLES.ADMIN && (
                   <a
                     href="/admin"
+                    id="nav-admin"
                     className="text-xs text-[#ef7c2c] hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#ef7c2c]/30 hover:border-[#ef7c2c]/60"
                   >
                     Admin
@@ -329,6 +331,7 @@ export default function HomePage() {
                 )}
                 <a
                   href="/profile"
+                  id="nav-profile-link"
                   className="flex items-center gap-2 group"
                 >
                   <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center text-xs font-bold text-white">
@@ -342,6 +345,7 @@ export default function HomePage() {
                 </a>
                 <button
                   onClick={logout}
+                  id="btn-logout"
                   className="text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
                 >
                   Sair
@@ -350,6 +354,7 @@ export default function HomePage() {
             ) : (
               <button
                 onClick={() => setShowLogin(true)}
+                id="btn-login-modal-trigger"
                 className="flex items-center gap-2 py-2 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold transition-all duration-200 hover:shadow-[0_4px_15px_rgba(239,124,44,0.3)] active:scale-[0.97]"
               >
                 <User size={14} />
@@ -367,6 +372,7 @@ export default function HomePage() {
         <div className="flex flex-wrap gap-3 mb-6">
           <button
             onClick={() => handleTabChange("produtos")}
+            id="tab-produtos"
             className={`flex items-center gap-2 py-2.5 px-5 text-xs font-semibold rounded-xl transition-all duration-300 cursor-pointer ${
               activeTab === "produtos" 
                 ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white shadow-[0_4px_15px_rgba(239,124,44,0.25)] font-bold scale-[1.02]" 
@@ -378,6 +384,7 @@ export default function HomePage() {
           </button>
           <button
             onClick={() => handleTabChange("luthiers")}
+            id="tab-luthiers"
             className={`flex items-center gap-2 py-2.5 px-5 text-xs font-semibold rounded-xl transition-all duration-300 cursor-pointer ${
               activeTab === "luthiers" 
                 ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white shadow-[0_4px_15px_rgba(239,124,44,0.25)] font-bold scale-[1.02]" 
@@ -402,20 +409,23 @@ export default function HomePage() {
                 </span>
                 <input
                   type="text"
+                  id="search-input"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Ex: Fender, Gibson, Regulagem..."
+                  aria-label="Pesquisar por instrumentos, acessórios ou luthiers"
                   className="w-full bg-[#181615] border border-[#2a2827] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]"
                 />
               </div>
 
               {/* VER RESULTADOS DE */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-[#ef7c2c] opacity-90">
+                <label htmlFor="category-select" className="text-[10px] font-bold uppercase tracking-wider text-[#ef7c2c] opacity-90">
                   Ver resultados de:
                 </label>
                 <div className="relative">
                   <select
+                    id="category-select"
                     value={selectedCategory}
                     onChange={(e) => handleCategoryChange(e.target.value as any)}
                     className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-2.5 text-xs text-white outline-none appearance-none transition-all duration-200 focus:border-[#ef7c2c] cursor-pointer"
@@ -442,6 +452,7 @@ export default function HomePage() {
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => setQuickPriceFilter(null)}
+                      id="quick-price-all"
                       className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
                         quickPriceFilter === null
                           ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
@@ -452,6 +463,7 @@ export default function HomePage() {
                     </button>
                     <button
                       onClick={() => setQuickPriceFilter(1000)}
+                      id="quick-price-1000"
                       className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
                         quickPriceFilter === 1000
                           ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
@@ -462,6 +474,7 @@ export default function HomePage() {
                     </button>
                     <button
                       onClick={() => setQuickPriceFilter(3000)}
+                      id="quick-price-3000"
                       className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
                         quickPriceFilter === 3000
                           ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
@@ -472,6 +485,7 @@ export default function HomePage() {
                     </button>
                     <button
                       onClick={() => setQuickPriceFilter(5000)}
+                      id="quick-price-5000"
                       className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
                         quickPriceFilter === 5000
                           ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
@@ -490,11 +504,12 @@ export default function HomePage() {
               {selectedCategory !== "luthier" && (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-surface-400">
+                    <label htmlFor="min-price-input" className="text-[10px] font-bold uppercase tracking-wider text-surface-400">
                       Preço Mín. (R$)
                     </label>
                     <input
                       type="number"
+                      id="min-price-input"
                       value={minPrice}
                       onChange={(e) => setMinPrice(e.target.value)}
                       placeholder="Mínimo"
@@ -502,11 +517,12 @@ export default function HomePage() {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-surface-400">
+                    <label htmlFor="max-price-input" className="text-[10px] font-bold uppercase tracking-wider text-surface-400">
                       Preço Máx. (R$)
                     </label>
                     <input
                       type="number"
+                      id="max-price-input"
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(e.target.value)}
                       placeholder="Máximo"
@@ -523,9 +539,10 @@ export default function HomePage() {
                   Localização
                 </div>
                 
-                <label className="flex items-center gap-2 text-xs text-surface-400 select-none cursor-pointer">
+                <label htmlFor="search-radius-checkbox" className="flex items-center gap-2 text-xs text-surface-400 select-none cursor-pointer">
                   <input
                     type="checkbox"
+                    id="search-radius-checkbox"
                     checked={searchRadius}
                     onChange={(e) => setSearchRadius(e.target.checked)}
                     className="rounded border-[#2a2827] bg-[#181615] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
@@ -536,23 +553,29 @@ export default function HomePage() {
                 <div className="flex flex-col gap-2.5">
                   <input
                     type="text"
+                    id="state-filter-input"
                     value={stateFilter}
                     onChange={(e) => setStateFilter(e.target.value)}
                     placeholder="Estado (Ex: SP, RJ, MG)"
+                    aria-label="Filtrar por Estado (UF)"
                     className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
                   />
                   <input
                     type="text"
+                    id="city-filter-input"
                     value={cityFilter}
                     onChange={(e) => setCityFilter(e.target.value)}
                     placeholder="Município (Cidade)"
+                    aria-label="Filtrar por Município (Cidade)"
                     className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
                   />
                   <input
                     type="text"
+                    id="neighborhood-filter-input"
                     value={neighborhoodFilter}
                     onChange={(e) => setNeighborhoodFilter(e.target.value)}
                     placeholder="Bairro"
+                    aria-label="Filtrar por Bairro"
                     className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
                   />
                 </div>
@@ -569,6 +592,7 @@ export default function HomePage() {
                   <div className="flex flex-col gap-2">
                     <button
                       onClick={() => setSortBy(sortBy === "priceAsc" ? null : "priceAsc")}
+                      id="sort-price-asc"
                       className={`w-full py-2 px-4 rounded-xl border text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
                         sortBy === "priceAsc"
                           ? "bg-[#ef7c2c]/10 border-[#ef7c2c] text-[#ef7c2c]"
@@ -579,6 +603,7 @@ export default function HomePage() {
                     </button>
                     <button
                       onClick={() => setSortBy(sortBy === "priceDesc" ? null : "priceDesc")}
+                      id="sort-price-desc"
                       className={`w-full py-2 px-4 rounded-xl border text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
                         sortBy === "priceDesc"
                           ? "bg-[#ef7c2c]/10 border-[#ef7c2c] text-[#ef7c2c]"
@@ -594,6 +619,7 @@ export default function HomePage() {
               {/* LIMPAR FILTROS */}
               <button
                 onClick={clearFilters}
+                id="clear-filters-btn"
                 className="w-full py-2.5 rounded-xl border border-[#2a2827] hover:border-[#ef7c2c] text-surface-400 hover:text-[#ef7c2c] text-xs font-bold transition-all duration-200 cursor-pointer flex items-center justify-center"
               >
                 Limpar filtros
@@ -724,6 +750,7 @@ export default function HomePage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setViewMode(viewMode === "photo" ? "map" : "photo")}
+                        id="toggle-view-btn"
                         className="flex items-center gap-1.5 py-1 px-3 rounded-lg bg-[#181615] border border-[#2a2827] hover:border-[#ef7c2c] text-xs font-semibold text-white transition-colors cursor-pointer"
                       >
                         {viewMode === "photo" ? (
@@ -846,13 +873,13 @@ export default function HomePage() {
       <footer className="border-t border-[#1c1a19]/60 mt-16 py-8 text-center text-xs text-surface-500 font-body">
         <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-4">
           <div className="flex items-center gap-6">
-            <a href="/termos" className="hover:text-surface-300 transition-colors">
+            <a href="/termos" id="footer-link-termos" className="hover:text-surface-300 transition-colors">
               Termos de Uso
             </a>
-            <a href="/cookies" className="hover:text-surface-300 transition-colors">
+            <a href="/cookies" id="footer-link-cookies" className="hover:text-surface-300 transition-colors">
               Política de Cookies
             </a>
-            <a href="/suporte" className="hover:text-surface-300 transition-colors">
+            <a href="/suporte" id="footer-link-suporte" className="hover:text-surface-300 transition-colors">
               Contato de Suporte
             </a>
           </div>

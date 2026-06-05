@@ -59,7 +59,7 @@ export default function AdminProdutosPage() {
         <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link href="/admin" className="text-surface-400 hover:text-white transition-colors">
+              <Link href="/admin" id="admin-products-back-btn" className="text-surface-400 hover:text-white transition-colors">
                 <ArrowLeft size={18} />
               </Link>
               <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center">
@@ -71,6 +71,7 @@ export default function AdminProdutosPage() {
               </div>
             </div>
             <button onClick={logout}
+              id="admin-products-logout-btn"
               className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
             >
               <SignOut size={14} /> Sair
@@ -81,6 +82,7 @@ export default function AdminProdutosPage() {
         <main className="max-w-4xl mx-auto px-6 py-8 space-y-6">
           <div className="flex items-center gap-3">
             <button onClick={() => setFilter("pending")}
+              id="filter-pending-btn"
               className={`text-xs font-semibold py-2 px-4 rounded-xl transition-all ${
                 filter === "pending"
                   ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white"
@@ -90,6 +92,7 @@ export default function AdminProdutosPage() {
               Pendentes
             </button>
             <button onClick={() => setFilter("all")}
+              id="filter-all-btn"
               className={`text-xs font-semibold py-2 px-4 rounded-xl transition-all ${
                 filter === "all"
                   ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white"
@@ -155,11 +158,14 @@ export default function AdminProdutosPage() {
                     <div className="space-y-3 pt-2 border-t border-[#22201e]">
                       <textarea value={adminNotes} onChange={(e) => setAdminNotes(e.target.value)}
                         placeholder="Observações (opcional)..."
+                        id={`admin-notes-prod-${product.id}`}
+                        aria-label="Observações do administrador para aprovação ou rejeição do produto"
                         rows={2} className={inputBase}
                       />
                       <div className="flex gap-3">
                         <button onClick={() => handleReview(product.id!, "approved")}
                           disabled={reviewingId === product.id}
+                          id={`approve-prod-${product.id}`}
                           className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold hover:bg-emerald-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
                         >
                           {reviewingId === product.id ? <Spinner size={14} className="animate-spin" /> : <CheckCircle size={14} />}
@@ -167,6 +173,7 @@ export default function AdminProdutosPage() {
                         </button>
                         <button onClick={() => handleReview(product.id!, "rejected")}
                           disabled={reviewingId === product.id}
+                          id={`reject-prod-${product.id}`}
                           className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
                         >
                           {reviewingId === product.id ? <Spinner size={14} className="animate-spin" /> : <XCircle size={14} />}

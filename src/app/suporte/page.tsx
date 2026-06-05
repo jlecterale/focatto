@@ -57,7 +57,7 @@ export default function SuportePage() {
   return (
     <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
       <div className="max-w-3xl mx-auto px-6 py-12">
-        <Link href="/" className="text-sm text-[#ef7c2c] hover:underline mb-6 inline-block">
+        <Link href="/" id="back-to-home-link" className="text-sm text-[#ef7c2c] hover:underline mb-6 inline-block">
           &larr; Voltar ao início
         </Link>
 
@@ -79,6 +79,9 @@ export default function SuportePage() {
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                  id={`faq-item-toggle-${idx}`}
+                  aria-expanded={openFaq === idx}
+                  aria-controls={`faq-item-panel-${idx}`}
                   className="w-full px-5 py-4 flex items-center justify-between text-left text-sm font-medium text-white hover:bg-[#1a1817] transition-colors"
                 >
                   {item.q}
@@ -89,7 +92,12 @@ export default function SuportePage() {
                   </span>
                 </button>
                 {openFaq === idx && (
-                  <div className="px-5 pb-4 text-sm text-surface-400 leading-relaxed">
+                  <div
+                    id={`faq-item-panel-${idx}`}
+                    role="region"
+                    aria-labelledby={`faq-item-toggle-${idx}`}
+                    className="px-5 pb-4 text-sm text-surface-400 leading-relaxed"
+                  >
                     {item.a}
                   </div>
                 )}
@@ -108,9 +116,10 @@ export default function SuportePage() {
           <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e]">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs text-surface-400 mb-1.5">Nome</label>
+                <label htmlFor="support-name-input" className="block text-xs text-surface-400 mb-1.5">Nome</label>
                 <input
                   type="text"
+                  id="support-name-input"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Seu nome"
@@ -119,11 +128,12 @@ export default function SuportePage() {
               </div>
 
               <div>
-                <label className="block text-xs text-surface-400 mb-1.5">Email</label>
+                <label htmlFor="support-email-input" className="block text-xs text-surface-400 mb-1.5">Email</label>
                 <div className="relative">
                   <Envelope size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
                   <input
                     type="email"
+                    id="support-email-input"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="seu@email.com"
@@ -133,8 +143,9 @@ export default function SuportePage() {
               </div>
 
               <div>
-                <label className="block text-xs text-surface-400 mb-1.5">Mensagem</label>
+                <label htmlFor="support-message-textarea" className="block text-xs text-surface-400 mb-1.5">Mensagem</label>
                 <textarea
+                  id="support-message-textarea"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Descreva sua dúvida ou problema..."
@@ -145,6 +156,7 @@ export default function SuportePage() {
 
               <button
                 type="submit"
+                id="support-submit-btn"
                 disabled={sending}
                 className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
@@ -161,6 +173,7 @@ export default function SuportePage() {
             Prefere enviar um email direto?{" "}
             <a
               href="mailto:suporte@focatto.com.br"
+              id="support-direct-email-link"
               className="text-[#ef7c2c] hover:underline"
             >
               suporte@focatto.com.br
