@@ -37,8 +37,12 @@ service cloud.firestore {
 
     // Products collection
     match /products/{productId} {
-      // Anyone can read approved, active or pending products
-      allow read: if resource.data.status == 'approved' || resource.data.status == 'active' || resource.data.status == 'pending' || isAdmin();
+      // Anyone can read approved, active or pending products. Owners can read their own products.
+      allow read: if resource.data.status == 'approved' 
+                  || resource.data.status == 'active' 
+                  || resource.data.status == 'pending' 
+                  || (isAuth() && resource.data.userId == request.auth.uid) 
+                  || isAdmin();
 
       // Authenticated users can create products
       allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
