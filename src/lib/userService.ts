@@ -41,6 +41,8 @@ export async function ensureUserDocument(uid: string, email: string | null, disp
     isProfessional: false,
     isTeacher: false,
     verificationStatus: "none",
+    isPremium: false,
+    premiumTier: "tier3",
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
@@ -210,6 +212,16 @@ export async function adminSetUserProfessional(uid: string, isProfessional: bool
 export async function adminSetUserTeacher(uid: string, isTeacher: boolean) {
   const userRef = doc(db, "users", uid);
   await updateDoc(userRef, { isTeacher, updatedAt: Date.now() });
+}
+
+export async function adminSetUserPremiumTier(uid: string, tier: string) {
+  const userRef = doc(db, "users", uid);
+  const isPremium = tier === "tier1" || tier === "tier2";
+  await updateDoc(userRef, {
+    premiumTier: tier,
+    isPremium,
+    updatedAt: Date.now(),
+  });
 }
 
 export async function getTeacherProfile(uid: string): Promise<TeacherData | null> {

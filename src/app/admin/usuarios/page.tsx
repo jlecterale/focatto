@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import AdminGuard from "../../../components/admin/AdminGuard";
 import { useAuth } from "../../../contexts/AuthContext";
-import { getAllUsers, adminUpdateUserRole, adminSetUserVerified, adminSetUserProfessional, adminSetUserTeacher } from "../../../lib/userService";
+import { getAllUsers, adminUpdateUserRole, adminSetUserVerified, adminSetUserProfessional, adminSetUserTeacher, adminSetUserPremiumTier } from "../../../lib/userService";
 import { ROLES, type UserData, type UserRole } from "../../../lib/roles";
 import Link from "next/link";
 import {
@@ -84,6 +84,22 @@ export default function AdminUsuariosPage() {
       toast.success(`Usuário ${newVal ? "marcado como professor" : "removido como professor"}.`);
     } catch {
       toast.error("Erro ao alterar status de professor.");
+    } finally {
+      setProcessingUid(null);
+    }
+  }
+
+  async function handleChangeUserTier(uid: string, tier: string) {
+    setProcessingUid(uid);
+    try {
+      await adminSetUserPremiumTier(uid, tier);
+      const isPremium = tier === "tier1" || tier === "tier2";
+      setUsers((prev) =>
+        prev.map((u) => (u.uid === uid ? { ...u, premiumTier: tier, isPremium } : u))
+      );
+      toast.success("Plano de assinatura atualizado com sucesso!");
+    } catch {
+      toast.error("Erro ao alterar o plano de assinatura.");
     } finally {
       setProcessingUid(null);
     }
@@ -232,6 +248,23 @@ export default function AdminUsuariosPage() {
                       {processingUid === u.uid ? <Spinner size={12} className="animate-spin" /> : <GraduationCap size={14} />}
                       {u.isTeacher ? "Remover Professor" : "Marcar Professor"}
                     </button>
+
+                    {/* Alterar Assinatura (Apenas para jfreire.comercial@gmail.com) */}
+                    {user?.email === "jfreire.comercial@gmail.com" && (
+                      <div className="flex items-center gap-2 bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs font-semibold">
+                        <span className="text-surface-400">Plano:</span>
+                        <select
+                          value={u.premiumTier || "tier3"}
+                          onChange={(e) => handleChangeUserTier(u.uid, e.target.value)}
+                          disabled={processingUid === u.uid}
+                          className="bg-transparent border-none text-[#ef7c2c] font-bold outline-none cursor-pointer"
+                        >
+                          <option value="tier3" className="bg-[#0b0908] text-white">Tier 3 (Grátis)</option>
+                          <option value="tier2" className="bg-[#0b0908] text-white">Tier 2 (Plus)</option>
+                          <option value="tier1" className="bg-[#0b0908] text-white">Tier 1 (Pro)</option>
+                        </select>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
