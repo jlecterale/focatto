@@ -78,6 +78,10 @@ export interface UserData {
   isProfessional: boolean;
   isTeacher?: boolean;
   verificationStatus: VerificationStatus;
+  sellerAbout?: string;
+  sellerMusic?: string;
+  sellerHobbies?: string;
+  sellerFunFacts?: string;
   createdAt: number;
   updatedAt: number;
 }

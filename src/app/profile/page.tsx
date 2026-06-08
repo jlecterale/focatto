@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { getUserData, updateUserProfile, uploadProfilePhoto, submitVerificationRequest, getTeacherProfile, updateTeacherProfile } from "../../lib/userService";
 import type { UserData } from "../../lib/roles";
+import { Smiley, MusicNote, HeartStraight, Sparkle } from "@phosphor-icons/react";
 import Link from "next/link";
 import {
   Compass,
@@ -69,6 +70,12 @@ export default function ProfilePage() {
   const [facePreview, setFacePreview] = useState<string>("");
   const [submittingVerification, setSubmittingVerification] = useState(false);
 
+  // Seller profile states
+  const [sellerAbout, setSellerAbout] = useState("");
+  const [sellerMusic, setSellerMusic] = useState("");
+  const [sellerHobbies, setSellerHobbies] = useState("");
+  const [sellerFunFacts, setSellerFunFacts] = useState("");
+
   // Teacher profile states
   const [teacherBio, setTeacherBio] = useState("");
   const [teacherSpecialties, setTeacherSpecialties] = useState<string[]>([]);
@@ -86,6 +93,10 @@ export default function ProfilePage() {
         setPhone(data.phone);
         setCpfCnpj(data.cpfCnpj);
         setBio(data.bio);
+        setSellerAbout(data.sellerAbout || "");
+        setSellerMusic(data.sellerMusic || "");
+        setSellerHobbies(data.sellerHobbies || "");
+        setSellerFunFacts(data.sellerFunFacts || "");
         setCep(data.address.cep);
         setStreet(data.address.street);
         setNumber(data.address.number);
@@ -118,6 +129,10 @@ export default function ProfilePage() {
         phone,
         cpfCnpj,
         bio,
+        sellerAbout,
+        sellerMusic,
+        sellerHobbies,
+        sellerFunFacts,
         address: { cep, street, number, complement, neighborhood, city, state },
       });
 
@@ -146,6 +161,10 @@ export default function ProfilePage() {
               phone,
               cpfCnpj,
               bio,
+              sellerAbout,
+              sellerMusic,
+              sellerHobbies,
+              sellerFunFacts,
               address: { cep, street, number, complement, neighborhood, city, state },
               updatedAt: Date.now(),
             }
@@ -644,6 +663,79 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
+
+        {/* Seller Profile Section */}
+        <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-5">
+          <div className="flex items-center gap-2">
+            <Smiley size={18} className="text-[#ef7c2c]" />
+            <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Perfil do Vendedor</h3>
+          </div>
+          <p className="text-xs text-surface-500 leading-relaxed">
+            Essas informações aparecerão no seu perfil público para seus compradores conhecerem você melhor.
+          </p>
+
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="seller-about-textarea" className="flex items-center gap-1.5 text-xs text-surface-400 mb-1.5">
+                <Sparkle size={14} className="text-amber-400" />
+                Quem Sou Eu
+              </label>
+              <textarea
+                id="seller-about-textarea"
+                value={sellerAbout}
+                onChange={(e) => setSellerAbout(e.target.value)}
+                placeholder="Conte um pouco sobre sua história com música, o que te motiva, seus valores como vendedor..."
+                rows={3}
+                className={`${inputBase} resize-none`}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="seller-music-input" className="flex items-center gap-1.5 text-xs text-surface-400 mb-1.5">
+                <MusicNote size={14} className="text-amber-400" />
+                Gosto Musical
+              </label>
+              <textarea
+                id="seller-music-input"
+                value={sellerMusic}
+                onChange={(e) => setSellerMusic(e.target.value)}
+                placeholder="Que estilos musicais você curte? Bandas favoritas, artistas que te inspiram..."
+                rows={2}
+                className={`${inputBase} resize-none`}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="seller-hobbies-input" className="flex items-center gap-1.5 text-xs text-surface-400 mb-1.5">
+                <HeartStraight size={14} className="text-amber-400" />
+                Hobbies
+              </label>
+              <textarea
+                id="seller-hobbies-input"
+                value={sellerHobbies}
+                onChange={(e) => setSellerHobbies(e.target.value)}
+                placeholder="Além da música, o que você gosta de fazer? Colecionar discos, tocar em bandas, lutheria..."
+                rows={2}
+                className={`${inputBase} resize-none`}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="seller-funfacts-input" className="flex items-center gap-1.5 text-xs text-surface-400 mb-1.5">
+                <Smiley size={14} className="text-amber-400" />
+                Fatos Divertidos
+              </label>
+              <textarea
+                id="seller-funfacts-input"
+                value={sellerFunFacts}
+                onChange={(e) => setSellerFunFacts(e.target.value)}
+                placeholder="Curiosidades sobre você! Já tocou em alguma banda? Tem algum instrumento raro? Conheceu algum artista famoso?"
+                rows={2}
+                className={`${inputBase} resize-none`}
+              />
+            </div>
+          </div>
+        </div>
 
         {/* Save Button */}
         <button

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { getProductById } from "../../../lib/productService";
@@ -374,6 +375,14 @@ export default function AnuncioDetalhePage() {
                   {product.userEmail}
                 </div>
               )}
+
+              <Link
+                href={`/vendedor/${product.userId}`}
+                className="mt-4 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 text-xs font-semibold hover:bg-[#ef7c2c]/20 transition-all w-full"
+              >
+                Ver Perfil Completo
+                <ArrowLeft size={14} className="rotate-180" />
+              </Link>
             </div>
           </div>
 

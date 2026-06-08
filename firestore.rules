@@ -16,9 +16,8 @@ service cloud.firestore {
 
     // Users collection
     match /users/{userId} {
-      // Users can read their own profile
-      // Admins can read any profile
-      allow read: if isAuth() && (request.auth.uid == userId || isAdmin());
+      // Anyone can read public profiles
+      allow read: if true;
 
       // Users can create their own profile
       allow create: if isAuth() && request.auth.uid == userId;
