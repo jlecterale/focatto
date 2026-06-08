@@ -16,11 +16,14 @@ import {
   MagnifyingGlass,
   Faders,
   X,
-  GraduationCap
+  GraduationCap,
+  Plus
 } from "@phosphor-icons/react";
 import { useAuth } from "../contexts/AuthContext";
 import LoginModal from "../components/LoginModal";
 import { ROLES } from "../lib/roles";
+import { getUserData } from "../lib/userService";
+import { toast } from "sonner";
 
 // Dynamically import the Map component to prevent SSR issues with Leaflet
 const Map = dynamic(() => import("../Map"), { 
@@ -51,26 +54,28 @@ interface ItemLocation {
   modalities?: string[];
   phone?: string;
   bio?: string;
+  premiumTier?: string;
+  isPremium?: boolean;
 }
 
 const mockProducts: ItemLocation[] = [
-  { id: "p1", title: "Gibson Les Paul Custom 1978", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 29000, type: "produto", category: "Guitarra", photo: "/gibson_les_paul.png" },
+  { id: "p1", title: "Gibson Les Paul Custom 1978", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 29000, type: "produto", category: "Guitarra", photo: "/gibson_les_paul.png", premiumTier: "tier1", isPremium: true },
   { id: "p2", title: "Fender Stratocaster American Standard", city: "Curitiba", state: "PR", neighborhood: "Centro", price: 12500, type: "produto", category: "Guitarra", photo: "/fender_stratocaster.png" },
-  { id: "p3", title: "Violão Taylor 214ce Deluxe", city: "Belo Horizonte", state: "MG", neighborhood: "Savassi", price: 9800, type: "produto", category: "Violão", photo: "/taylor_acoustic.png" },
+  { id: "p3", title: "Violão Taylor 214ce Deluxe", city: "Belo Horizonte", state: "MG", neighborhood: "Savassi", price: 9800, type: "produto", category: "Violão", photo: "/taylor_acoustic.png", premiumTier: "tier2", isPremium: true },
   { id: "p4", title: "Cabo P10 Santo Angelo 5m", city: "São Paulo", state: "SP", neighborhood: "Vila Mariana", price: 150, type: "produto", category: "Acessório" },
   { id: "p5", title: "Palhetas Dunlop Tortex (Pacote)", city: "Rio de Janeiro", state: "RJ", neighborhood: "Copacabana", price: 75, type: "produto", category: "Acessório" },
   { id: "p6", title: "Pedal de Efeito Boss DS-1 Distortion", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 650, type: "produto", category: "Acessório" },
 ];
 
 const mockLuthiers: ItemLocation[] = [
-  { id: "l1", title: "Guthier Luteria", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", type: "luthier", rating: 4.9, specialties: ["Regulagem", "Pintura"] },
+  { id: "l1", title: "Guthier Luteria", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", type: "luthier", rating: 4.9, specialties: ["Regulagem", "Pintura"], premiumTier: "tier1", isPremium: true },
   { id: "l2", title: "D'Alegria Custom Guitars", city: "Rio de Janeiro", state: "RJ", neighborhood: "Botafogo", type: "luthier", rating: 5.0, specialties: ["Construção", "Restauro"] },
   { id: "l3", title: "Luthieria do Sul", city: "Porto Alegre", state: "RS", neighborhood: "Moinhos de Vento", type: "luthier", rating: 4.8, specialties: ["Trastes", "Eletrônica"] },
 ];
 
 const mockTeachers: ItemLocation[] = [
-  { id: "t1", title: "João Silva - Aulas de Violão & Guitarra", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 80, type: "teacher", rating: 4.8, specialties: ["Violão", "Guitarra", "Teoria Musical"], levels: ["Iniciante", "Intermediário"], modalities: ["Presencial", "Online"], bio: "Professor com mais de 10 anos de experiência didática no ensino de cordas.", phone: "11999999999" },
-  { id: "t2", title: "Aline Mendes - Técnica Vocal & Canto", city: "Rio de Janeiro", state: "RJ", neighborhood: "Copacabana", price: 120, type: "teacher", rating: 5.0, specialties: ["Canto / Técnica Vocal", "Teoria Musical"], levels: ["Iniciante", "Intermediário", "Avançado"], modalities: ["Online"], bio: "Aulas focadas em fisiologia vocal, respiração, afinação e interpretação.", phone: "21988888888" },
+  { id: "t1", title: "João Silva - Aulas de Violão & Guitarra", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 80, type: "teacher", rating: 4.8, specialties: ["Violão", "Guitarra", "Teoria Musical"], levels: ["Iniciante", "Intermediário"], modalities: ["Presencial", "Online"], bio: "Professor com mais de 10 anos de experiência didática no ensino de cordas.", phone: "11999999999", premiumTier: "tier1", isPremium: true },
+  { id: "t2", title: "Aline Mendes - Técnica Vocal & Canto", city: "Rio de Janeiro", state: "RJ", neighborhood: "Copacabana", price: 120, type: "teacher", rating: 5.0, specialties: ["Canto / Técnica Vocal", "Teoria Musical"], levels: ["Iniciante", "Intermediário", "Avançado"], modalities: ["Online"], bio: "Aulas focadas em fisiologia vocal, respiração, afinação e interpretação.", phone: "21988888888", premiumTier: "tier2", isPremium: true },
   { id: "t3", title: "Roberto K. - Aulas de Bateria", city: "Curitiba", state: "PR", neighborhood: "Centro", price: 90, type: "teacher", rating: 4.9, specialties: ["Bateria"], levels: ["Iniciante", "Intermediário", "Avançado"], modalities: ["Presencial"], bio: "Aprenda ritmos, rudimentos, leitura de partitura e grooves diversos.", phone: "41977777777" },
 ];
 
@@ -82,6 +87,26 @@ export default function HomePage() {
   const [items, setItems] = useState<ItemLocation[]>([]);
   const [selectedItem, setSelectedItem] = useState<ItemLocation | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  const [profile, setProfile] = useState<any | null>(null);
+  const [showAnunciarModal, setShowAnunciarModal] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setProfile(null);
+      return;
+    }
+    const uid = user.uid;
+    async function loadProfile() {
+      try {
+        const data = await getUserData(uid);
+        setProfile(data);
+      } catch (err) {
+        console.error("Erro ao carregar perfil do usuário:", err);
+      }
+    }
+    loadProfile();
+  }, [user]);
 
   // Sidebar Filter States
   const [searchQuery, setSearchQuery] = useState("");
@@ -165,6 +190,8 @@ export default function HomePage() {
               type: "produto",
               category: data.category || "",
               photo: data.photo || (data.photos && data.photos[0]) || undefined,
+              premiumTier: data.premiumTier || undefined,
+              isPremium: data.isPremium || false,
             });
           });
 
@@ -188,6 +215,8 @@ export default function HomePage() {
               rating: data.averageRating || 5.0,
               specialties: data.specialties || [],
               photo: data.photo,
+              premiumTier: data.premiumTier || undefined,
+              isPremium: data.isPremium || false,
             });
           });
 
@@ -216,6 +245,8 @@ export default function HomePage() {
               modalities: data.modalities || [],
               phone: data.phone || "",
               bio: data.bio || "",
+              premiumTier: data.premiumTier || undefined,
+              isPremium: data.isPremium || false,
             });
           });
 
@@ -588,13 +619,14 @@ export default function HomePage() {
           <div className="flex items-center gap-2 sm:gap-3">
             {user ? (
               <div className="flex items-center gap-2 sm:gap-3">
-                <a
-                  href="/meus-anuncios"
+                <button
+                  onClick={() => setShowAnunciarModal(true)}
                   id="nav-anunciar"
-                  className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+                  className="flex items-center gap-1.5 py-2 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-bold transition-all duration-200 hover:shadow-[0_4px_15px_rgba(239,124,44,0.4)] hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
                 >
+                  <Plus size={14} weight="bold" />
                   Anunciar
-                </a>
+                </button>
                 {userRole === ROLES.ADMIN && (
                   <a
                     href="/admin"
@@ -627,14 +659,24 @@ export default function HomePage() {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => setShowLogin(true)}
-                id="btn-login-modal-trigger"
-                className="flex items-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold transition-all duration-200 hover:shadow-[0_4px_15px_rgba(239,124,44,0.3)] active:scale-[0.97]"
-              >
-                <User size={14} />
-                Entrar
-              </button>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <button
+                  onClick={() => setShowLogin(true)}
+                  id="nav-anunciar-loggedout"
+                  className="flex items-center gap-1.5 py-2 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-bold transition-all duration-200 hover:shadow-[0_4px_15px_rgba(239,124,44,0.4)] hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+                >
+                  <Plus size={14} weight="bold" />
+                  Anunciar
+                </button>
+                <button
+                  onClick={() => setShowLogin(true)}
+                  id="btn-login-modal-trigger"
+                  className="flex items-center gap-2 py-2 px-4 rounded-xl border border-[#2a2827] text-surface-300 text-xs font-semibold transition-all duration-200 hover:border-[#ef7c2c]/30 hover:text-white hover:bg-[#181615] active:scale-[0.97] cursor-pointer"
+                >
+                  <User size={14} />
+                  Entrar
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -773,8 +815,14 @@ export default function HomePage() {
 
                           {/* Info Column */}
                           <div className="min-w-0 flex-1">
-                            <h4 className="text-sm font-bold text-white tracking-wide font-body truncate">
-                              {item.title}
+                            <h4 className="text-sm font-bold text-white tracking-wide font-body truncate flex items-center gap-1.5">
+                              <span className="truncate">{item.title}</span>
+                              {item.premiumTier === "tier1" && (
+                                <span className="bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/30 text-[9px] font-extrabold px-1.5 rounded uppercase tracking-wider flex-shrink-0">PRO</span>
+                              )}
+                              {item.premiumTier === "tier2" && (
+                                <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 text-[9px] font-extrabold px-1.5 rounded uppercase tracking-wider flex-shrink-0">PLUS</span>
+                              )}
                             </h4>
                             <div className="flex items-center gap-2 mt-1 text-[11px] text-surface-400">
                               <span className="flex items-center gap-1 font-medium truncate">
@@ -1043,6 +1091,98 @@ export default function HomePage() {
 
       {/* Login Modal */}
       <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
+
+      {/* Selection Modal for Anunciar */}
+      {showAnunciarModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="w-full max-w-lg bg-[#0e0c0b] border border-[#2a2827] rounded-3xl shadow-2xl p-6 relative overflow-hidden">
+            {/* Ambient background glow inside modal */}
+            <div className="absolute -top-12 -right-12 w-40 h-40 bg-[radial-gradient(circle,rgba(239,124,44,0.1),transparent_60%)] pointer-events-none" />
+            
+            <button
+              onClick={() => setShowAnunciarModal(false)}
+              className="absolute top-4 right-4 h-8 w-8 flex items-center justify-center rounded-full text-surface-400 hover:text-white hover:bg-[#1c1a19] transition-all cursor-pointer"
+              aria-label="Fechar"
+            >
+              <X size={16} />
+            </button>
+
+            <div className="text-center mb-6">
+              <h2 className="text-lg font-bold text-white font-heading">O que você deseja anunciar?</h2>
+              <p className="text-xs text-surface-400 mt-1">Escolha a categoria ideal para o seu anúncio</p>
+            </div>
+
+            <div className="space-y-4">
+              {/* Option 1: Instrument & Accessory */}
+              <div
+                onClick={() => {
+                  setShowAnunciarModal(false);
+                  router.push("/meus-anuncios");
+                }}
+                className="group flex items-start gap-4 p-4 rounded-2xl bg-[#141211] border border-[#22201e] hover:border-[#ef7c2c]/40 hover:bg-[#1c1a19] cursor-pointer transition-all duration-300"
+              >
+                <div className="p-3 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 group-hover:scale-110 transition-transform">
+                  <Tag size={20} weight="fill" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-white group-hover:text-[#ef7c2c] transition-colors">Instrumento ou Acessório</h4>
+                  <p className="text-[11px] text-surface-400 mt-0.5 leading-relaxed">Venda guitarras, baixos, pedais, amplificadores ou outros acessórios.</p>
+                </div>
+              </div>
+
+              {/* Option 2: Luthier */}
+              <div
+                onClick={async () => {
+                  setShowAnunciarModal(false);
+                  if (profile?.isProfessional) {
+                    router.push("/profile");
+                    toast.success("Habilitado! Edite seu Perfil de Luthier na página de perfil.");
+                  } else {
+                    const confirmActivate = window.confirm("Seu perfil de Luthier não está ativo. Deseja ir para seu perfil para ativar as atividades de Luthier?");
+                    if (confirmActivate) {
+                      router.push("/profile");
+                    }
+                  }
+                }}
+                className="group flex items-start gap-4 p-4 rounded-2xl bg-[#141211] border border-[#22201e] hover:border-[#ef7c2c]/40 hover:bg-[#1c1a19] cursor-pointer transition-all duration-300"
+              >
+                <div className="p-3 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 group-hover:scale-110 transition-transform">
+                  <Wrench size={20} weight="fill" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-white group-hover:text-[#ef7c2c] transition-colors">Luthier Especializado</h4>
+                  <p className="text-[11px] text-surface-400 mt-0.5 leading-relaxed">Ofereça serviços de regulagem, customização, elétrica e reparo de instrumentos.</p>
+                </div>
+              </div>
+
+              {/* Option 3: Teacher */}
+              <div
+                onClick={async () => {
+                  setShowAnunciarModal(false);
+                  if (profile?.isTeacher) {
+                    router.push("/profile");
+                    toast.success("Habilitado! Edite seu Perfil de Professor na página de perfil.");
+                  } else {
+                    const confirmActivate = window.confirm("Seu perfil de Professor não está ativo. Deseja ir para seu perfil para ativar as atividades de Professor?");
+                    if (confirmActivate) {
+                      router.push("/profile");
+                    }
+                  }
+                }}
+                className="group flex items-start gap-4 p-4 rounded-2xl bg-[#141211] border border-[#22201e] hover:border-indigo-500/40 hover:bg-[#1c1a19] cursor-pointer transition-all duration-300"
+              >
+                <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 group-hover:scale-110 transition-transform">
+                  <GraduationCap size={20} weight="fill" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors">Professor de Música</h4>
+                  <p className="text-[11px] text-surface-400 mt-0.5 leading-relaxed">Ofereça aulas particulares ou online, divulgue suas especialidades e encontre alunos.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="border-t border-[#1c1a19]/60 mt-12 sm:mt-16 py-6 sm:py-8 text-center text-xs text-surface-500 font-body">

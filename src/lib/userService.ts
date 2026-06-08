@@ -4,6 +4,7 @@ import { db, storage } from "../firebase";
 import {
   ADMIN_EMAILS, ROLES, type UserRole, type UserData, type UserAddress,
   type VerificationRequest, type VerificationStatus, type TeacherData,
+  type LuthierData,
 } from "./roles";
 
 const DEFAULT_ADDRESS: UserAddress = {
@@ -265,3 +266,36 @@ export async function reviewVerification(
     updatedAt: Date.now(),
   });
 }
+
+export async function getLuthierProfile(uid: string): Promise<LuthierData | null> {
+  try {
+    const docRef = doc(db, "luthiers", uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() } as LuthierData;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export async function updateLuthierProfile(uid: string, data: Partial<LuthierData>) {
+  const docRef = doc(db, "luthiers", uid);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    await updateDoc(docRef, {
+      ...data,
+      updatedAt: Date.now(),
+    });
+  } else {
+    await setDoc(docRef, {
+      userId: uid,
+      ...data,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+  }
+}
+
