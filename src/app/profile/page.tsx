@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { getUserData, updateUserProfile, uploadProfilePhoto, submitVerificationRequest, getTeacherProfile, updateTeacherProfile } from "../../lib/userService";
-import type { UserData } from "../../lib/roles";
+import type { UserData, VerificationStatus } from "../../lib/roles";
 import Link from "next/link";
 import {
   Compass,
@@ -68,6 +68,12 @@ export default function ProfilePage() {
   const [documentPreview, setDocumentPreview] = useState<string>("");
   const [facePreview, setFacePreview] = useState<string>("");
   const [submittingVerification, setSubmittingVerification] = useState(false);
+
+  // Premium plans states
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [premiumBilling, setPremiumBilling] = useState<"monthly" | "yearly">("yearly");
+  const [premiumTier, setPremiumTier] = useState<1 | 2>(1); // default to 1 (Pro / Complete)
+  const [submittingPremium, setSubmittingPremium] = useState(false);
 
   // Teacher profile states
   const [teacherBio, setTeacherBio] = useState("");
@@ -220,6 +226,56 @@ export default function ProfilePage() {
       toast.error("Erro ao enviar verificação.");
     } finally {
       setSubmittingVerification(false);
+    }
+  }
+
+  async function handleSubscribePremium() {
+    if (!user || !profile) return;
+    setSubmittingPremium(true);
+    try {
+      const isYearly = premiumBilling === "yearly";
+      const updatedData = {
+        isPremium: true,
+        premiumTier: premiumTier === 1 ? "tier1" : "tier2",
+        premiumBilling: premiumBilling,
+        isVerified: true,
+        verificationStatus: "approved" as VerificationStatus,
+      };
+
+      await updateUserProfile(user.uid, updatedData as any);
+
+      setProfile((prev) => prev ? { ...prev, ...updatedData } as any : prev);
+      toast.success(`Plano Focatto ${premiumTier === 1 ? "Pro" : "Plus"} (${isYearly ? "Anual" : "Mensal"}) ativado!`);
+      setShowPremiumModal(false);
+    } catch {
+      toast.error("Erro ao ativar plano premium.");
+    } finally {
+      setSubmittingPremium(false);
+    }
+  }
+
+  async function handleCancelPremium() {
+    if (!user || !profile) return;
+    try {
+      const updatedData = {
+        isPremium: false,
+        premiumTier: "",
+        premiumBilling: "",
+      };
+
+      await updateUserProfile(user.uid, updatedData as any);
+
+      setProfile((prev) => {
+        if (!prev) return null;
+        const newProf = { ...prev };
+        delete (newProf as any).premiumTier;
+        delete (newProf as any).premiumBilling;
+        return { ...newProf, isPremium: false };
+      });
+
+      toast.success("Assinatura cancelada com sucesso!");
+    } catch {
+      toast.error("Erro ao cancelar assinatura.");
     }
   }
 
@@ -656,6 +712,75 @@ export default function ProfilePage() {
           Salvar Alterações
         </button>
 
+        {/* Assinatura Premium Section */}
+        <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-4 relative overflow-hidden">
+          {profile?.isPremium && (
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(239,124,44,0.06),transparent_50%)] pointer-events-none" />
+          )}
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-[#ef7c2c]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Plano de Assinatura</h3>
+            </div>
+            
+            {profile?.isPremium ? (
+              <span className="flex items-center gap-1.5 text-xs text-[#ef7c2c] font-semibold bg-[#ef7c2c]/10 px-2.5 py-1 rounded-full border border-[#ef7c2c]/20">
+                ★ Focatto {profile.premiumTier === "tier1" ? "Pro" : "Plus"}
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5 text-xs text-surface-400 font-semibold bg-surface-800 px-2.5 py-1 rounded-full border border-surface-700">
+                Plano Gratuito
+              </span>
+            )}
+          </div>
+
+          {profile?.isPremium ? (
+            <div className="space-y-3">
+              <p className="text-xs text-surface-300 leading-relaxed">
+                Você é um membro <strong>{profile.premiumTier === "tier1" ? "Focatto Pro (Completo)" : "Focatto Plus"}</strong>!
+                Sua assinatura está ativa via faturamento <strong>{profile.premiumBilling === "yearly" ? "Anual" : "Mensal"}</strong>.
+              </p>
+              <div className="flex flex-wrap gap-3 pt-2">
+                <button
+                  onClick={() => setShowPremiumModal(true)}
+                  className="py-2 px-4 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 text-xs font-semibold hover:bg-[#ef7c2c]/20 transition-colors"
+                >
+                  Alterar Plano
+                </button>
+                <button
+                  onClick={handleCancelPremium}
+                  className="py-2 px-4 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20 transition-colors"
+                >
+                  Cancelar Assinatura
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-xs text-surface-400 leading-relaxed">
+                Aumente suas vendas e contatos com os planos premium. Tenha até 3x mais exposição, anúncios ilimitados, WhatsApp direto no anúncio e selo verificado automático!
+              </p>
+              <button
+                onClick={() => {
+                  setPremiumTier(1);
+                  setPremiumBilling("yearly");
+                  setShowPremiumModal(true);
+                }}
+                id="profile-upgrade-premium-btn"
+                className="w-full sm:w-auto py-2.5 px-6 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold hover:shadow-[0_4px_15px_rgba(239,124,44,0.25)] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Quero ser Premium
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Verification Section */}
         <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-4">
           <div className="flex items-center justify-between">
@@ -755,6 +880,181 @@ export default function ProfilePage() {
                 {submittingVerification ? <Spinner size={16} className="animate-spin" /> : null}
                 Enviar para Análise
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Premium Checkout Modal */}
+      {showPremiumModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-4">
+          <div className="w-full max-w-[90vw] sm:max-w-lg bg-[#0c0a09] border border-[#2a2827] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 pt-6 pb-2">
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 rounded-lg bg-[#ef7c2c]/10 text-[#ef7c2c]">
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                </span>
+                <h2 className="text-lg font-bold text-white font-display">Upgrade de Conta - Premium</h2>
+              </div>
+              <button
+                onClick={() => setShowPremiumModal(false)}
+                className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[#181615] transition-colors"
+              >
+                <XCircle size={18} />
+              </button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="px-6 pb-6 pt-2 overflow-y-auto space-y-5 flex-1 scrollbar-thin">
+              
+              {/* Billing Toggle (Mensal / Anual) */}
+              <div className="bg-[#141211] p-1.5 rounded-xl border border-[#22201e] flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPremiumBilling("monthly")}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${
+                    premiumBilling === "monthly"
+                      ? "bg-[#181615] text-[#ef7c2c] border border-[#ef7c2c]/30 shadow-md"
+                      : "text-surface-400 hover:text-white"
+                  }`}
+                >
+                  Mensal
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPremiumBilling("yearly")}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 relative ${
+                    premiumBilling === "yearly"
+                      ? "bg-[#181615] text-[#ef7c2c] border border-[#ef7c2c]/30 shadow-md"
+                      : "text-surface-400 hover:text-white"
+                  }`}
+                >
+                  Anual
+                  <span className="bg-emerald-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                    -R$ 5/mês
+                  </span>
+                </button>
+              </div>
+
+              {/* Package Options */}
+              <div className="space-y-4">
+                <span className="block text-xs font-bold text-surface-400 uppercase tracking-wider">Escolha seu plano:</span>
+                
+                {/* Tier 1: Pro (Complete Package) -> RECOMMENDED */}
+                <div
+                  onClick={() => setPremiumTier(1)}
+                  className={`p-5 rounded-2xl border cursor-pointer transition-all duration-300 relative overflow-hidden ${
+                    premiumTier === 1
+                      ? "bg-[#1d1712] border-[#ef7c2c] shadow-[0_0_15px_rgba(239,124,44,0.15)]"
+                      : "bg-[#141211] border-[#22201e] hover:border-[#2a2827]"
+                  }`}
+                >
+                  {/* Recommended Ribbon */}
+                  <div className="absolute top-0 right-0 bg-gradient-to-l from-[#ef7c2c] to-[#d4ae12] text-white text-[9px] font-extrabold px-3 py-1 rounded-bl-xl uppercase tracking-wider">
+                    Melhor Compra
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <span className="p-2 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] mt-0.5 flex-shrink-0">
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    </span>
+                    <div>
+                      <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                        Plano Pro (Pacote Completo)
+                      </h4>
+                      <p className="text-[11px] text-surface-400 mt-1">
+                        Exposição Máxima (3.0x), anúncios ILIMITADOS, WhatsApp direto nos cards e selo "Pro".
+                      </p>
+                      
+                      <div className="mt-3 flex items-baseline gap-1.5">
+                        <span className="text-lg font-extrabold text-[#ef7c2c]">
+                          R$ {premiumBilling === "yearly" ? "74,90" : "79,90"}
+                        </span>
+                        <span className="text-[10px] text-surface-500">/mês</span>
+                        {premiumBilling === "yearly" && (
+                          <span className="text-[10px] text-emerald-400 font-semibold ml-2">
+                            (R$ 898,80 cobrado anualmente)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tier 2: Plus */}
+                <div
+                  onClick={() => setPremiumTier(2)}
+                  className={`p-5 rounded-2xl border cursor-pointer transition-all duration-300 ${
+                    premiumTier === 2
+                      ? "bg-[#17121d] border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.15)]"
+                      : "bg-[#141211] border-[#22201e] hover:border-[#2a2827]"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 mt-0.5 flex-shrink-0">
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2H2v10h10V2zm0 10H2v10h10V12zm10-10h-10v10h10V2zm0 10h-10v10h10V12z"/>
+                      </svg>
+                    </span>
+                    <div>
+                      <h4 className="text-sm font-bold text-white">Plano Plus (Intermediário)</h4>
+                      <p className="text-[11px] text-surface-400 mt-1">
+                        Exposição Média (1.8x), até 15 anúncios simultâneos e selo "Verificado".
+                      </p>
+                      
+                      <div className="mt-3 flex items-baseline gap-1.5">
+                        <span className="text-lg font-extrabold text-indigo-400">
+                          R$ {premiumBilling === "yearly" ? "24,90" : "29,90"}
+                        </span>
+                        <span className="text-[10px] text-surface-500">/mês</span>
+                        {premiumBilling === "yearly" && (
+                          <span className="text-[10px] text-emerald-400 font-semibold ml-2">
+                            (R$ 298,80 cobrado anualmente)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recommendation message */}
+              {premiumTier === 1 ? (
+                <div className="bg-[#ef7c2c]/5 border border-[#ef7c2c]/10 p-4 rounded-2xl text-[11px] text-surface-300 leading-relaxed flex items-start gap-2.5">
+                  <span className="text-[#ef7c2c] font-bold text-base select-none mt-[-2px]">🏆</span>
+                  <div>
+                    <strong>Recomendação Focatto:</strong> O plano <strong>Pro (Pacote Completo)</strong> é a melhor compra! Ele oferece anúncios ilimitados e o triplo de exposição, ideal para expandir seus contatos e impulsionar suas vendas. O faturamento anual economiza <strong>R$ 60,00 por ano</strong> (desconto de R$ 5,00/mês).
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-indigo-500/5 border border-indigo-500/10 p-4 rounded-2xl text-[11px] text-surface-300 leading-relaxed flex items-start gap-2.5">
+                  <span className="text-indigo-400 font-bold text-base select-none mt-[-2px]">💡</span>
+                  <div>
+                    <strong>Aviso:</strong> O plano <strong>Plus</strong> oferece recursos intermediários, mas se você precisa de anúncios ilimitados ou visibilidade máxima, o plano <strong>Pro</strong> é mais vantajoso!
+                  </div>
+                </div>
+              )}
+
+              {/* Simulated billing note */}
+              <p className="text-[10px] text-surface-500 text-center">
+                * Ambiente de testes. Nenhuma cobrança real será realizada em seu cartão de crédito.
+              </p>
+
+              {/* Submit Button */}
+              <button
+                onClick={handleSubscribePremium}
+                disabled={submittingPremium}
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white font-bold text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {submittingPremium ? <Spinner size={16} className="animate-spin" /> : null}
+                Ativar Plano {premiumTier === 1 ? "Pro" : "Plus"} {premiumBilling === "yearly" ? "Anual" : "Mensal"}
+              </button>
+
             </div>
           </div>
         </div>

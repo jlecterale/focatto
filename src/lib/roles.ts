@@ -80,6 +80,9 @@ export interface UserData {
   verificationStatus: VerificationStatus;
   createdAt: number;
   updatedAt: number;
+  isPremium?: boolean;
+  premiumTier?: string;
+  premiumBilling?: "monthly" | "yearly";
 }
 
 export interface VerificationRequest {

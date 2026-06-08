@@ -51,26 +51,28 @@ interface ItemLocation {
   modalities?: string[];
   phone?: string;
   bio?: string;
+  premiumTier?: string;
+  isPremium?: boolean;
 }
 
 const mockProducts: ItemLocation[] = [
-  { id: "p1", title: "Gibson Les Paul Custom 1978", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 29000, type: "produto", category: "Guitarra", photo: "/gibson_les_paul.png" },
+  { id: "p1", title: "Gibson Les Paul Custom 1978", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 29000, type: "produto", category: "Guitarra", photo: "/gibson_les_paul.png", premiumTier: "tier1", isPremium: true },
   { id: "p2", title: "Fender Stratocaster American Standard", city: "Curitiba", state: "PR", neighborhood: "Centro", price: 12500, type: "produto", category: "Guitarra", photo: "/fender_stratocaster.png" },
-  { id: "p3", title: "Violão Taylor 214ce Deluxe", city: "Belo Horizonte", state: "MG", neighborhood: "Savassi", price: 9800, type: "produto", category: "Violão", photo: "/taylor_acoustic.png" },
+  { id: "p3", title: "Violão Taylor 214ce Deluxe", city: "Belo Horizonte", state: "MG", neighborhood: "Savassi", price: 9800, type: "produto", category: "Violão", photo: "/taylor_acoustic.png", premiumTier: "tier2", isPremium: true },
   { id: "p4", title: "Cabo P10 Santo Angelo 5m", city: "São Paulo", state: "SP", neighborhood: "Vila Mariana", price: 150, type: "produto", category: "Acessório" },
   { id: "p5", title: "Palhetas Dunlop Tortex (Pacote)", city: "Rio de Janeiro", state: "RJ", neighborhood: "Copacabana", price: 75, type: "produto", category: "Acessório" },
   { id: "p6", title: "Pedal de Efeito Boss DS-1 Distortion", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 650, type: "produto", category: "Acessório" },
 ];
 
 const mockLuthiers: ItemLocation[] = [
-  { id: "l1", title: "Guthier Luteria", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", type: "luthier", rating: 4.9, specialties: ["Regulagem", "Pintura"] },
+  { id: "l1", title: "Guthier Luteria", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", type: "luthier", rating: 4.9, specialties: ["Regulagem", "Pintura"], premiumTier: "tier1", isPremium: true },
   { id: "l2", title: "D'Alegria Custom Guitars", city: "Rio de Janeiro", state: "RJ", neighborhood: "Botafogo", type: "luthier", rating: 5.0, specialties: ["Construção", "Restauro"] },
   { id: "l3", title: "Luthieria do Sul", city: "Porto Alegre", state: "RS", neighborhood: "Moinhos de Vento", type: "luthier", rating: 4.8, specialties: ["Trastes", "Eletrônica"] },
 ];
 
 const mockTeachers: ItemLocation[] = [
-  { id: "t1", title: "João Silva - Aulas de Violão & Guitarra", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 80, type: "teacher", rating: 4.8, specialties: ["Violão", "Guitarra", "Teoria Musical"], levels: ["Iniciante", "Intermediário"], modalities: ["Presencial", "Online"], bio: "Professor com mais de 10 anos de experiência didática no ensino de cordas.", phone: "11999999999" },
-  { id: "t2", title: "Aline Mendes - Técnica Vocal & Canto", city: "Rio de Janeiro", state: "RJ", neighborhood: "Copacabana", price: 120, type: "teacher", rating: 5.0, specialties: ["Canto / Técnica Vocal", "Teoria Musical"], levels: ["Iniciante", "Intermediário", "Avançado"], modalities: ["Online"], bio: "Aulas focadas em fisiologia vocal, respiração, afinação e interpretação.", phone: "21988888888" },
+  { id: "t1", title: "João Silva - Aulas de Violão & Guitarra", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 80, type: "teacher", rating: 4.8, specialties: ["Violão", "Guitarra", "Teoria Musical"], levels: ["Iniciante", "Intermediário"], modalities: ["Presencial", "Online"], bio: "Professor com mais de 10 anos de experiência didática no ensino de cordas.", phone: "11999999999", premiumTier: "tier1", isPremium: true },
+  { id: "t2", title: "Aline Mendes - Técnica Vocal & Canto", city: "Rio de Janeiro", state: "RJ", neighborhood: "Copacabana", price: 120, type: "teacher", rating: 5.0, specialties: ["Canto / Técnica Vocal", "Teoria Musical"], levels: ["Iniciante", "Intermediário", "Avançado"], modalities: ["Online"], bio: "Aulas focadas em fisiologia vocal, respiração, afinação e interpretação.", phone: "21988888888", premiumTier: "tier2", isPremium: true },
   { id: "t3", title: "Roberto K. - Aulas de Bateria", city: "Curitiba", state: "PR", neighborhood: "Centro", price: 90, type: "teacher", rating: 4.9, specialties: ["Bateria"], levels: ["Iniciante", "Intermediário", "Avançado"], modalities: ["Presencial"], bio: "Aprenda ritmos, rudimentos, leitura de partitura e grooves diversos.", phone: "41977777777" },
 ];
 
@@ -165,6 +167,8 @@ export default function HomePage() {
               type: "produto",
               category: data.category || "",
               photo: data.photo || (data.photos && data.photos[0]) || undefined,
+              premiumTier: data.premiumTier || undefined,
+              isPremium: data.isPremium || false,
             });
           });
 
@@ -188,6 +192,8 @@ export default function HomePage() {
               rating: data.averageRating || 5.0,
               specialties: data.specialties || [],
               photo: data.photo,
+              premiumTier: data.premiumTier || undefined,
+              isPremium: data.isPremium || false,
             });
           });
 
@@ -216,6 +222,8 @@ export default function HomePage() {
               modalities: data.modalities || [],
               phone: data.phone || "",
               bio: data.bio || "",
+              premiumTier: data.premiumTier || undefined,
+              isPremium: data.isPremium || false,
             });
           });
 
@@ -773,8 +781,14 @@ export default function HomePage() {
 
                           {/* Info Column */}
                           <div className="min-w-0 flex-1">
-                            <h4 className="text-sm font-bold text-white tracking-wide font-body truncate">
-                              {item.title}
+                            <h4 className="text-sm font-bold text-white tracking-wide font-body truncate flex items-center gap-1.5">
+                              <span className="truncate">{item.title}</span>
+                              {item.premiumTier === "tier1" && (
+                                <span className="bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/30 text-[9px] font-extrabold px-1.5 rounded uppercase tracking-wider flex-shrink-0">PRO</span>
+                              )}
+                              {item.premiumTier === "tier2" && (
+                                <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 text-[9px] font-extrabold px-1.5 rounded uppercase tracking-wider flex-shrink-0">PLUS</span>
+                              )}
                             </h4>
                             <div className="flex items-center gap-2 mt-1 text-[11px] text-surface-400">
                               <span className="flex items-center gap-1 font-medium truncate">
