@@ -6,6 +6,7 @@ import { getUserData } from "../../lib/userService";
 import { createProduct, getUserProducts } from "../../lib/productService";
 import type { ProductData } from "../../lib/roles";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Compass, SignOut, Package, Plus, Spinner, ArrowLeft, Clock, CheckCircle, XCircle,
   MapPin, CurrencyDollar, Tag, FileImage, Trash,
@@ -29,7 +30,8 @@ function getConditionsForCategory(cat: string) {
 }
 
 export default function MeusAnunciosPage() {
-  const { user, logout } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
+  const router = useRouter();
   const [products, setProducts] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -54,6 +56,12 @@ export default function MeusAnunciosPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const photoInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/");
+    }
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     if (!user) return;
@@ -139,12 +147,16 @@ export default function MeusAnunciosPage() {
     }
   };
 
-  if (!user) {
+  if (authLoading || (user && loading)) {
     return (
       <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
-        <p className="text-surface-400">Faça login para gerenciar seus anúncios.</p>
+        <Spinner size={24} className="animate-spin text-[#ef7c2c]" />
       </div>
     );
+  }
+
+  if (!user) {
+    return null;
   }
 
   const inputBase =

@@ -15,6 +15,7 @@ import {
 import type { UserData, VerificationStatus } from "../../lib/roles";
 import { Smiley, MusicNote, HeartStraight, Sparkle } from "@phosphor-icons/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Compass,
   SignOut,
@@ -64,7 +65,8 @@ const LUTHIER_SPECIALTIES_LIST = [
 ];
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
+  const router = useRouter();
   const [profile, setProfile] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -119,6 +121,12 @@ export default function ProfilePage() {
   const [teacherPricePerHour, setTeacherPricePerHour] = useState("");
   const [teacherLevels, setTeacherLevels] = useState<string[]>([]);
   const [teacherModalities, setTeacherModalities] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/");
+    }
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     if (!user) return;
@@ -363,20 +371,16 @@ export default function ProfilePage() {
     }
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
-        <p className="text-surface-400">Faça login para acessar seu perfil.</p>
-      </div>
-    );
-  }
-
-  if (loading) {
+  if (authLoading || (user && loading)) {
     return (
       <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
         <Spinner size={24} className="animate-spin text-[#ef7c2c]" />
       </div>
     );
+  }
+
+  if (!user) {
+    return null;
   }
 
   const inputBase =

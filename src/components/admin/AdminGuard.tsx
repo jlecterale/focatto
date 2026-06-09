@@ -2,7 +2,8 @@
 
 import { useAuth } from "../../contexts/AuthContext";
 import { ROLES } from "../../lib/roles";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 
 interface AdminGuardProps {
   children: ReactNode;
@@ -11,6 +12,13 @@ interface AdminGuardProps {
 
 export default function AdminGuard({ children, fallback }: AdminGuardProps) {
   const { user, userRole, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && (!user || userRole !== ROLES.ADMIN)) {
+      router.push("/");
+    }
+  }, [user, userRole, loading, router]);
 
   if (loading) {
     return (
@@ -25,14 +33,7 @@ export default function AdminGuard({ children, fallback }: AdminGuardProps) {
 
   if (!user || userRole !== ROLES.ADMIN) {
     if (fallback) return <>{fallback}</>;
-    return (
-      <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-2">Acesso Restrito</h1>
-          <p className="text-surface-400">Você não tem permissão para acessar esta página.</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return <>{children}</>;
