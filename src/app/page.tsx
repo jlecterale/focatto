@@ -626,7 +626,7 @@ export default function HomePage() {
                 <button
                   onClick={() => setShowAnunciarModal(true)}
                   id="nav-anunciar"
-                  className="flex items-center gap-1.5 py-2 px-3 sm:px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-bold transition-all duration-200 hover:shadow-[0_4px_15px_rgba(239,124,44,0.4)] hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+                  className="flex items-center justify-center gap-1 h-9 w-9 sm:h-auto sm:w-auto sm:py-2.5 sm:px-4 rounded-full sm:rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-bold transition-all duration-200 hover:shadow-[0_4px_15px_rgba(239,124,44,0.4)] hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
                 >
                   <Plus size={14} weight="bold" />
                   <span className="hidden sm:inline">Anunciar</span>
@@ -667,7 +667,7 @@ export default function HomePage() {
                 <button
                   onClick={() => setShowLogin(true)}
                   id="nav-anunciar-loggedout"
-                  className="flex items-center gap-1.5 py-2 px-3 sm:px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-bold transition-all duration-200 hover:shadow-[0_4px_15px_rgba(239,124,44,0.4)] hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+                  className="flex items-center justify-center gap-1 h-9 w-9 sm:h-auto sm:w-auto sm:py-2.5 sm:px-4 rounded-full sm:rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-bold transition-all duration-200 hover:shadow-[0_4px_15px_rgba(239,124,44,0.4)] hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
                 >
                   <Plus size={14} weight="bold" />
                   <span className="hidden sm:inline">Anunciar</span>
@@ -694,7 +694,7 @@ export default function HomePage() {
           <button
             onClick={() => handleTabChange("produtos")}
             id="tab-produtos"
-            className={`flex items-center gap-2 py-2.5 px-5 text-xs font-semibold rounded-xl transition-all duration-300 cursor-pointer flex-shrink-0 whitespace-nowrap ${
+            className={`flex items-center gap-1.5 py-2 px-3 sm:py-2.5 sm:px-5 text-[11px] sm:text-xs font-semibold rounded-xl transition-all duration-300 cursor-pointer flex-shrink-0 whitespace-nowrap ${
               activeTab === "produtos" 
                 ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white shadow-[0_4px_15px_rgba(239,124,44,0.25)] font-bold scale-[1.02]" 
                 : "bg-[#181615] text-surface-400 hover:text-white border border-[#252322] hover:bg-[#201e1d]"
@@ -707,7 +707,7 @@ export default function HomePage() {
           <button
             onClick={() => handleTabChange("luthiers")}
             id="tab-luthiers"
-            className={`flex items-center gap-2 py-2.5 px-5 text-xs font-semibold rounded-xl transition-all duration-300 cursor-pointer flex-shrink-0 whitespace-nowrap ${
+            className={`flex items-center gap-1.5 py-2 px-3 sm:py-2.5 sm:px-5 text-[11px] sm:text-xs font-semibold rounded-xl transition-all duration-300 cursor-pointer flex-shrink-0 whitespace-nowrap ${
               activeTab === "luthiers" 
                 ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white shadow-[0_4px_15px_rgba(239,124,44,0.25)] font-bold scale-[1.02]" 
                 : "bg-[#181615] text-surface-400 hover:text-white border border-[#252322] hover:bg-[#201e1d]"
@@ -720,7 +720,7 @@ export default function HomePage() {
           <button
             onClick={() => handleTabChange("professores")}
             id="tab-professores"
-            className={`flex items-center gap-2 py-2.5 px-5 text-xs font-semibold rounded-xl transition-all duration-300 cursor-pointer flex-shrink-0 whitespace-nowrap ${
+            className={`flex items-center gap-1.5 py-2 px-3 sm:py-2.5 sm:px-5 text-[11px] sm:text-xs font-semibold rounded-xl transition-all duration-300 cursor-pointer flex-shrink-0 whitespace-nowrap ${
               activeTab === "professores" 
                 ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white shadow-[0_4px_15px_rgba(239,124,44,0.25)] font-bold scale-[1.02]" 
                 : "bg-[#181615] text-surface-400 hover:text-white border border-[#252322] hover:bg-[#201e1d]"
@@ -803,8 +803,8 @@ export default function HomePage() {
           <div className="lg:col-span-9 grid md:grid-cols-12 gap-6">
             
             {/* Listings Panel */}
-            <div className={`md:col-span-5 flex flex-col gap-4 ${mobileView !== "list" ? "hidden md:flex" : "flex"}`}>
-              <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] flex flex-col gap-4 shadow-xl">
+            <div className={`md:col-span-5 flex flex-col gap-4 min-w-0 ${mobileView !== "list" ? "hidden md:flex" : "flex"}`}>
+              <div className="bg-[#141211] rounded-2xl p-3 sm:p-5 border border-[#22201e] flex flex-col gap-4 shadow-xl min-w-0">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-surface-400 font-body">
                     Resultados ({filteredItems.length})
@@ -814,7 +814,7 @@ export default function HomePage() {
                   )}
                 </div>
 
-                <div className="flex flex-col gap-3 max-h-[280px] sm:max-h-[360px] md:max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
+                <div className="flex flex-col gap-3 max-h-[280px] sm:max-h-[360px] md:max-h-[420px] overflow-y-auto pr-1 scrollbar-thin min-w-0">
                   {loading ? (
                     Array.from({ length: 3 }).map((_, i) => (
                       <div key={i} className="shimmer h-[76px] rounded-xl border border-surface-800/50" />
@@ -826,7 +826,7 @@ export default function HomePage() {
                         <div
                           key={item.id}
                           onClick={() => { setSelectedItem(item); setViewMode("photo"); setMobileView("details"); }}
-                          className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 flex items-center gap-3 ${
+                          className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl border cursor-pointer transition-all duration-300 flex items-center gap-2 sm:gap-3 min-w-0 ${
                             isSelected
                               ? "bg-[#1d1b1a] border-[#ef7c2c] shadow-[0_0_12px_rgba(239,124,44,0.12)]"
                               : "bg-[#110f0e] border-[#1c1a19] hover:border-[#2a2827]"
@@ -917,9 +917,8 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Map/Photo Panel */}
-            <div className={`md:col-span-7 flex flex-col gap-4 ${mobileView !== "details" ? "hidden md:flex" : "flex"}`}>
-              <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] flex flex-col gap-4 shadow-xl">
+            <div className={`md:col-span-7 flex flex-col gap-4 min-w-0 ${mobileView !== "details" ? "hidden md:flex" : "flex"}`}>
+              <div className="bg-[#141211] rounded-2xl p-3 sm:p-5 border border-[#22201e] flex flex-col gap-4 shadow-xl min-w-0">
                 <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
                   <div className="flex items-center gap-3">
                     {/* Mobile Back Button */}
