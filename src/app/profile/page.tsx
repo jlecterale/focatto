@@ -13,6 +13,15 @@ import {
   updateLuthierProfile,
 } from "../../lib/userService";
 import type { UserData, VerificationStatus } from "../../lib/roles";
+import {
+  formatPhone,
+  formatCpfCnpj,
+  isValidPhone,
+  isValidCPF,
+  isValidCNPJ,
+  formatCep,
+  isValidCep,
+} from "../../lib/validation";
 import { Smiley, MusicNote, HeartStraight, Sparkle } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -73,9 +82,13 @@ export default function ProfilePage() {
 
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [cpfCnpj, setCpfCnpj] = useState("");
+  const [cpfCnpjError, setCpfCnpjError] = useState("");
   const [bio, setBio] = useState("");
   const [cep, setCep] = useState("");
+  const [cepError, setCepError] = useState("");
+  const [loadingCep, setLoadingCep] = useState(false);
   const [street, setStreet] = useState("");
   const [number, setNumber] = useState("");
   const [complement, setComplement] = useState("");
@@ -84,6 +97,7 @@ export default function ProfilePage() {
   const [state, setState] = useState("");
 
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const numberInputRef = useRef<HTMLInputElement>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   // Verification
@@ -122,6 +136,152 @@ export default function ProfilePage() {
   const [teacherLevels, setTeacherLevels] = useState<string[]>([]);
   const [teacherModalities, setTeacherModalities] = useState<string[]>([]);
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhone(e.target.value);
+    setPhone(formatted);
+    if (phoneError) setPhoneError("");
+  };
+
+  const handlePhoneBlur = () => {
+    if (phone) {
+      if (!isValidPhone(phone)) {
+        setPhoneError("Telefone inválido. Use o formato (XX) 9XXXX-XXXX ou (XX) XXXX-XXXX.");
+      } else {
+        setPhoneError("");
+      }
+    } else {
+      setPhoneError("");
+    }
+  };
+
+  const handleCpfCnpjChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCpfCnpj(e.target.value);
+    setCpfCnpj(formatted);
+    if (cpfCnpjError) setCpfCnpjError("");
+  };
+
+  const handleCpfCnpjBlur = () => {
+    if (cpfCnpj) {
+      const cleanVal = cpfCnpj.replace(/\D/g, "");
+      if (cleanVal.length <= 11) {
+        if (!isValidCPF(cleanVal)) {
+          setCpfCnpjError("CPF inválido.");
+        } else {
+          setCpfCnpjError("");
+        }
+      } else {
+        if (!isValidCNPJ(cleanVal)) {
+          setCpfCnpjError("CNPJ inválido.");
+        } else {
+          setCpfCnpjError("");
+        }
+      }
+    } else {
+      setCpfCnpjError("");
+    }
+  };
+
+  const fetchAddressByCep = async (cleanCep: string) => {
+    setLoadingCep(true);
+    setCepError("");
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+      if (!res.ok) {
+        throw new Error("Erro de conexão");
+      }
+      const data = await res.json();
+      if (data.erro) {
+        setCepError("CEP não encontrado.");
+      } else {
+        setStreet(data.logradouro || "");
+        setNeighborhood(data.bairro || "");
+        setCity(data.localidade || "");
+        setState(data.uf || "");
+        
+        // Focus on the number input after auto-filling
+        setTimeout(() => {
+          numberInputRef.current?.focus();
+        }, 100);
+      }
+    } catch {
+      setCepError("Erro ao buscar o CEP. Preencha os campos manualmente.");
+    } finally {
+      setLoadingCep(false);
+    }
+  };
+
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCep(e.target.value);
+    setCep(formatted);
+    setCepError("");
+
+    const cleanCep = formatted.replace(/\D/g, "");
+    if (cleanCep.length === 8) {
+      fetchAddressByCep(cleanCep);
+    }
+  };
+
+  const handleCepBlur = () => {
+    if (cep) {
+      if (!isValidCep(cep)) {
+        setCepError("CEP inválido. Deve conter 8 dígitos.");
+      } else {
+        setCepError("");
+      }
+    } else {
+      setCepError("");
+    }
+  };
+
+  function validateFields(currentPhone: string, currentCpfCnpj: string, currentCep: string): boolean {
+    let isValid = true;
+    
+    if (currentPhone) {
+      if (!isValidPhone(currentPhone)) {
+        setPhoneError("Telefone inválido. Use o formato (XX) 9XXXX-XXXX ou (XX) XXXX-XXXX.");
+        isValid = false;
+      } else {
+        setPhoneError("");
+      }
+    } else {
+      setPhoneError("");
+    }
+
+    if (currentCpfCnpj) {
+      const cleanVal = currentCpfCnpj.replace(/\D/g, "");
+      if (cleanVal.length <= 11) {
+        if (!isValidCPF(cleanVal)) {
+          setCpfCnpjError("CPF inválido.");
+          isValid = false;
+        } else {
+          setCpfCnpjError("");
+        }
+      } else {
+        if (!isValidCNPJ(cleanVal)) {
+          setCpfCnpjError("CNPJ inválido.");
+          isValid = false;
+        } else {
+          setCpfCnpjError("");
+        }
+      }
+    } else {
+      setCpfCnpjError("");
+    }
+
+    if (currentCep) {
+      if (!isValidCep(currentCep)) {
+        setCepError("CEP inválido. Deve conter 8 dígitos.");
+        isValid = false;
+      } else {
+        setCepError("");
+      }
+    } else {
+      setCepError("");
+    }
+
+    return isValid;
+  }
+
   useEffect(() => {
     if (!authLoading && !user) {
       router.push("/");
@@ -135,14 +295,14 @@ export default function ProfilePage() {
       if (data) {
         setProfile(data);
         setDisplayName(data.displayName);
-        setPhone(data.phone);
-        setCpfCnpj(data.cpfCnpj);
+        setPhone(formatPhone(data.phone || ""));
+        setCpfCnpj(formatCpfCnpj(data.cpfCnpj || ""));
         setBio(data.bio);
         setSellerAbout(data.sellerAbout || "");
         setSellerMusic(data.sellerMusic || "");
         setSellerHobbies(data.sellerHobbies || "");
         setSellerFunFacts(data.sellerFunFacts || "");
-        setCep(data.address.cep);
+        setCep(formatCep(data.address.cep || ""));
         setStreet(data.address.street);
         setNumber(data.address.number);
         setComplement(data.address.complement);
@@ -179,6 +339,12 @@ export default function ProfilePage() {
 
   async function handleSave() {
     if (!user || !profile) return;
+    
+    if (!validateFields(phone, cpfCnpj, cep)) {
+      toast.error("Por favor, corrija os erros no formulário antes de salvar.");
+      return;
+    }
+
     setSaving(true);
     try {
       await updateUserProfile(user.uid, {
@@ -530,31 +696,39 @@ export default function ProfilePage() {
             <div>
               <label htmlFor="profile-phone-input" className="block text-xs text-surface-400 mb-1.5">Telefone / WhatsApp</label>
               <div className="relative">
-                <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
+                <Phone size={16} className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${phoneError ? 'text-red-400' : 'text-surface-400'}`} />
                 <input
                   type="text"
                   id="profile-phone-input"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={handlePhoneChange}
+                  onBlur={handlePhoneBlur}
                   placeholder="(11) 99999-9999"
-                  className={`${inputBase} pl-10`}
+                  className={`${inputBase} pl-10 ${phoneError ? 'border-red-500/50 focus:border-red-500 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]' : ''}`}
                 />
               </div>
+              {phoneError && (
+                <span className="text-[11px] text-red-400 mt-1 block px-1">{phoneError}</span>
+              )}
             </div>
 
             <div>
               <label htmlFor="profile-cpf-cnpj-input" className="block text-xs text-surface-400 mb-1.5">CPF / CNPJ</label>
               <div className="relative">
-                <IdentificationCard size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400" />
+                <IdentificationCard size={16} className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${cpfCnpjError ? 'text-red-400' : 'text-surface-400'}`} />
                 <input
                   type="text"
                   id="profile-cpf-cnpj-input"
                   value={cpfCnpj}
-                  onChange={(e) => setCpfCnpj(e.target.value)}
+                  onChange={handleCpfCnpjChange}
+                  onBlur={handleCpfCnpjBlur}
                   placeholder="000.000.000-00"
-                  className={`${inputBase} pl-10`}
+                  className={`${inputBase} pl-10 ${cpfCnpjError ? 'border-red-500/50 focus:border-red-500 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]' : ''}`}
                 />
               </div>
+              {cpfCnpjError && (
+                <span className="text-[11px] text-red-400 mt-1 block px-1">{cpfCnpjError}</span>
+              )}
             </div>
 
             <div className="sm:col-span-2">
@@ -581,14 +755,27 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label htmlFor="profile-cep-input" className="block text-xs text-surface-400 mb-1.5">CEP</label>
-              <input
-                type="text"
-                id="profile-cep-input"
-                value={cep}
-                onChange={(e) => setCep(e.target.value)}
-                placeholder="00000-000"
-                className={inputBase}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  id="profile-cep-input"
+                  value={cep}
+                  onChange={handleCepChange}
+                  onBlur={handleCepBlur}
+                  placeholder="00000-000"
+                  className={`${inputBase} ${cepError ? 'border-red-500/50 focus:border-red-500 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]' : ''} pr-10`}
+                />
+                {loadingCep && (
+                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2">
+                    <Spinner size={14} className="animate-spin text-[#ef7c2c]" />
+                  </div>
+                )}
+              </div>
+              {cepError ? (
+                <span className="text-[11px] text-red-400 mt-1 block px-1">{cepError}</span>
+              ) : (
+                <span className="text-[10px] text-surface-500 mt-1 block px-1">Endereço preenchido automaticamente ao digitar o CEP.</span>
+              )}
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="profile-street-input" className="block text-xs text-surface-400 mb-1.5">Rua</label>
@@ -605,6 +792,7 @@ export default function ProfilePage() {
               <input
                 type="text"
                 id="profile-number-input"
+                ref={numberInputRef}
                 value={number}
                 onChange={(e) => setNumber(e.target.value)}
                 className={inputBase}
