@@ -10,6 +10,13 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 
 ## 📅 Histórico de Intervenções
 
+### 10/06/2026 — Hub de Painel e Modo de Edição no Perfil do Usuário
+*   **Objetivo**: Transformar a tela de Perfil (`/profile`) em um painel central limpo que exibe por padrão as seções: "Meus Anúncios", "Favoritos", "Atividades" e "Propostas Recebidas". Ocultar todos os formulários e configurações de edição de perfil (dados pessoais, endereço, luthier, professor, premium, verificação) atrás de um modo de edição toggle ("Editar Perfil"), melhorando significativamente a experiência de uso (UX) e organização.
+*   **Arquivos Modificados**:
+    *   [`src/lib/productService.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/productService.ts) — Adicionado método `getUserFavorites` para carregar anúncios favoritados pelo usuário logado.
+    *   [`src/app/profile/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/profile/page.tsx) — Refatorado layout para usar um painel com abas por padrão (`!isEditing`). Adicionado carregamento paralelo dos anúncios do usuário e dos detalhes de seus favoritos (com foto, preço, local). Adicionado atalhos para desfavoritar itens e excluir anúncios.
+*   **Estado**: Concluído e validado com build de produção.
+
 ### 10/06/2026 — Correção de Consultas e Índices do Firestore (Painel Admin e Meus Anúncios)
 *   **Objetivo**: Resolver problemas de anúncios ativos que não apareciam no Dashboard do Admin e de anúncios do próprio usuário (pendentes por padrão) que não eram exibidos na página "Meus Anúncios".
 *   **Arquivos Modificados**:

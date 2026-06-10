@@ -243,6 +243,20 @@ export async function getSellerProductsFavorites(sellerId: string): Promise<Favo
   }
 }
 
+export async function getUserFavorites(userId: string): Promise<FavoriteData[]> {
+  try {
+    const q = query(
+      collection(db, "favorites"),
+      where("userId", "==", userId)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() } as FavoriteData));
+  } catch {
+    return [];
+  }
+}
+
+
 export async function createProposal(
   productId: string,
   productTitle: string,
