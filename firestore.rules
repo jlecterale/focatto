@@ -110,8 +110,8 @@ service cloud.firestore {
 
     // Chats collection
     match /chats/{chatId} {
-      // Only participants can read the chat
-      allow read: if isAuth() && request.auth.uid in resource.data.participants;
+      // Only participants can read the chat (allow read if doc doesn't exist yet for getDoc checks)
+      allow read: if isAuth() && (resource == null || request.auth.uid in resource.data.participants);
 
       // Authenticated users can create chats
       allow create: if isAuth() && request.auth.uid in request.resource.data.participants;

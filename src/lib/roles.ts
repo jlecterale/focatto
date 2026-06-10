@@ -172,8 +172,14 @@ export interface ProposalData {
   receiverId: string;
   receiverName: string;
   receiverEmail: string;
+  type: "value" | "trade";
   value: number;
+  tradeValue?: number;
   message: string;
+  tradeDescription?: string;
+  tradeCategory?: string;
+  tradeCondition?: string;
+  tradePhotos?: string[];
   status: "pending" | "accepted" | "rejected";
   createdAt: number;
 }

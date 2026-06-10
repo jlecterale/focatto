@@ -286,10 +286,27 @@ export async function createProposal(
   receiverId: string,
   receiverName: string,
   receiverEmail: string,
+  type: "value" | "trade",
   value: number,
   message: string,
-  senderId: string
+  senderId: string,
+  tradeDescription?: string,
+  tradeCategory?: string,
+  tradeCondition?: string,
+  tradePhotoFiles?: File[],
+  tradeValue?: number,
 ): Promise<string> {
+  let tradePhotos: string[] = [];
+
+  if (tradePhotoFiles && tradePhotoFiles.length > 0) {
+    for (let i = 0; i < tradePhotoFiles.length; i++) {
+      const fileRef = ref(storage, `proposals/${receiverId}/${Date.now()}_${i}`);
+      await uploadBytes(fileRef, tradePhotoFiles[i]);
+      const url = await getDownloadURL(fileRef);
+      tradePhotos.push(url);
+    }
+  }
+
   const proposalData: Omit<ProposalData, "id"> = {
     productId,
     productTitle,
@@ -299,13 +316,39 @@ export async function createProposal(
     receiverId,
     receiverName,
     receiverEmail,
+    type,
     value,
     message,
+    ...(type === "trade" && {
+      tradeDescription,
+      tradeCategory,
+      tradeCondition,
+      tradePhotos: tradePhotos.length > 0 ? tradePhotos : undefined,
+      tradeValue,
+    }),
     status: "pending",
     createdAt: Date.now(),
   };
 
   const docRef = await addDoc(collection(db, "proposals"), proposalData);
+
+  // Notify the receiver about the proposal
+  try {
+    const proposalTypeLabel = type === "trade" ? "Proposta de Troca" : "Proposta de Valor";
+    await createNotification(
+      receiverId,
+      senderId,
+      sellerName,
+      "proposal",
+      proposalTypeLabel,
+      `${sellerName} enviou uma ${proposalTypeLabel.toLowerCase()} para o anúncio "${productTitle}".`,
+      productId,
+      productTitle
+    );
+  } catch (err) {
+    console.error("Error creating proposal notification:", err);
+  }
+
   return docRef.id;
 }
 

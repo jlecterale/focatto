@@ -113,6 +113,7 @@ export function listenToUserChats(
     },
     (err) => {
       console.error("Error listening to user chats:", err);
+      callback([]);
     }
   );
 }
@@ -137,6 +138,7 @@ export function listenToChatMessages(
     },
     (err) => {
       console.error("Error listening to chat messages:", err);
+      callback([]);
     }
   );
 }
@@ -209,6 +211,7 @@ export function listenToUnreadChatsCount(
     },
     (err) => {
       console.error("Error listening to unread chats count:", err);
+      callback(0);
     }
   );
 }

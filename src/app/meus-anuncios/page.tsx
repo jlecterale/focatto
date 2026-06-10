@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Compass, SignOut, Package, Plus, Spinner, ArrowLeft, Clock, CheckCircle, XCircle,
-  MapPin, CurrencyDollar, Tag, FileImage, Trash, HeartStraight,
+  MapPin, CurrencyDollar, Tag, FileImage, Trash, HeartStraight, ArrowsLeftRight,
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import NotificationBell from "../../components/NotificationBell";
@@ -68,24 +68,42 @@ export default function MeusAnunciosPage() {
   const [showProposalModal, setShowProposalModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(null);
   const [selectedFav, setSelectedFav] = useState<FavoriteData | null>(null);
+  const [proposalType, setProposalType] = useState<"value" | "trade">("value");
   const [proposalValue, setProposalValue] = useState("");
   const [proposalMessage, setProposalMessage] = useState("");
+  const [tradeDescription, setTradeDescription] = useState("");
+  const [tradeCategory, setTradeCategory] = useState(CATEGORIES[0]);
+  const [tradeCondition, setTradeCondition] = useState(getConditionsForCategory(CATEGORIES[0])[0]);
+  const [tradeValue, setTradeValue] = useState("");
+  const [tradePhotos, setTradePhotos] = useState<File[]>([]);
+  const [tradePhotoPreviews, setTradePhotoPreviews] = useState<string[]>([]);
   const [sendingProposal, setSendingProposal] = useState(false);
 
   function handleOpenProposalModal(product: ProductData, favorite: FavoriteData) {
     setSelectedProduct(product);
     setSelectedFav(favorite);
+    setProposalType("value");
     setProposalValue(String(product.price));
     setProposalMessage(
       `Olá ${favorite.userName}! Vi que você favoritou o meu anúncio "${product.title}". Gostaria de te fazer uma proposta especial...`
     );
+    setTradeDescription("");
+    setTradeCategory(CATEGORIES[0]);
+    setTradeCondition(getConditionsForCategory(CATEGORIES[0])[0]);
+    setTradeValue("");
+    setTradePhotos([]);
+    setTradePhotoPreviews([]);
     setShowProposalModal(true);
   }
 
   async function handleSubmitProposal() {
-    if (!user || !selectedProduct || !selectedFav || !proposalValue) return;
-    if (Number(proposalValue) <= 0) {
+    if (!user || !selectedProduct || !selectedFav) return;
+    if (proposalType === "value" && Number(proposalValue) <= 0) {
       toast.error("O valor da proposta deve ser maior que zero.");
+      return;
+    }
+    if (proposalType === "trade" && !tradeDescription.trim()) {
+      toast.error("Descreva o item que você está oferecendo para troca.");
       return;
     }
     setSendingProposal(true);
@@ -98,9 +116,15 @@ export default function MeusAnunciosPage() {
         selectedFav.userId,
         selectedFav.userName,
         selectedFav.userEmail,
-        Number(proposalValue),
+        proposalType,
+        proposalType === "value" ? Number(proposalValue) : 0,
         proposalMessage,
-        user.uid
+        user.uid,
+        proposalType === "trade" ? tradeDescription : undefined,
+        proposalType === "trade" ? tradeCategory : undefined,
+        proposalType === "trade" ? tradeCondition : undefined,
+        proposalType === "trade" && tradePhotos.length > 0 ? tradePhotos : undefined,
+        proposalType === "trade" && tradeValue ? Number(tradeValue) : undefined,
       );
       toast.success("Proposta enviada com sucesso!");
       setShowProposalModal(false);
@@ -458,7 +482,7 @@ export default function MeusAnunciosPage() {
                                           : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                                       }`}
                                     >
-                                      Proposta: R$ {existingProposal.value} ({
+                                      {existingProposal.type === "trade" ? "Troca" : `R$ ${existingProposal.value}`} ({
                                         existingProposal.status === "accepted" ? "Aceita" :
                                         existingProposal.status === "rejected" ? "Recusada" :
                                         "Pendente"
@@ -490,13 +514,19 @@ export default function MeusAnunciosPage() {
       {/* Proposal Modal */}
       {showProposalModal && selectedProduct && selectedFav && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md bg-[#0c0a09] border border-[#2a2827] rounded-3xl shadow-2xl overflow-hidden">
+          <div className="w-full max-w-md bg-[#0c0a09] border border-[#2a2827] rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]">
             <div className="flex items-center justify-between px-6 pt-6 pb-2">
               <div className="flex items-center gap-2">
                 <span className="p-1.5 rounded-lg bg-[#ef7c2c]/10 text-[#ef7c2c]">
-                  <CurrencyDollar size={18} weight="bold" />
+                  {proposalType === "value" ? (
+                    <CurrencyDollar size={18} weight="bold" />
+                  ) : (
+                    <ArrowsLeftRight size={18} weight="bold" />
+                  )}
                 </span>
-                <h2 className="text-base font-bold text-white">Fazer Proposta</h2>
+                <h2 className="text-base font-bold text-white">
+                  {proposalType === "value" ? "Proposta de Valor" : "Proposta de Troca"}
+                </h2>
               </div>
               <button
                 onClick={() => setShowProposalModal(false)}
@@ -508,7 +538,7 @@ export default function MeusAnunciosPage() {
 
             <div className="px-6 pb-6 pt-2 space-y-4">
               <p className="text-xs text-surface-400">
-                Envie uma proposta de preço personalizada para <strong>{selectedFav.userName}</strong>.
+                Envie uma proposta para <strong>{selectedFav.userName}</strong> sobre o anúncio:
               </p>
 
               <div>
@@ -518,17 +548,153 @@ export default function MeusAnunciosPage() {
                 </div>
               </div>
 
+              {/* Toggle Tipo de Proposta */}
               <div>
-                <label htmlFor="proposal-value-input" className="block text-xs text-surface-400 mb-1.5">Valor Proposto (R$)</label>
-                <input
-                  type="number"
-                  id="proposal-value-input"
-                  value={proposalValue}
-                  onChange={(e) => setProposalValue(e.target.value)}
-                  placeholder="Ex: 8500"
-                  className={inputBase}
-                />
+                <label className="block text-xs text-surface-400 mb-1.5">Tipo de Proposta</label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setProposalType("value")}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      proposalType === "value"
+                        ? "bg-[#ef7c2c]/20 text-[#ef7c2c] border border-[#ef7c2c]/40"
+                        : "bg-[#181615] text-surface-400 border border-[#2a2827] hover:border-[#ef7c2c]/20"
+                    }`}
+                  >
+                    <CurrencyDollar size={14} className="inline mr-1" weight="bold" />
+                    Valor
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setProposalType("trade")}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      proposalType === "trade"
+                        ? "bg-[#ef7c2c]/20 text-[#ef7c2c] border border-[#ef7c2c]/40"
+                        : "bg-[#181615] text-surface-400 border border-[#2a2827] hover:border-[#ef7c2c]/20"
+                    }`}
+                  >
+                    <ArrowsLeftRight size={14} className="inline mr-1" weight="bold" />
+                    Troca
+                  </button>
+                </div>
               </div>
+
+              {proposalType === "value" ? (
+                <div>
+                  <label htmlFor="proposal-value-input" className="block text-xs text-surface-400 mb-1.5">Valor Proposto (R$)</label>
+                  <input
+                    type="number"
+                    id="proposal-value-input"
+                    value={proposalValue}
+                    onChange={(e) => setProposalValue(e.target.value)}
+                    placeholder="Ex: 8500"
+                    className={inputBase}
+                  />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="trade-description-textarea" className="block text-xs text-surface-400 mb-1.5">Descreva o item oferecido para troca</label>
+                    <textarea
+                      id="trade-description-textarea"
+                      value={tradeDescription}
+                      onChange={(e) => setTradeDescription(e.target.value)}
+                      placeholder="Ex: Ofereço uma Guitarra Fender Stratocaster 2005 sunburst em excelente estado..."
+                      rows={3}
+                      className={`${inputBase} resize-none`}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label htmlFor="trade-category-select" className="block text-xs text-surface-400 mb-1.5">Categoria</label>
+                      <select
+                        id="trade-category-select"
+                        value={tradeCategory}
+                        onChange={(e) => setTradeCategory(e.target.value)}
+                        className={inputBase}
+                      >
+                        {CATEGORIES.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor="trade-condition-select" className="block text-xs text-surface-400 mb-1.5">Condição</label>
+                      <select
+                        id="trade-condition-select"
+                        value={tradeCondition}
+                        onChange={(e) => setTradeCondition(e.target.value)}
+                        className={inputBase}
+                      >
+                        {getConditionsForCategory(tradeCategory).map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="trade-value-input" className="block text-xs text-surface-400 mb-1.5">Valor de diferença (R$) <span className="text-surface-500">(opcional)</span></label>
+                    <input
+                      type="number"
+                      id="trade-value-input"
+                      value={tradeValue}
+                      onChange={(e) => setTradeValue(e.target.value)}
+                      placeholder="Ex: 2000"
+                      className={inputBase}
+                    />
+                    <p className="text-[10px] text-surface-500 mt-1">Se o item de troca valer menos, você pode pagar a diferença.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-surface-400 mb-1.5">Fotos do item de troca <span className="text-surface-500">(opcional, máx. 10MB cada)</span></label>
+                    <div className="flex flex-wrap gap-2">
+                      {tradePhotoPreviews.map((preview, index) => (
+                        <div key={index} className="relative">
+                          <img
+                            src={preview}
+                            alt={`Trade photo ${index + 1}`}
+                            className="h-16 w-16 rounded-xl object-cover border border-[#2a2827]"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTradePhotos((prev) => prev.filter((_, i) => i !== index));
+                              setTradePhotoPreviews((prev) => prev.filter((_, i) => i !== index));
+                            }}
+                            className="absolute -top-1.5 -right-1.5 h-5 w-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] cursor-pointer hover:bg-red-600 transition-colors"
+                          >
+                            <XCircle size={12} weight="fill" />
+                          </button>
+                        </div>
+                      ))}
+                      {tradePhotoPreviews.length < 4 && (
+                        <label className="h-16 w-16 rounded-xl border-2 border-dashed border-[#2a2827] flex items-center justify-center cursor-pointer hover:border-[#ef7c2c]/40 transition-colors bg-[#181615]">
+                          <FileImage size={18} className="text-surface-400" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const MAX_FILE_SIZE = 10 * 1024 * 1024;
+                              if (file.size > MAX_FILE_SIZE) {
+                                toast.error("Cada foto deve ter no máximo 10MB.");
+                                return;
+                              }
+                              setTradePhotos((prev) => [...prev, file]);
+                              setTradePhotoPreviews((prev) => [...prev, URL.createObjectURL(file)]);
+                              e.target.value = "";
+                            }}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label htmlFor="proposal-message-textarea" className="block text-xs text-surface-400 mb-1.5">Mensagem para o interessado</label>
@@ -536,19 +702,19 @@ export default function MeusAnunciosPage() {
                   id="proposal-message-textarea"
                   value={proposalMessage}
                   onChange={(e) => setProposalMessage(e.target.value)}
-                  placeholder="Olá! Posso te dar um desconto..."
-                  rows={4}
+                  placeholder="Olá! Posso te fazer uma proposta..."
+                  rows={3}
                   className={`${inputBase} resize-none`}
                 />
               </div>
 
               <button
                 onClick={handleSubmitProposal}
-                disabled={sendingProposal || !proposalValue}
+                disabled={sendingProposal || (proposalType === "value" && !proposalValue)}
                 className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white font-bold text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
               >
                 {sendingProposal ? <Spinner size={16} className="animate-spin" /> : null}
-                Enviar Proposta
+                {proposalType === "value" ? "Enviar Proposta de Valor" : "Enviar Proposta de Troca"}
               </button>
             </div>
           </div>

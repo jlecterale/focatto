@@ -143,6 +143,20 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
     *   [`monetizacao.html`](file:///c:/Users/USER%201/Desktop/focatto/monetizacao.html) — Modelo geral de monetização.
 *   **Estado**: Concluído.
 
+### 10/06/2026 — Propostas de Troca com Descrição Livre, Fotos (10MB) e Notificação ao Comprador
+*   **Objetivo**: Adicionar suporte a propostas de troca (além das propostas de valor existentes) quando um vendedor envia proposta para um usuário que favoritou seu anúncio. O vendedor pode descrever livremente o item de troca, selecionar categoria/condição, fazer upload de até 4 fotos (limite de 10MB cada via Firebase Storage) e opcionalmente definir um valor de diferença. O comprador agora também recebe notificação em tempo real quando uma proposta é criada.
+*   **Arquivos Modificados**:
+    *   [`src/lib/roles.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/roles.ts) — Adicionados campos `type`, `tradeDescription`, `tradeCategory`, `tradeCondition`, `tradePhotos`, `tradeValue` ao `ProposalData`.
+    *   [`src/lib/productService.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/productService.ts) — Refatorado `createProposal` para aceitar `type` e campos de troca, upload de fotos para `storage/proposals/`, e criação de notificação `type:"proposal"` para o receiver.
+    *   [`src/app/meus-anuncios/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/meus-anuncios/page.tsx) — Modal de proposta com toggle Valor/Troca, campos dinâmicos, upload de fotos com validação de 10MB, preview e remoção. Badge de status exibe "Troca" ou "R$ X".
+    *   [`src/app/profile/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/profile/page.tsx) — Aba "Propostas" agora exibe badge "Valor"/"Troca", detalhes do item de troca (descrição, categoria, condição, fotos clicáveis) e valor de referência.
+*   **Estado**: Concluído, build validado, rules/indexes em produção.
+*   **Objetivo**: Diagnosticar e corrigir falha no chat interno que impedia sua inicialização. Causa raiz: security rule `allow read` em `chats` negava leitura quando o documento não existia (primeiro acesso via `getDoc`), gerando `Missing or insufficient permissions`. Também corrigido loading infinito nos listeners do Firestore por falta de chamada ao callback em caso de erro.
+*   **Arquivos Modificados**:
+    *   [`firestore.rules`](file:///c:/Users/USER%201/Desktop/focatto/firestore.rules) — Regra de leitura em `/chats/{chatId}` alterada para `allow read: if isAuth() && (resource == null || request.auth.uid in resource.data.participants)`, permitindo `getDoc()` em documentos inexistentes.
+    *   [`src/lib/chatService.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/chatService.ts) — Adicionado `callback([])` no error handler de `listenToUserChats`, `listenToChatMessages` e `callback(0)` em `listenToUnreadChatsCount` para evitar loading infinito quando a query do Firestore falha.
+*   **Estado**: Concluído e validado com build de produção + deploy das rules e índices.
+
 ---
 
 ## 🛠️ Status Tecnológico e Arquitetural

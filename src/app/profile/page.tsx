@@ -55,7 +55,7 @@ import {
   GraduationCap,
   Wrench,
   Handshake,
-  CurrencyDollar,
+  CurrencyDollar, ArrowsLeftRight,
   Star,
   Trash,
   Plus,
@@ -1251,6 +1251,19 @@ export default function ProfilePage() {
                         <div key={prop.id} className="bg-[#110f0e] rounded-xl p-4 border border-[#1c1a19] space-y-3">
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                {prop.type === "trade" ? (
+                                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 flex items-center gap-1">
+                                    <ArrowsLeftRight size={10} weight="bold" />
+                                    Troca
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                                    <CurrencyDollar size={10} weight="bold" />
+                                    Valor
+                                  </span>
+                                )}
+                              </div>
                               <Link href={`/anuncio/${prop.productId}`} className="text-xs font-bold text-white hover:text-[#ef7c2c] transition-colors block truncate">
                                 {prop.productTitle}
                               </Link>
@@ -1265,6 +1278,34 @@ export default function ProfilePage() {
                             </span>
                           </div>
 
+                          {prop.type === "trade" && prop.tradeDescription && (
+                            <div className="bg-[#141211] p-3 rounded-xl border border-[#22201e] space-y-2">
+                              <p className="text-[10px] text-surface-500 uppercase tracking-wider font-semibold">Item Oferecido para Troca</p>
+                              <p className="text-[11px] text-surface-200">{prop.tradeDescription}</p>
+                              {prop.tradeCategory && (
+                                <div className="flex gap-3 text-[10px] text-surface-400">
+                                  <span>Categoria: <strong className="text-surface-300">{prop.tradeCategory}</strong></span>
+                                  {prop.tradeCondition && (
+                                    <span>Condição: <strong className="text-surface-300">{prop.tradeCondition}</strong></span>
+                                  )}
+                                </div>
+                              )}
+                              {prop.tradePhotos && prop.tradePhotos.length > 0 && (
+                                <div className="flex gap-2 mt-1">
+                                  {prop.tradePhotos.map((photo, idx) => (
+                                    <a key={idx} href={photo} target="_blank" rel="noopener noreferrer">
+                                      <img
+                                        src={photo}
+                                        alt={`Item de troca ${idx + 1}`}
+                                        className="h-14 w-14 rounded-lg object-cover border border-[#2a2827] hover:opacity-80 transition-opacity"
+                                      />
+                                    </a>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
                           {prop.message && (
                             <p className="text-[11px] text-surface-300 bg-[#141211] p-2 rounded-lg border border-[#22201e] italic">
                               "{prop.message}"
@@ -1273,8 +1314,14 @@ export default function ProfilePage() {
 
                           <div className="flex items-center justify-between gap-3 pt-1 border-t border-[#1c1a19]/50">
                             <div>
-                              <span className="text-[10px] text-surface-500 block uppercase tracking-wider font-semibold">Valor Proposto</span>
-                              <span className="text-sm font-bold text-[#ef7c2c]">R$ {prop.value.toLocaleString("pt-BR")}</span>
+                              <span className="text-[10px] text-surface-500 block uppercase tracking-wider font-semibold">
+                                {prop.type === "trade" ? "Valor de Referência" : "Valor Proposto"}
+                              </span>
+                              <span className="text-sm font-bold text-[#ef7c2c]">
+                                {prop.type === "trade" && prop.tradeValue
+                                  ? `R$ ${prop.tradeValue.toLocaleString("pt-BR")} + Troca`
+                                  : `R$ ${prop.value.toLocaleString("pt-BR")}`}
+                              </span>
                             </div>
 
                             {prop.status === "pending" && (
