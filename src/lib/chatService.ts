@@ -10,6 +10,7 @@ import {
   orderBy,
   onSnapshot,
   increment,
+  serverTimestamp,
   writeBatch
 } from "firebase/firestore";
 import { db } from "../firebase";
@@ -79,6 +80,16 @@ export async function createOrGetChat(
   }
 
   return chatId;
+}
+
+/**
+ * Fetches a single chat by ID.
+ */
+export async function getChatById(chatId: string): Promise<ChatData | null> {
+  const chatRef = doc(db, "chats", chatId);
+  const snap = await getDoc(chatRef);
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() } as ChatData;
 }
 
 /**

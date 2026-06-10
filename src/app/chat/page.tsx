@@ -20,6 +20,7 @@ import {
   listenToChatMessages,
   sendMessage,
   markChatAsRead,
+  getChatById,
   ChatData,
   MessageData
 } from "../../lib/chatService";
@@ -30,7 +31,7 @@ import ChatHeaderButton from "../../components/ChatHeaderButton";
 import { toast } from "sonner";
 
 function ChatPageContent() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const chatUrlId = searchParams.get("id");
@@ -48,10 +49,10 @@ function ChatPageContent() {
 
   // Redirect to home if not logged in
   useEffect(() => {
-    if (!user && !loadingChats) {
+    if (!authLoading && !user) {
       router.push("/");
     }
-  }, [user, loadingChats, router]);
+  }, [user, authLoading, router]);
 
   // Listen to user's chats
   useEffect(() => {
@@ -74,6 +75,17 @@ function ChatPageContent() {
 
     return () => unsubscribe();
   }, [user, chatUrlId]);
+
+  // If the chatUrlId chat isn't in the list yet (just created), fetch it directly
+  useEffect(() => {
+    if (!chatUrlId || !user || activeChat?.id === chatUrlId) return;
+    getChatById(chatUrlId).then((chat) => {
+      if (chat && chat.participants.includes(user.uid)) {
+        setActiveChat(chat);
+        setShowMobileChat(true);
+      }
+    }).catch(console.error);
+  }, [chatUrlId, user, activeChat]);
 
   // Listen to messages for the active chat
   useEffect(() => {
@@ -159,6 +171,17 @@ function ChatPageContent() {
     }
     return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-surface-400">
+          <Circle size={28} className="animate-spin text-[#ef7c2c]" />
+          <p className="text-xs">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
