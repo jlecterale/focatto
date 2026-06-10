@@ -96,6 +96,7 @@ export async function getProductsByCategory(category: string): Promise<ProductDa
   try {
     const q = query(
       collection(db, "products"),
+      where("status", "==", "approved"),
       where("category", "==", category),
       orderBy("createdAt", "desc"),
     );
@@ -110,6 +111,7 @@ export async function getProductsByCategories(categories: string[]): Promise<Pro
   try {
     const q = query(
       collection(db, "products"),
+      where("status", "==", "approved"),
       where("category", "in", categories),
       orderBy("createdAt", "desc"),
     );

@@ -10,6 +10,13 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 
 ## 📅 Histórico de Intervenções
 
+### 10/06/2026 — Correção de Consultas e Índices do Firestore (Painel Admin e Meus Anúncios)
+*   **Objetivo**: Resolver problemas de anúncios ativos que não apareciam no Dashboard do Admin e de anúncios do próprio usuário (pendentes por padrão) que não eram exibidos na página "Meus Anúncios".
+*   **Arquivos Modificados**:
+    *   [`firestore.indexes.json`](file:///c:/Users/USER%201/Desktop/focatto/firestore.indexes.json) — Adicionados índices compostos obrigatórios para busca de Luthiers, Professores e Verificações pendentes, além de indexação geral por categoria.
+    *   [`src/lib/productService.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/productService.ts) — Ajuste das funções `getProductsByCategory` e `getProductsByCategories` para filtrar apenas anúncios `status == 'approved'`, correspondendo aos anúncios ativos e prevenindo erros de indexação/regras.
+*   **Estado**: Concluído, implantado em produção e validado com build local.
+
 ### 10/06/2026 — Correção de Índices do Firestore e Exibição de Status de Anúncios
 *   **Objetivo**: Corrigir erro em que anúncios de usuários não eram exibidos na página "Meus Anúncios" devido a índice incorreto no Firestore (que usava `sellerId` em vez de `userId`). Adicionar a exibição de tag "Ativo" ou "Pendente" para que o usuário saiba o andamento do anúncio. Corrigir carregamento de anúncios no perfil do vendedor para evitar erros de leitura.
 *   **Arquivos Modificados**:
