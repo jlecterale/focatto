@@ -14,6 +14,7 @@ import {
 import { useAuth } from "../../../contexts/AuthContext";
 import LoginModal from "../../../components/LoginModal";
 import { toast } from "sonner";
+import NotificationBell from "../../../components/NotificationBell";
 
 export default function VendedorPage() {
   const params = useParams();
@@ -120,13 +121,16 @@ export default function VendedorPage() {
     <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
       {/* Header */}
       <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
-          <button onClick={() => router.back()} className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors cursor-pointer">
-            <ArrowLeft size={16} />
-            Voltar
-          </button>
-          <div className="h-5 w-px bg-[#2a2827]" />
-          <img src="/focattolecter.png" alt="Logo" className="h-7 w-auto object-contain invert brightness-110 mix-blend-screen" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.back()} className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors cursor-pointer">
+              <ArrowLeft size={16} />
+              Voltar
+            </button>
+            <div className="h-5 w-px bg-[#2a2827]" />
+            <img src="/focattolecter.png" alt="Logo" className="h-7 w-auto object-contain invert brightness-110 mix-blend-screen" />
+          </div>
+          <NotificationBell />
         </div>
       </header>
 

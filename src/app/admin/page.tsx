@@ -14,6 +14,7 @@ import { getPendingRatings, reviewRating } from "../../lib/ratingService";
 import type { ProductData, VerificationRequest, UserData, LuthierData, TeacherData, RatingData } from "../../lib/roles";
 import { ROLES } from "../../lib/roles";
 import { toast } from "sonner";
+import NotificationBell from "../../components/NotificationBell";
 
 type Tab = "pendentes" | "luthier" | "acessorios" | "instrumentos" | "usuarios" | "professores";
 
@@ -802,6 +803,7 @@ export default function AdminPage() {
             </Link>
 
             <div className="flex items-center gap-1.5 sm:gap-3">
+              <NotificationBell />
               <Link
                 href="/profile"
                 className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827]"

@@ -14,6 +14,7 @@ import {
   MapPin, CurrencyDollar, Tag, FileImage, Trash, HeartStraight,
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
+import NotificationBell from "../../components/NotificationBell";
 
 const CATEGORIES = [
   "Guitarra", "Violão", "Baixo", "Bateria", "Teclado", "Saxofone", "Violino",
@@ -240,6 +241,7 @@ export default function MeusAnunciosPage() {
             </div>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+            <NotificationBell />
             <button onClick={() => setShowForm(true)}
               id="announcements-create-modal-trigger"
               className="flex items-center gap-1.5 py-2 sm:py-2.5 px-3 sm:px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold transition-all hover:shadow-[0_4px_15px_rgba(239,124,44,0.3)]"

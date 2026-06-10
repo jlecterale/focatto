@@ -22,6 +22,7 @@ import {
   deleteProduct,
 } from "../../lib/productService";
 import type { UserData, VerificationStatus, ProposalData, ProductData, FavoriteData } from "../../lib/roles";
+import NotificationBell from "../../components/NotificationBell";
 import {
   formatPhone,
   formatCpfCnpj,
@@ -769,6 +770,7 @@ export default function ProfilePage() {
             </div>
           </Link>
           <div className="flex items-center gap-1.5 sm:gap-3">
+            <NotificationBell />
             <Link
               href="/"
               id="profile-back-btn"

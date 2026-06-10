@@ -10,6 +10,7 @@ import {
   Compass, SignOut, CheckCircle, XCircle, Clock, Package, Spinner, ArrowLeft, CurrencyDollar,
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
+import NotificationBell from "../../../components/NotificationBell";
 
 export default function AdminProdutosPage() {
   const { user, logout } = useAuth();
@@ -70,6 +71,7 @@ export default function AdminProdutosPage() {
                 <p className="text-[10px] text-surface-400 hidden sm:block">Revise anúncios de usuários</p>
               </div>
             </div>
+            <NotificationBell />
             <button onClick={logout}
               id="admin-products-logout-btn"
               className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"

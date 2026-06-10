@@ -177,3 +177,18 @@ export interface ProposalData {
   status: "pending" | "accepted" | "rejected";
   createdAt: number;
 }
+
+export interface NotificationData {
+  id?: string;
+  userId: string; // Recipient: owner of the ad (sellerId)
+  senderId: string; // The user who favorited the ad
+  senderName: string; // Name of the user who favorited
+  type: "favorite" | "proposal" | "rating" | "system";
+  title: string;
+  message: string;
+  productId?: string;
+  productTitle?: string;
+  read: boolean;
+  createdAt: number;
+}
+

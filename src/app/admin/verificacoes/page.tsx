@@ -17,6 +17,7 @@ import {
   ArrowLeft,
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
+import NotificationBell from "../../../components/NotificationBell";
 
 export default function AdminVerificacoesPage() {
   const { user, logout } = useAuth();
@@ -78,6 +79,7 @@ export default function AdminVerificacoesPage() {
                 <p className="text-[10px] text-surface-400 hidden sm:block">Revise documentos de usuários</p>
               </div>
             </div>
+            <NotificationBell />
             <button
               onClick={logout}
               id="admin-verifications-logout-btn"

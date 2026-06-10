@@ -10,6 +10,19 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 
 ## 📅 Histórico de Intervenções
 
+### 10/06/2026 — Notificações em Tempo Real para Anúncios Favoritados
+*   **Objetivo**: Configurar o Firebase e a aplicação para notificar em tempo real quando um anúncio de um usuário for favoritado por outra pessoa. A notificação deve ser exibida através de um painel dropdown no cabeçalho (com badge de contagem de não lidas) e alertas de toast imediatos em tempo real.
+*   **Arquivos Criados/Modificados**:
+    *   [`firestore.rules`](file:///c:/Users/USER%201/Desktop/focatto/firestore.rules) — Regras de leitura, criação, atualização e exclusão para a coleção `/notifications`.
+    *   [`firestore.indexes.json`](file:///c:/Users/USER%201/Desktop/focatto/firestore.indexes.json) — Índice composto para buscas de notificações por `userId` ordenadas por `createdAt` desc.
+    *   [`src/lib/roles.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/roles.ts) — Definição do tipo `NotificationData`.
+    *   [`src/lib/notificationService.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/notificationService.ts) — Novo módulo de serviço para criação, leitura, atualização e subscrição a notificações.
+    *   [`src/lib/productService.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/productService.ts) — Integração com o serviço de notificações ao favoritar anúncios.
+    *   [`src/components/NotificationBell.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/components/NotificationBell.tsx) — Componente premium glassmorphic com badge de notificação e alertas em tempo real.
+    *   [`src/index.css`](file:///c:/Users/USER%201/Desktop/focatto/src/index.css) — Adicionada animação swing para o ícone de sino.
+    *   Headers das páginas: `src/app/page.tsx`, `src/app/profile/page.tsx`, `src/app/meus-anuncios/page.tsx`, `src/app/anuncio/[id]/page.tsx`, `src/app/vendedor/[id]/page.tsx`, e painel administrativo (`src/app/admin/page.tsx`, `produtos/page.tsx`, `usuarios/page.tsx`, `verificacoes/page.tsx`) — Integração do componente `<NotificationBell />`.
+*   **Estado**: Concluído e verificado com build de produção.
+
 ### 10/06/2026 — Hub de Painel e Modo de Edição no Perfil do Usuário
 *   **Objetivo**: Transformar a tela de Perfil (`/profile`) em um painel central limpo que exibe por padrão as seções: "Meus Anúncios", "Favoritos", "Atividades" e "Propostas Recebidas". Ocultar todos os formulários e configurações de edição de perfil (dados pessoais, endereço, luthier, professor, premium, verificação) atrás de um modo de edição toggle ("Editar Perfil"), melhorando significativamente a experiência de uso (UX) e organização.
 *   **Arquivos Modificados**:

@@ -58,6 +58,7 @@
   --animate-slide-up: slideUp 0.3s ease-out;
   --animate-slide-right: slideRight 0.3s ease-out;
   --animate-scale-in: scaleIn 0.2s ease-out;
+  --animate-swing: swing 1.5s ease-in-out infinite;
 
   @keyframes shimmer {
     0% { background-position: -200% 0; }
@@ -78,6 +79,15 @@
   @keyframes slideRight {
     from { transform: translateX(-100%); }
     to { transform: translateX(0); }
+  }
+  @keyframes swing {
+    0%, 100% { transform: rotate(0deg); }
+    15% { transform: rotate(15deg); }
+    30% { transform: rotate(-10deg); }
+    45% { transform: rotate(8deg); }
+    60% { transform: rotate(-6deg); }
+    75% { transform: rotate(4deg); }
+    85% { transform: rotate(-2deg); }
   }
 }
 

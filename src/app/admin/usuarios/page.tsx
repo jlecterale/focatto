@@ -11,6 +11,7 @@ import {
   CheckCircle, XCircle, GraduationCap,
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
+import NotificationBell from "../../../components/NotificationBell";
 
 export default function AdminUsuariosPage() {
   const { user, logout } = useAuth();
@@ -137,6 +138,7 @@ export default function AdminUsuariosPage() {
                 </p>
               </div>
             </div>
+            <NotificationBell />
             <button onClick={logout}
               id="admin-users-logout-btn"
               className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"

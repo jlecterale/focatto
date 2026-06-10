@@ -24,6 +24,7 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import LoginModal from "../components/LoginModal";
 import BannerCarousel from "../components/BannerCarousel";
+import NotificationBell from "../components/NotificationBell";
 import { ROLES } from "../lib/roles";
 import { getUserData } from "../lib/userService";
 import { toast } from "sonner";
@@ -706,6 +707,7 @@ export default function HomePage() {
                     )}
                   </a>
                 )}
+                <NotificationBell />
                 <a
                   href="/profile"
                   id="nav-profile-link"

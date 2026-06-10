@@ -5,6 +5,8 @@ import {
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase";
 import type { ProductData, ProductStatus, FavoriteData, ProposalData } from "./roles";
+import { createNotification } from "./notificationService";
+
 
 export async function createProduct(
   userId: string,
@@ -226,6 +228,25 @@ export async function toggleFavoriteProduct(
       createdAt: Date.now(),
     };
     await addDoc(collection(db, "favorites"), favData);
+
+    // Create a real-time notification if the favoriting user is not the owner/seller
+    if (userId !== sellerId) {
+      try {
+        await createNotification(
+          sellerId,
+          userId,
+          userName,
+          "favorite",
+          "Anúncio Favoritado",
+          `${userName} favoritou seu anúncio "${productTitle}".`,
+          productId,
+          productTitle
+        );
+      } catch (err) {
+        console.error("Error creating favorite notification:", err);
+      }
+    }
+
     return { favorited: true };
   }
 }
