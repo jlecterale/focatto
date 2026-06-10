@@ -132,13 +132,17 @@ export interface VerificationRequest {
 
 export interface RatingData {
   id?: string;
-  productId: string;
+  productId?: string;
   sellerId: string;
   userId: string;
   userName: string;
   rating: number;
   comment: string;
+  status: "pending" | "approved" | "rejected";
   createdAt: number;
+  adminNotes?: string;
+  reviewedBy?: string;
+  reviewedAt?: number;
 }
 
 export interface SellerStats {

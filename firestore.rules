@@ -180,6 +180,21 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Top-level Profile Ratings collection
+    match /ratings/{ratingId} {
+      // Anyone can read ratings
+      allow read: if true;
+
+      // Authenticated users can create ratings (but not for themselves)
+      allow create: if isAuth()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.sellerId != request.auth.uid;
+
+      // Only admins can update (approve/reject) or delete profile ratings
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // Verifications collection
     match /verifications/{verificationId} {
       // Users can read their own verification

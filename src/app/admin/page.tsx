@@ -6,11 +6,12 @@ import { useAuth } from "../../contexts/AuthContext";
 import Link from "next/link";
 import {
   Compass, SignOut, Clock, Users, Package, Wrench, MusicNote,
-  CheckCircle, XCircle, Spinner, ArrowLeft, GraduationCap,
+  CheckCircle, XCircle, Spinner, ArrowLeft, GraduationCap, Star,
 } from "@phosphor-icons/react";
 import { getPendingProducts, getProductsByCategory, getProductsByCategories, reviewProduct } from "../../lib/productService";
 import { getPendingVerifications, getAllUsers, getProfessionalUsers, getTeacherUsers, reviewVerification, adminUpdateUserRole, adminSetUserVerified, adminSetUserProfessional, adminSetUserTeacher, getPendingLuthiers, getPendingTeachers, reviewLuthier, reviewTeacher } from "../../lib/userService";
-import type { ProductData, VerificationRequest, UserData, LuthierData, TeacherData } from "../../lib/roles";
+import { getPendingRatings, reviewRating } from "../../lib/ratingService";
+import type { ProductData, VerificationRequest, UserData, LuthierData, TeacherData, RatingData } from "../../lib/roles";
 import { ROLES } from "../../lib/roles";
 import { toast } from "sonner";
 
@@ -360,6 +361,84 @@ function PendingTeacherCard({
   );
 }
 
+function PendingRatingCard({
+  rating,
+  onReview,
+  reviewingId,
+  adminNotes,
+  setAdminNotes,
+}: {
+  rating: RatingData;
+  onReview: (id: string, status: "approved" | "rejected") => void;
+  reviewingId: string | null;
+  adminNotes: string;
+  setAdminNotes: (v: string) => void;
+}) {
+  return (
+    <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="min-w-0 flex-1">
+          <h4 className="text-sm font-bold text-white">Avaliação de Perfil</h4>
+          <p className="text-xs text-surface-400 mt-1">
+            Autor: <span className="text-surface-300 font-semibold">{rating.userName}</span>
+          </p>
+          <p className="text-xs text-surface-400">
+            Destinatário (ID do Vendedor): <span className="text-surface-300 font-semibold">{rating.sellerId}</span>
+          </p>
+          <div className="flex items-center gap-0.5 mt-2">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star
+                key={star}
+                size={14}
+                weight={star <= rating.rating ? "fill" : "regular"}
+                className={star <= rating.rating ? "text-amber-400" : "text-surface-600"}
+              />
+            ))}
+            <span className="text-xs font-bold text-amber-400 ml-1.5">{rating.rating} estrelas</span>
+          </div>
+        </div>
+        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-amber-400/10 text-amber-400 border border-amber-400/20 flex-shrink-0">
+          Pendente Avaliação
+        </span>
+      </div>
+
+      {rating.comment && (
+        <p className="text-xs text-surface-300 leading-relaxed bg-[#181615] border border-[#2a2827] rounded-xl p-3">
+          "{rating.comment}"
+        </p>
+      )}
+
+      <div className="space-y-3 pt-2 border-t border-[#22201e]">
+        <textarea
+          value={adminNotes}
+          onChange={(e) => setAdminNotes(e.target.value)}
+          placeholder="Observações do administrador para aprovação ou rejeição..."
+          rows={2}
+          className={inputBase}
+        />
+        <div className="flex gap-3">
+          <button
+            onClick={() => onReview(rating.id!, "approved")}
+            disabled={reviewingId === rating.id}
+            className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold hover:bg-emerald-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer animate-none"
+          >
+            {reviewingId === rating.id ? <Spinner size={14} className="animate-spin" /> : <CheckCircle size={14} />}
+            Aprovar Avaliação
+          </button>
+          <button
+            onClick={() => onReview(rating.id!, "rejected")}
+            disabled={reviewingId === rating.id}
+            className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer animate-none"
+          >
+            {reviewingId === rating.id ? <Spinner size={14} className="animate-spin" /> : <XCircle size={14} />}
+            Rejeitar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function UserCard({
   u,
   onToggleRole,
@@ -462,6 +541,7 @@ export default function AdminPage() {
   const [pendingVerifications, setPendingVerifications] = useState<VerificationRequest[]>([]);
   const [pendingLuthiers, setPendingLuthiers] = useState<LuthierData[]>([]);
   const [pendingTeachers, setPendingTeachers] = useState<TeacherData[]>([]);
+  const [pendingRatings, setPendingRatings] = useState<RatingData[]>([]);
   const [acessorioProducts, setAcessorioProducts] = useState<ProductData[]>([]);
   const [instrumentoProducts, setInstrumentoProducts] = useState<ProductData[]>([]);
   const [users, setUsers] = useState<UserData[]>([]);
@@ -473,6 +553,7 @@ export default function AdminPage() {
   const [verAdminNotes, setVerAdminNotes] = useState("");
   const [luthierAdminNotes, setLuthierAdminNotes] = useState("");
   const [teacherAdminNotes, setTeacherAdminNotes] = useState("");
+  const [ratingAdminNotes, setRatingAdminNotes] = useState("");
   const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [togglingUser, setTogglingUser] = useState<string | null>(null);
   const [userSearch, setUserSearch] = useState("");
@@ -482,6 +563,7 @@ export default function AdminPage() {
     verifications: 0,
     luthiers: 0,
     teachers: 0,
+    ratings: 0,
   });
 
   useEffect(() => {
@@ -490,35 +572,38 @@ export default function AdminPage() {
 
   async function refreshPendingCounts() {
     try {
-      const [prods, vers, luths, teachs] = await Promise.all([
+      const [prods, vers, luths, teachs, rats] = await Promise.all([
         getPendingProducts(),
         getPendingVerifications(),
         getPendingLuthiers(),
         getPendingTeachers(),
+        getPendingRatings(),
       ]);
       setPendingCounts({
         products: prods.length,
         verifications: vers.length,
         luthiers: luths.length,
         teachers: teachs.length,
+        ratings: rats.length,
       });
-      return { prods, vers, luths, teachs };
+      return { prods, vers, luths, teachs, rats };
     } catch (err) {
       console.error("Error refreshing pending counts:", err);
-      return { prods: [], vers: [], luths: [], teachs: [] };
+      return { prods: [], vers: [], luths: [], teachs: [], rats: [] };
     }
   }
 
   async function loadTabData() {
     setLoading(true);
     try {
-      const { prods, vers, luths, teachs } = await refreshPendingCounts();
+      const { prods, vers, luths, teachs, rats } = await refreshPendingCounts();
       switch (activeTab) {
         case "pendentes": {
           setPendingProducts(prods);
           setPendingVerifications(vers);
           setPendingLuthiers(luths);
           setPendingTeachers(teachs);
+          setPendingRatings(rats);
           break;
         }
         case "luthier": {
@@ -609,6 +694,21 @@ export default function AdminPage() {
       loadTabData();
     } catch {
       toast.error("Erro ao processar professor.");
+    } finally {
+      setReviewingId(null);
+    }
+  }
+
+  async function handleRatingReview(ratingId: string, status: "approved" | "rejected") {
+    if (!user) return;
+    setReviewingId(ratingId);
+    try {
+      await reviewRating(ratingId, status, ratingAdminNotes, user.uid);
+      toast.success(`Avaliação de perfil ${status === "approved" ? "aprovada" : "rejeitada"}!`);
+      setRatingAdminNotes("");
+      loadTabData();
+    } catch {
+      toast.error("Erro ao processar avaliação.");
     } finally {
       setReviewingId(null);
     }
@@ -726,7 +826,7 @@ export default function AdminPage() {
           </div>
 
           {/* Summary Notification Alert */}
-          {(pendingCounts.products + pendingCounts.verifications + pendingCounts.luthiers + pendingCounts.teachers) > 0 && (
+          {(pendingCounts.products + pendingCounts.verifications + pendingCounts.luthiers + pendingCounts.teachers + pendingCounts.ratings) > 0 && (
             <div className="mb-6 bg-gradient-to-r from-[#ef7c2c]/10 to-[#d4ae12]/10 border border-[#ef7c2c]/20 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -737,7 +837,7 @@ export default function AdminPage() {
                   Aprovações Pendentes
                 </h3>
                 <p className="text-xs text-surface-400 mt-1">
-                  Você tem {pendingCounts.products + pendingCounts.verifications + pendingCounts.luthiers + pendingCounts.teachers} solicitação(ões) pendente(s) de aprovação na plataforma:
+                  Você tem {pendingCounts.products + pendingCounts.verifications + pendingCounts.luthiers + pendingCounts.teachers + pendingCounts.ratings} solicitação(ões) pendente(s) de aprovação na plataforma:
                 </p>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[11px] text-surface-300">
                   {pendingCounts.products > 0 && (
@@ -751,6 +851,9 @@ export default function AdminPage() {
                   )}
                   {pendingCounts.teachers > 0 && (
                     <span>🎓 {pendingCounts.teachers} perfil(is) de professor</span>
+                  )}
+                  {pendingCounts.ratings > 0 && (
+                    <span>⭐ {pendingCounts.ratings} avaliação(ões) de perfil</span>
                   )}
                 </div>
               </div>
@@ -769,7 +872,7 @@ export default function AdminPage() {
           <div className="flex overflow-x-auto pb-2 gap-2 mb-8 scrollbar-hide flex-nowrap -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth">
             {tabs.map((tab) => {
               const isPendenteTab = tab.key === "pendentes";
-              const totalPendings = pendingCounts.products + pendingCounts.verifications + pendingCounts.luthiers + pendingCounts.teachers;
+              const totalPendings = pendingCounts.products + pendingCounts.verifications + pendingCounts.luthiers + pendingCounts.teachers + pendingCounts.ratings;
               return (
                 <button
                   key={tab.key}
@@ -901,6 +1004,32 @@ export default function AdminPage() {
                             reviewingId={reviewingId}
                             adminNotes={teacherAdminNotes}
                             setAdminNotes={setTeacherAdminNotes}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </section>
+
+                  <section>
+                    <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                      <Star size={18} className="text-[#ef7c2c]" weight="fill" />
+                      Avaliações de Perfil Pendentes
+                    </h3>
+                    {pendingRatings.length === 0 ? (
+                      <div className="text-center py-8 bg-[#141211] rounded-2xl border border-[#22201e]">
+                        <Star size={40} className="mx-auto text-surface-500 mb-2" />
+                        <p className="text-surface-400 text-sm">Nenhuma avaliação de perfil pendente.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {pendingRatings.map((r) => (
+                          <PendingRatingCard
+                            key={r.id}
+                            rating={r}
+                            onReview={handleRatingReview}
+                            reviewingId={reviewingId}
+                            adminNotes={ratingAdminNotes}
+                            setAdminNotes={setRatingAdminNotes}
                           />
                         ))}
                       </div>

@@ -4,25 +4,35 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getUserData, getTeacherProfile } from "../../../lib/userService";
-import { getSellerStats, getSellerRatings } from "../../../lib/ratingService";
+import { getSellerStats, getSellerRatings, getUserRatingForSeller, addRating } from "../../../lib/ratingService";
 import { getUserProducts } from "../../../lib/productService";
 import type { UserData, SellerStats, ProductData, RatingData, TeacherData } from "../../../lib/roles";
 import {
   ArrowLeft, Star, MapPin, ShieldCheck, WhatsappLogo, Clock,
   Sparkle, MusicNote, HeartStraight, Smiley, Tag, Package, GraduationCap
 } from "@phosphor-icons/react";
+import { useAuth } from "../../../contexts/AuthContext";
+import LoginModal from "../../../components/LoginModal";
+import { toast } from "sonner";
 
 export default function VendedorPage() {
   const params = useParams();
   const router = useRouter();
   const sellerId = params.id as string;
 
+  const { user } = useAuth();
   const [seller, setSeller] = useState<UserData | null>(null);
   const [stats, setStats] = useState<SellerStats | null>(null);
   const [ratings, setRatings] = useState<RatingData[]>([]);
   const [products, setProducts] = useState<ProductData[]>([]);
   const [teacherProfile, setTeacherProfile] = useState<TeacherData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [userRating, setUserRating] = useState<RatingData | null>(null);
+  const [showLogin, setShowLogin] = useState(false);
+  const [ratingValue, setRatingValue] = useState(0);
+  const [ratingComment, setRatingComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -44,10 +54,39 @@ export default function VendedorPage() {
         setTeacherProfile(tProfile);
       }
 
+      if (user) {
+        const existing = await getUserRatingForSeller(sellerId, user.uid);
+        setUserRating(existing);
+      }
+
       setLoading(false);
     }
     load();
-  }, [sellerId]);
+  }, [sellerId, user]);
+
+  async function handleSubmitRating() {
+    if (!user || !sellerId || ratingValue === 0) return;
+    setSubmitting(true);
+    try {
+      await addRating(
+        sellerId,
+        user.uid,
+        user.displayName || user.email || "Anônimo",
+        ratingValue,
+        ratingComment,
+      );
+      setRatingValue(0);
+      setRatingComment("");
+      toast.success("Avaliação enviada com sucesso! Ela aparecerá após aprovação do administrador.");
+
+      const existing = await getUserRatingForSeller(sellerId, user.uid);
+      setUserRating(existing);
+    } catch (error) {
+      toast.error("Erro ao enviar avaliação.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   function formatDate(ts: number) {
     return new Date(ts).toLocaleDateString("pt-BR", {
@@ -403,17 +442,32 @@ export default function VendedorPage() {
               </div>
             </div>
 
-            {/* Recent Reviews */}
-            {ratings.length > 0 && (
-              <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] shadow-xl">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-surface-400 mb-3">
-                  Avaliações Recentes
-                </h3>
-                <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto">
-                  {ratings.slice(0, 5).map((r) => (
+            {/* Profile Reviews Section */}
+            <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] shadow-xl">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+                <Star size={16} className="text-amber-400" weight="fill" />
+                Avaliações do Perfil
+                {stats && (
+                  <span className="text-xs text-surface-400 font-normal">
+                    ({stats.totalRatings})
+                  </span>
+                )}
+              </h3>
+
+              {/* Reviews List */}
+              <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto mb-4">
+                {ratings.length === 0 ? (
+                  <p className="text-xs text-surface-500 text-center py-4">Nenhuma avaliação aprovada ainda.</p>
+                ) : (
+                  ratings.map((r) => (
                     <div key={r.id} className="bg-[#110f0e] border border-[#1c1a19] rounded-xl p-3">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-semibold text-white">{r.userName}</span>
+                        <div className="flex items-center gap-1.5">
+                          <div className="h-5 w-5 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center text-[9px] font-bold text-white">
+                            {r.userName.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="text-xs font-semibold text-white truncate max-w-[100px]">{r.userName}</span>
+                        </div>
                         <div className="flex items-center gap-0.5">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
@@ -425,16 +479,73 @@ export default function VendedorPage() {
                           ))}
                         </div>
                       </div>
-                      {r.comment && <p className="text-xs text-surface-300">{r.comment}</p>}
+                      {r.comment && <p className="text-xs text-surface-300 mt-1">{r.comment}</p>}
+                      <p className="text-[9px] text-surface-500 mt-1">{formatDate(r.createdAt)}</p>
                     </div>
-                  ))}
-                </div>
+                  ))
+                )}
               </div>
-            )}
+
+              {/* Rating Form */}
+              {user ? (
+                user.uid !== sellerId ? (
+                  !userRating ? (
+                    <div className="mt-4 pt-4 border-t border-[#22201e]">
+                      <h4 className="text-xs font-bold text-white mb-2">Avaliar este perfil</h4>
+                      <div className="flex items-center gap-1 mb-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            onClick={() => setRatingValue(star)}
+                            className="cursor-pointer transition-all hover:scale-110"
+                          >
+                            <Star
+                              size={20}
+                              weight={star <= ratingValue ? "fill" : "regular"}
+                              className={star <= ratingValue ? "text-amber-400" : "text-surface-600 hover:text-amber-400/50"}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                      <textarea
+                        value={ratingComment}
+                        onChange={(e) => setRatingComment(e.target.value)}
+                        placeholder="Comente sua experiência com este vendedor (opcional)"
+                        className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c] resize-none h-16 mb-2"
+                      />
+                      <button
+                        onClick={handleSubmitRating}
+                        disabled={ratingValue === 0 || submitting}
+                        className="w-full py-2 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold transition-all hover:shadow-[0_4px_15px_rgba(239,124,44,0.3)] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-center"
+                      >
+                        {submitting ? "Enviando..." : "Enviar Avaliação"}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mt-4 pt-4 border-t border-[#22201e]">
+                      <p className="text-xs text-surface-400 flex items-center gap-1.5 justify-center bg-[#181615] py-2 rounded-lg border border-[#2a2827]">
+                        <ShieldCheck size={14} className="text-emerald-400" weight="fill" />
+                        Você já avaliou este perfil
+                      </p>
+                    </div>
+                  )
+                ) : null
+              ) : (
+                <div className="mt-4 pt-4 border-t border-[#22201e] text-center">
+                  <button
+                    onClick={() => setShowLogin(true)}
+                    className="text-xs text-[#ef7c2c] hover:underline cursor-pointer font-semibold"
+                  >
+                    Faça login para avaliar este perfil
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
         </div>
       </main>
+      <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
     </div>
   );
 }
