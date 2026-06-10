@@ -200,7 +200,7 @@ export default function MeusAnunciosPage() {
   const statusBadge = (status: string) => {
     switch (status) {
       case "approved":
-        return <span className="flex items-center gap-1 text-xs text-emerald-400 font-semibold"><CheckCircle size={12} weight="fill" /> Aprovado</span>;
+        return <span className="flex items-center gap-1 text-xs text-emerald-400 font-semibold"><CheckCircle size={12} weight="fill" /> Ativo</span>;
       case "rejected":
         return <span className="flex items-center gap-1 text-xs text-red-400 font-semibold"><XCircle size={12} weight="fill" /> Reprovado</span>;
       default:

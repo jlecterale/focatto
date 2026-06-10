@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia de Recebimentos e Gateways no Brasil - Focatto</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Palette Focatto - Dark Theme Premium */
+            --bg-dark: hsl(222, 18%, 4%);
+            --bg-card: hsla(222, 15%, 9%, 0.8);
+            --bg-card-hover: hsla(222, 15%, 13%, 0.9);
+            --border-color: hsla(222, 12%, 18%, 0.8);
+            --border-hover: hsla(222, 12%, 28%, 0.8);
+            
+            --text-primary: hsl(210, 20%, 98%);
+            --text-secondary: hsl(210, 14%, 80%);
+            --text-muted: hsl(210, 10%, 60%);
+            
+            /* Accents */
+            --focatto-orange: hsl(25, 95%, 55%);
+            --focatto-orange-glow: hsla(25, 95%, 55%, 0.2);
+            --focatto-gold: hsl(48, 90%, 50%);
+            --focatto-gold-glow: hsla(48, 90%, 50%, 0.15);
+            
+            /* Gateways Colors */
+            --asaas-color: hsl(212, 100%, 45%);
+            --mp-color: hsl(198, 95%, 45%);
+            --stripe-color: hsl(250, 90%, 60%);
+            --efi-color: hsl(35, 90%, 50%);
+            
+            /* Status Colors */
+            --success-color: hsl(142, 70%, 45%);
+            --success-glow: hsla(142, 70%, 45%, 0.2);
+            --info-color: hsl(200, 90%, 50%);
+            --warning-color: hsl(38, 92%, 50%);
+            
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+            
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Base Resets */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 5% 15%, hsla(25, 95%, 55%, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 95% 85%, hsla(212, 100%, 45%, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        /* Header styling */
+        header {
+            text-align: center;
+            margin-bottom: 56px;
+            position: relative;
+        }
+
+        .logo-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--focatto-orange), var(--focatto-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 40%, hsl(210, 15%, 80%));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 780px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        /* Sections Title */
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 45px;
+            height: 3px;
+            background: var(--focatto-orange);
+            border-radius: 2px;
+        }
+
+        /* Two-Column Layout */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 36px;
+            margin-bottom: 56px;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Grid de Gateways */
+        .gateways-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 56px;
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px;
+            position: relative;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
+        }
+
+        .gateway-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .gateway-logo {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .gateway-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Gateway Specific Styles */
+        .asaas-card { border-top: 4px solid var(--asaas-color); }
+        .asaas-logo { color: var(--text-primary); }
+        .asaas-logo span { color: var(--asaas-color); }
+        .asaas-badge { background-color: hsla(212, 100%, 45%, 0.15); color: hsl(212, 100%, 60%); }
+
+        .mp-card { border-top: 4px solid var(--mp-color); }
+        .mp-logo { color: var(--text-primary); }
+        .mp-logo span { color: var(--mp-color); }
+        .mp-badge { background-color: hsla(198, 95%, 45%, 0.15); color: hsl(198, 95%, 60%); }
+
+        .stripe-card { border-top: 4px solid var(--stripe-color); }
+        .stripe-logo { color: var(--text-primary); }
+        .stripe-logo span { color: var(--stripe-color); }
+        .stripe-badge { background-color: hsla(250, 90%, 60%, 0.15); color: hsl(250, 90%, 75%); }
+
+        .efi-card { border-top: 4px solid var(--efi-color); }
+        .efi-logo { color: var(--text-primary); }
+        .efi-logo span { color: var(--efi-color); }
+        .efi-badge { background-color: hsla(35, 90%, 50%, 0.15); color: hsl(35, 90%, 65%); }
+
+        .gateway-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            min-height: 54px;
+        }
+
+        .rate-list {
+            list-style: none;
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+            margin-bottom: 24px;
+        }
+
+        .rate-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.88rem;
+            margin-bottom: 12px;
+        }
+
+        .rate-label {
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rate-value {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .btn-register {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            text-align: center;
+        }
+
+        .btn-asaas { background-color: var(--asaas-color); color: #fff; }
+        .btn-asaas:hover { background-color: hsl(212, 100%, 38%); box-shadow: 0 0 15px hsla(212, 100%, 45%, 0.4); }
+
+        .btn-mp { background-color: var(--mp-color); color: #fff; }
+        .btn-mp:hover { background-color: hsl(198, 95%, 38%); box-shadow: 0 0 15px hsla(198, 95%, 45%, 0.4); }
+
+        .btn-stripe { background-color: var(--stripe-color); color: #fff; }
+        .btn-stripe:hover { background-color: hsl(250, 90%, 53%); box-shadow: 0 0 15px hsla(250, 90%, 60%, 0.4); }
+
+        .btn-efi { background-color: var(--efi-color); color: #fff; }
+        .btn-efi:hover { background-color: hsl(35, 90%, 42%); box-shadow: 0 0 15px hsla(35, 90%, 50%, 0.4); }
+
+        /* Checklist de Requisitos */
+        .checklist-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px;
+        }
+
+        .checklist-intro {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .checklist-group {
+            margin-bottom: 24px;
+        }
+
+        .checklist-group-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--focatto-orange);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 10px;
+            background-color: hsla(222, 15%, 7%, 0.5);
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            user-select: none;
+        }
+
+        .check-item:hover {
+            border-color: var(--focatto-orange-glow);
+            background-color: hsla(222, 15%, 8%, 0.8);
+        }
+
+        .check-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 2px solid var(--text-muted);
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+            flex-shrink: 0;
+        }
+
+        .check-checkbox::after {
+            content: '✓';
+            color: #000;
+            font-weight: 900;
+            font-size: 0.8rem;
+            display: none;
+        }
+
+        .check-item.completed {
+            border-color: var(--success-color);
+            background-color: hsla(142, 70%, 45%, 0.05);
+        }
+
+        .check-item.completed .check-checkbox {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .check-item.completed .check-checkbox::after {
+            display: block;
+        }
+
+        .check-item.completed .check-text {
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .check-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #fff;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .check-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-container {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background-color: hsla(222, 10%, 18%, 1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--focatto-orange), var(--success-color));
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        /* Simulador de Repasses e Taxas */
+        .simulator-card {
+            background-color: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 24px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            height: 100%;
+        }
+
+        .sim-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .sim-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-prefix {
+            position: absolute;
+            left: 16px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .input-suffix {
+            position: absolute;
+            right: 16px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .input-field {
+            width: 100%;
+            background-color: hsla(222, 15%, 6%, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #fff;
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 700;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .input-field:focus {
+            border-color: var(--focatto-orange);
+            box-shadow: 0 0 10px var(--focatto-orange-glow);
+        }
+
+        .input-field.has-prefix { padding-left: 48px; }
+        .input-field.has-suffix { padding-right: 40px; }
+
+        select.input-field {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+            padding-right: 48px;
+        }
+
+        /* Visualização do Split */
+        .split-visualization {
+            background-color: hsla(222, 15%, 5%, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .split-header {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .split-bars {
+            display: flex;
+            height: 36px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .split-bar {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #000;
+            transition: var(--transition-smooth);
+        }
+
+        .split-bar-seller { background-color: var(--success-color); color: #fff; }
+        .split-bar-platform { background-color: var(--focatto-orange); color: #fff; }
+        .split-bar-gateway { background-color: hsl(0, 0%, 30%); color: #ccc; }
+
+        .split-legend {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background-color: hsla(222, 15%, 7%, 0.6);
+            border: 1px solid var(--border-color);
+        }
+
+        .legend-marker {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .marker-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .marker-dot.seller { background-color: var(--success-color); }
+        .marker-dot.platform { background-color: var(--focatto-orange); }
+        .marker-dot.gateway { background-color: hsl(0, 0%, 50%); }
+
+        .legend-value {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .gateway-selected-name {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background-color: rgba(255,255,255,0.08);
+            margin-left: 6px;
+            vertical-align: middle;
+            color: var(--text-primary);
+        }
+
+        /* Accordion Técnico */
+        .accordion {
+            margin-top: 40px;
+            margin-bottom: 56px;
+        }
+
+        .accordion-item {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .accordion-item:hover {
+            border-color: var(--border-hover);
+        }
+
+        .accordion-trigger {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 20px 24px;
+            text-align: left;
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion-trigger span {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .accordion-trigger::after {
+            content: '▼';
+            font-size: 0.8rem;
+            color: var(--focatto-orange);
+            transition: transform 0.3s;
+        }
+
+        .accordion-item.active .accordion-trigger::after {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            border-top: 0 solid var(--border-color);
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 1200px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .accordion-inner {
+            padding: 24px;
+        }
+
+        .tech-flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--focatto-orange-glow);
+            border: 1px solid var(--focatto-orange);
+            color: var(--focatto-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+        }
+
+        code {
+            background-color: hsla(222, 15%, 5%, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 2px 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            color: var(--focatto-orange);
+        }
+
+        pre {
+            background-color: hsla(222, 15%, 5%, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            color: hsl(210, 15%, 85%);
+            margin-top: 16px;
+            line-height: 1.5;
+        }
+
+        pre .keyword { color: hsl(300, 80%, 70%); }
+        pre .string { color: hsl(100, 70%, 65%); }
+        pre .comment { color: var(--text-muted); }
+        pre .number { color: hsl(35, 100%, 65%); }
+        pre .function { color: hsl(200, 90%, 65%); }
+
+        /* Icones e Detalhes de Ajuda */
+        .info-alert {
+            background-color: hsla(200, 90%, 50%, 0.05);
+            border: 1px solid hsla(200, 90%, 50%, 0.2);
+            border-left: 4px solid var(--info-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .info-alert-icon {
+            color: var(--info-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .info-alert-text {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+
+        /* SVG Icons */
+        .svg-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            vertical-align: middle;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 40px;
+        }
+
+        footer p span {
+            color: var(--focatto-orange);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo-badge">Recebimentos no Site</div>
+        <h1>Gateways de Pagamento para Focatto</h1>
+        <p>Entenda as melhores opções para receber pagamentos no Brasil (Pix, Cartão de Crédito e Boleto), simule taxas de repasse (Split) e saiba o que é necessário para se cadastrar.</p>
+    </header>
+
+    <!-- INFO ALERT -->
+    <div class="info-alert">
+        <div class="info-alert-icon">ℹ</div>
+        <div class="info-alert-text">
+            <strong>O que é Split de Pagamento?</strong> Como a Focatto conecta clientes a profissionais (Luthiers e Professores), o ideal é usar um gateway com suporte a <strong>split</strong>. Isso garante que, quando um cliente paga, o valor é dividido automaticamente: a taxa da plataforma (comissão Focatto) vai para sua conta bancária e o restante vai direto para a conta do profissional, evitando bitributação e reduzindo burocracia.
+        </div>
+    </div>
+
+    <!-- SEÇÃO 1: GATEWAYS DISPONÍVEIS NO BRASIL -->
+    <h2 class="section-title">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.25z"/></svg>
+        Onde Fazer Cadastro? Principais Gateways
+    </h2>
+    
+    <div class="gateways-grid">
+        <!-- Gateway Asaas -->
+        <div class="card gateway-card asaas-card">
+            <div class="gateway-header">
+                <div class="gateway-logo asaas-logo">Asaas<span>.</span></div>
+                <span class="gateway-badge asaas-badge">Recomendado</span>
+            </div>
+            <p class="gateway-desc">Excelente para marketplaces e SaaS. Possui o sistema de split de pagamentos mais maduro do Brasil e taxas muito competitivas, principalmente no Pix e Boleto.</p>
+            <ul class="rate-list">
+                <li class="rate-item">
+                    <span class="rate-label">⚡ Pix</span>
+                    <span class="rate-value">R$ 0,99 <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">fixo</span></span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">💳 Cartão à vista</span>
+                    <span class="rate-value">2,99% + R$ 0,40</span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">⏳ Cartão parcelado</span>
+                    <span class="rate-value">+1,99% <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">por parc.</span></span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">📄 Boleto</span>
+                    <span class="rate-value">R$ 1,99 <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">pago</span></span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">🔗 Split de Pagamento</span>
+                    <span class="rate-value" style="color: var(--success-color);">Sim (Nativo)</span>
+                </li>
+            </ul>
+            <a href="https://www.asaas.com" target="_blank" class="btn-register btn-asaas">Acessar Asaas</a>
+        </div>
+
+        <!-- Gateway Mercado Pago -->
+        <div class="card gateway-card mp-card">
+            <div class="gateway-header">
+                <div class="gateway-logo mp-logo">Mercado<span>Pago</span></div>
+                <span class="gateway-badge mp-badge">Popular</span>
+            </div>
+            <p class="gateway-desc">Muito fácil de aprovar, mesmo para quem está começando com CPF ou CNPJ novo. Alta taxa de aprovação de cartão de crédito e grande confiança do consumidor brasileiro.</p>
+            <ul class="rate-list">
+                <li class="rate-item">
+                    <span class="rate-label">⚡ Pix</span>
+                    <span class="rate-value">0,99% <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">(na hora)</span></span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">💳 Cartão à vista</span>
+                    <span class="rate-value">3,99% <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">(na hora)</span></span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">⏳ Cartão parcelado</span>
+                    <span class="rate-value">Tabela MP <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">(~2.4% a 15%)</span></span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">📄 Boleto</span>
+                    <span class="rate-value">R$ 3,49 <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">pago</span></span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">🔗 Split de Pagamento</span>
+                    <span class="rate-value" style="color: var(--success-color);">Sim (API Split)</span>
+                </li>
+            </ul>
+            <a href="https://www.mercadopago.com.br" target="_blank" class="btn-register btn-mp">Acessar Mercado Pago</a>
+        </div>
+
+        <!-- Gateway Stripe -->
+        <div class="card gateway-card stripe-card">
+            <div class="gateway-header">
+                <div class="gateway-logo stripe-logo">stripe<span></span></div>
+                <span class="gateway-badge stripe-badge">Global</span>
+            </div>
+            <p class="gateway-desc">Líder global. A melhor documentação para desenvolvedores. O Stripe Connect gerencia múltiplos profissionais, mas exige CNPJ e possui processos rigorosos no Brasil.</p>
+            <ul class="rate-list">
+                <li class="rate-item">
+                    <span class="rate-label">⚡ Pix</span>
+                    <span class="rate-value">1,19% + R$ 0,40</span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">💳 Cartão à vista</span>
+                    <span class="rate-value">3,99% + R$ 0,50</span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">⏳ Cartão parcelado</span>
+                    <span class="rate-value">+1,99% <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">por parc.</span></span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">📄 Boleto</span>
+                    <span class="rate-value">Não <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">convencional</span></span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">🔗 Split de Pagamento</span>
+                    <span class="rate-value" style="color: var(--success-color);">Sim (Stripe Connect)</span>
+                </li>
+            </ul>
+            <a href="https://stripe.com/br" target="_blank" class="btn-register btn-stripe">Acessar Stripe</a>
+        </div>
+
+        <!-- Gateway Efí -->
+        <div class="card gateway-card efi-card">
+            <div class="gateway-header">
+                <div class="gateway-logo efi-logo">Efí<span>Bank</span></div>
+                <span class="gateway-badge efi-badge">Especialista Pix</span>
+            </div>
+            <p class="gateway-desc">Antiga Gerencianet, autorizada pelo Banco Central. Possui excelente suporte à API Pix oficial e tarifas bem baixas para recebimento Pix CNPJ.</p>
+            <ul class="rate-list">
+                <li class="rate-item">
+                    <span class="rate-label">⚡ Pix</span>
+                    <span class="rate-value">1,19% <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">(mín R$0.10 / máx R$5)</span></span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">💳 Cartão à vista</span>
+                    <span class="rate-value">3,19% + R$ 0,39</span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">⏳ Cartão parcelado</span>
+                    <span class="rate-value">Tabela Efí <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">(~2% a 12%)</span></span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">📄 Boleto</span>
+                    <span class="rate-value">R$ 3,49 <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">pago</span></span>
+                </li>
+                <li class="rate-item">
+                    <span class="rate-label">🔗 Split de Pagamento</span>
+                    <span class="rate-value" style="color: var(--success-color);">Sim (Nativo)</span>
+                </li>
+            </ul>
+            <a href="https://sejaefi.com.br" target="_blank" class="btn-register btn-efi">Acessar Efí Bank</a>
+        </div>
+    </div>
+
+    <!-- MAIN TWO COLUMN GRID -->
+    <div class="grid-layout">
+        <!-- COLUNA ESQUERDA: CHECKLIST INTERATIVO -->
+        <div>
+            <div class="checklist-card">
+                <h2 class="section-title" style="font-size: 1.5rem; margin-bottom: 12px;">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    Checklist de Documentos & Cadastro
+                </h2>
+                <p class="checklist-intro">Prepare estes documentos e requisitos para fazer o cadastro nas plataformas. Marque o que você já possui para acompanhar seu progresso:</p>
+                
+                <!-- Grupo 1: Dados Jurídicos / Pessoais -->
+                <div class="checklist-group">
+                    <div class="checklist-group-title">
+                        <span>👤 Dados do Proprietário & Empresa</span>
+                    </div>
+                    
+                    <div class="check-item" onclick="toggleCheck(this, 'cnpj')">
+                        <div class="check-checkbox"></div>
+                        <div class="check-text">
+                            <div class="check-title">CNPJ Ativo (Altamente Recomendado)</div>
+                            <div class="check-desc">Embora alguns aceitem CPF, ter um CNPJ (mesmo MEI) reduz as taxas de cartão, permite split de pagamento e aprova a conta muito mais rápido.</div>
+                        </div>
+                    </div>
+
+                    <div class="check-item" onclick="toggleCheck(this, 'rg_cnh')">
+                        <div class="check-checkbox"></div>
+                        <div class="check-text">
+                            <div class="check-title">RG, CNH ou RNE do Responsável Legal</div>
+                            <div class="check-desc">Foto nítida frente e verso ou documento digital para validação de identidade (KYC - Know Your Customer).</div>
+                        </div>
+                    </div>
+
+                    <div class="check-item" onclick="toggleCheck(this, 'documento_social')">
+                        <div class="check-checkbox"></div>
+                        <div class="check-text">
+                            <div class="check-title">Contrato Social ou CCMEI</div>
+                            <div class="check-desc">Se cadastrar como CNPJ, precisará do documento de constituição da empresa para comprovar que você é o administrador.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grupo 2: Financeiro -->
+                <div class="checklist-group">
+                    <div class="checklist-group-title">
+                        <span>🏦 Dados Bancários</span>
+                    </div>
+
+                    <div class="check-item" onclick="toggleCheck(this, 'conta_bancaria')">
+                        <div class="check-checkbox"></div>
+                        <div class="check-text">
+                            <div class="check-title">Conta Bancária Jurídica (mesmo titular)</div>
+                            <div class="check-desc">A conta para saque deve ser do mesmo titular (CPF ou CNPJ) cadastrado no gateway. Não é permitido sacar para contas de terceiros.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grupo 3: Requisitos do Site -->
+                <div class="checklist-group">
+                    <div class="checklist-group-title">
+                        <span>🌐 Requisitos Obrigatórios no Site</span>
+                    </div>
+
+                    <div class="check-item" onclick="toggleCheck(this, 'dominio')">
+                        <div class="check-checkbox"></div>
+                        <div class="check-text">
+                            <div class="check-title">Domínio Próprio e Ativo (focatto.com.br...)</div>
+                            <div class="check-desc">Os gateways de cartão avaliam o site em produção. Plataformas não aprovam cadastros de sites rodando apenas em "localhost".</div>
+                        </div>
+                    </div>
+
+                    <div class="check-item" onclick="toggleCheck(this, 'termos')">
+                        <div class="check-checkbox"></div>
+                        <div class="check-text">
+                            <div class="check-title">Termos de Uso & Políticas de Privacidade</div>
+                            <div class="check-desc">Essencial no rodapé do seu site. Deve conter detalhes claros sobre cancelamento, reembolso, contato e tratamento de dados.</div>
+                        </div>
+                    </div>
+
+                    <div class="check-item" onclick="toggleCheck(this, 'contato')">
+                        <div class="check-checkbox"></div>
+                        <div class="check-text">
+                            <div class="check-title">Canais de Atendimento Visíveis</div>
+                            <div class="check-desc">E-mail, telefone ou WhatsApp visíveis no site para suporte ao cliente. Isso reduz contestações de compras (chargebacks).</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra de Progresso do Checklist -->
+                <div class="progress-container">
+                    <div class="progress-text">
+                        <span>Progresso do Cadastro</span>
+                        <span id="progress-percentage">0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar" id="checklist-progress"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUNA DIREITA: SIMULADOR FINANCEIRO (TAXAS + SPLIT) -->
+        <div>
+            <div class="simulator-card">
+                <div>
+                    <h2 class="section-title" style="font-size: 1.5rem; margin-bottom: 6px;">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                        Simulador Financeiro
+                    </h2>
+                    <p class="checklist-intro" style="margin-bottom: 0;">Calcule as taxas exatas de repasse e a divisão de saldo (Split) para cada transação no Focatto.</p>
+                </div>
+
+                <!-- Entradas do Usuário -->
+                <div class="sim-row">
+                    <div class="input-group">
+                        <label class="input-label" for="val-venda">💰 Valor da Venda</label>
+                        <div class="input-wrapper">
+                            <span class="input-prefix">R$</span>
+                            <input type="number" id="val-venda" class="input-field has-prefix" value="300" min="5" step="1" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" for="val-comissao">⚡ Comissão Focatto</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="val-comissao" class="input-field has-suffix" value="10" min="0" max="100" step="0.5" oninput="calculate()">
+                            <span class="input-suffix">%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-row">
+                    <div class="input-group">
+                        <label class="input-label" for="sel-gateway">🏢 Escolher Gateway</label>
+                        <select id="sel-gateway" class="input-field" onchange="calculate()">
+                            <option value="asaas">Asaas (Recomendado)</option>
+                            <option value="mercadopago">Mercado Pago</option>
+                            <option value="stripe">Stripe</option>
+                            <option value="efi">Efí Bank</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" for="sel-pagamento">💳 Meio de Pagamento</label>
+                        <select id="sel-pagamento" class="input-field" onchange="calculate()">
+                            <option value="pix">Pix (À vista)</option>
+                            <option value="cartao_1x">Cartão de Crédito (1x)</option>
+                            <option value="cartao_6x">Cartão de Crédito (6x)</option>
+                            <option value="boleto">Boleto Bancário</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Pizza / Split em Barra -->
+                <div class="split-visualization">
+                    <div class="split-header">
+                        Divisão Automática do Valor (Split) <span class="gateway-selected-name" id="selected-gateway-badge">Asaas</span>
+                    </div>
+                    <div class="split-bars">
+                        <div class="split-bar split-bar-seller" id="bar-seller" style="width: 85%;">85%</div>
+                        <div class="split-bar split-bar-platform" id="bar-platform" style="width: 13%;">13%</div>
+                        <div class="split-bar split-bar-gateway" id="bar-gateway" style="width: 2%;">2%</div>
+                    </div>
+
+                    <div class="split-legend">
+                        <div class="legend-item">
+                            <div class="legend-marker">
+                                <div class="marker-dot seller"></div>
+                                <span>Luthier / Professor (Prestador)</span>
+                            </div>
+                            <div class="legend-value" id="val-seller">R$ 270,00</div>
+                        </div>
+
+                        <div class="legend-item">
+                            <div class="legend-marker">
+                                <div class="marker-dot platform"></div>
+                                <span>Focatto (Sua Plataforma)</span>
+                            </div>
+                            <div class="legend-value" id="val-platform">R$ 28,01</div>
+                        </div>
+
+                        <div class="legend-item">
+                            <div class="legend-marker">
+                                <div class="marker-dot gateway"></div>
+                                <span>Taxa do Gateway (Tarifa)</span>
+                            </div>
+                            <div class="legend-value" id="val-gateway" style="color: var(--text-secondary);">R$ 1,99</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEÇÃO: ACCORDION DE IMPLEMENTAÇÃO TÉCNICA -->
+    <h2 class="section-title">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+        Como Funciona a Integração Técnica e o Split?
+    </h2>
+
+    <div class="accordion">
+        <!-- Item 1: Fluxo conceitual do Split -->
+        <div class="accordion-item" id="acc-fluxo">
+            <button class="accordion-trigger" onclick="toggleAccordion('acc-fluxo')">
+                <span>🔄 1. O Fluxo de Transação (Passo a Passo)</span>
+            </button>
+            <div class="accordion-content">
+                <div class="accordion-inner">
+                    <div class="tech-flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Cliente faz a compra no site</h4>
+                            <p>O cliente escolhe um serviço de luthier ou contrata um professor no Focatto e realiza o pagamento via Pix ou Cartão.</p>
+                        </div>
+                    </div>
+                    <div class="tech-flow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Gateway processa e aplica o Split</h4>
+                            <p>A API do Gateway intercepta o pagamento. Com base na configuração do Split que enviamos no backend, ele separa a comissão da plataforma imediatamente.</p>
+                        </div>
+                    </div>
+                    <div class="tech-flow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Liquidação direta e segurança tributária</h4>
+                            <p>O prestador (luthier/professor) recebe a parte dele diretamente na subconta dele do Gateway, e a Focatto recebe a comissão. A emissão de notas fiscais pode ser configurada para ser automática para cada parte, eliminando riscos de bitributação.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Item 2: Exemplo de Código do Asaas (Split) -->
+        <div class="accordion-item" id="acc-code">
+            <button class="accordion-trigger" onclick="toggleAccordion('acc-code')">
+                <span>💻 2. Exemplo Prático de Código (Split via Asaas)</span>
+            </button>
+            <div class="accordion-content">
+                <div class="accordion-inner">
+                    <p>Veja como é simples criar um pagamento contendo split usando a API do <strong>Asaas</strong> no Node.js/Next.js. Você informa a comissão do parceiro ou o valor fixo a ser transferido:</p>
+                    
+                    <pre><span class="keyword">const</span> axios = <span class="function">require</span>(<span class="string">'axios'</span>);
+
+<span class="comment">// Exemplo de chamada na API do Asaas para criar uma cobrança com split</span>
+<span class="keyword">async function</span> <span class="function">criarCobrancaComSplit</span>() {
+    <span class="keyword">const</span> url = <span class="string">'https://api.asaas.com/v3/payments'</span>;
+    <span class="keyword">const</span> token = <span class="string">'Sua_Chave_De_API_Gerada_No_Painel_Do_Asaas'</span>;
+
+    <span class="keyword">const</span> payload = {
+        <span class="comment">// Dados da cobrança do Cliente</span>
+        <span class="string">"customer"</span>: <span class="string">"cus_000005747492"</span>, <span class="comment">// ID do cliente previamente cadastrado</span>
+        <span class="string">"billingType"</span>: <span class="string">"CREDIT_CARD"</span>,   <span class="comment">// CREDIT_CARD, PIX ou BOLETO</span>
+        <span class="string">"value"</span>: <span class="number">300.00</span>,                 <span class="comment">// R$ 300,00</span>
+        <span class="string">"dueDate"</span>: <span class="string">"2026-06-15"</span>,
+
+        <span class="comment">// Regra de divisão do dinheiro (Split)</span>
+        <span class="string">"split"</span>: [
+            {
+                <span class="string">"walletId"</span>: <span class="string">"d48509ca-85f0-4fa2-bf66-d44b1c8c8230"</span>, <span class="comment">// ID da carteira do Luthier/Professor</span>
+                <span class="string">"percentualValue"</span>: <span class="number">90</span>                                <span class="comment">// Fica com 90% (R$ 270)</span>
+            }
+            <span class="comment">// O restante (10%) fica automaticamente na carteira principal da Focatto</span>
+        ]
+    };
+
+    <span class="keyword">try</span> {
+        <span class="keyword">const</span> response = <span class="keyword">await</span> axios.<span class="function">post</span>(url, payload, {
+            <span class="string">"headers"</span>: {
+                <span class="string">"access_token"</span>: token
+            }
+        });
+        console.<span class="function">log</span>(<span class="string">'Cobrança com Split criada com sucesso!'</span>, response.data);
+    } <span class="keyword">catch</span> (error) {
+        console.<span class="function">error</span>(<span class="string">'Erro ao criar split:'</span>, error.response?.data || error.message);
+    }
+}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Item 3: Dicas fiscais importantes -->
+        <div class="accordion-item" id="acc-fiscal">
+            <button class="accordion-trigger" onclick="toggleAccordion('acc-fiscal')">
+                <span>⚖️ 3. Dica de Ouro sobre Tributação (Bitributação)</span>
+            </button>
+            <div class="accordion-content">
+                <div class="accordion-inner">
+                    <p style="margin-bottom: 12px;">Se você receber os R$ 300,00 na conta bancária da Focatto e depois transferir R$ 270,00 para o luthier de forma manual:</p>
+                    <ul style="margin-left: 20px; margin-bottom: 16px;">
+                        <li style="margin-bottom: 8px;">A Receita Federal entenderá que a Focatto faturou R$ 300,00 inteiros e você terá que pagar imposto (ex. 6% a 15%) sobre o <strong>valor total</strong>, mesmo repassando a maior parte.</li>
+                        <li>O luthier também terá que emitir uma nota e pagar imposto sobre os R$ 270,00 dele. Isso se chama <strong>bitributação</strong>.</li>
+                    </ul>
+                    <p><strong>Como o Split resolve isso:</strong> Como o dinheiro é dividido <em>antes</em> de entrar no banco (no próprio gateway), a Focatto declara apenas a comissão (R$ 30,00) e o luthier declara os R$ 270,00. Isso é legalmente respaldado e economiza milhares de reais em impostos no final do mês.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 <span>Focatto</span> - Planejamento Estratégico de Recebimentos. Desenvolvido para auxílio de decisão de negócios.</p>
+</footer>
+
+<script>
+    // Configurações das taxas padrão estimadas (Meio de pagamento vs Gateway)
+    // Para simplificar, calculamos a taxa do gateway direto
+    const GATEWAY_RATES = {
+        asaas: {
+            pix: { rate: 0, fixed: 0.99, label: 'R$ 0,99 fixo' },
+            cartao_1x: { rate: 0.0299, fixed: 0.40, label: '2,99% + R$ 0,40' },
+            cartao_6x: { rate: 0.0299 + (5 * 0.0199), fixed: 0.40, label: '2,99% + 5x de 1,99% + R$0,40' }, // Taxa de parcelamento simulada para 6 parcelas
+            boleto: { rate: 0, fixed: 1.99, label: 'R$ 1,99 por boleto pago' }
+        },
+        mercadopago: {
+            pix: { rate: 0.0099, fixed: 0, label: '0,99%' },
+            cartao_1x: { rate: 0.0399, fixed: 0, label: '3,99%' },
+            cartao_6x: { rate: 0.0399 + 0.0845, fixed: 0, label: '3,99% + 8,45% tarifa de parcelamento' },
+            boleto: { rate: 0, fixed: 3.49, label: 'R$ 3,49 fixo' }
+        },
+        stripe: {
+            pix: { rate: 0.0119, fixed: 0.40, label: '1,19% + R$ 0,40' },
+            cartao_1x: { rate: 0.0399, fixed: 0.50, label: '3,99% + R$ 0,50' },
+            cartao_6x: { rate: 0.0399 + (5 * 0.0199), fixed: 0.50, label: '3,99% + R$ 0,50 + parc.' },
+            boleto: { rate: 0, fixed: 0, label: 'Indisponível tradicionalmente' }
+        },
+        efi: {
+            pix: { rate: 0.0119, fixed: 0, maxFixed: 5.00, minFixed: 0.10, label: '1,19% (mín R$0.10, máx R$5)' },
+            cartao_1x: { rate: 0.0319, fixed: 0.39, label: '3,19% + R$ 0,39' },
+            cartao_6x: { rate: 0.0319 + 0.0750, fixed: 0.39, label: '3,19% + ~7,50% parcelado + R$ 0,39' },
+            boleto: { rate: 0, fixed: 3.49, label: 'R$ 3,49 por boleto' }
+        }
+    };
+
+    // Função para calcular os valores em tempo real
+    function calculate() {
+        const valVenda = parseFloat(document.getElementById('val-venda').value) || 0;
+        const comissaoPercent = parseFloat(document.getElementById('val-comissao').value) || 0;
+        const gateway = document.getElementById('sel-gateway').value;
+        const pagamento = document.getElementById('sel-pagamento').value;
+
+        // Atualizar o badge indicativo do gateway
+        const gwNames = { asaas: 'Asaas', mercadopago: 'Mercado Pago', stripe: 'Stripe', efi: 'Efí Bank' };
+        document.getElementById('selected-gateway-badge').innerText = gwNames[gateway];
+
+        // Se o valor de venda for muito baixo ou zero
+        if (valVenda <= 0) {
+            updateUI(0, 0, 0, 0, 0, 0);
+            return;
+        }
+
+        // Regra de taxas específicas do gateway selecionado
+        const rules = GATEWAY_RATES[gateway][pagamento];
+        let taxGateway = 0;
+
+        // Caso Stripe sem boleto
+        if (gateway === 'stripe' && pagamento === 'boleto') {
+            taxGateway = 0; // não disponível
+        } else if (gateway === 'efi' && pagamento === 'pix') {
+            // Regra especial da Efí para Pix
+            let calculated = valVenda * rules.rate;
+            if (calculated > rules.maxFixed) calculated = rules.maxFixed;
+            if (calculated < rules.minFixed) calculated = rules.minFixed;
+            taxGateway = calculated;
+        } else {
+            taxGateway = (valVenda * rules.rate) + rules.fixed;
+        }
+
+        // Limita a taxa para não ultrapassar o valor da venda
+        if (taxGateway > valVenda) {
+            taxGateway = valVenda;
+        }
+
+        // Valor restante após taxas do Gateway
+        const valorLiquidoGeral = valVenda - taxGateway;
+
+        // Valor correspondente à comissão bruta da Focatto sobre o valor da venda
+        const comissaoBrutaFocatto = valVenda * (comissaoPercent / 100);
+
+        // Divisão do split:
+        // A taxa do gateway geralmente é descontada do recebedor principal ou dividida.
+        // Numa modelagem padrão de marketplace, a Focatto desconta a taxa do gateway do montante geral.
+        // Focatto recebe a comissão líquida de impostos.
+        // Para este cálculo, assumimos o modelo de Split onde:
+        // Luthier/Professor recebe a parte dele (ex: 90% do valor total bruto)
+        // E a taxa do gateway é descontada da comissão da plataforma, OU o luthier paga a taxa proporcional.
+        // Modelo mais comum de split: A comissão da plataforma é retida integralmente, e o profissional assume a taxa, ou é descontado de forma proporcional.
+        // Vamos usar o modelo proporcional de divisão de custos:
+        // Prestador recebe: Valor da Venda * (100% - Comissão%) - Taxas Proporcionais
+        // Para ficar super simples e transparente para o usuário:
+        // 1. Calculamos o valor bruto do prestador: Valor da venda * (1 - comissão%)
+        // 2. Focatto recebe a comissão bruta.
+        // 3. Descontamos a taxa do gateway da transação. Geralmente a taxa sai da comissão da Focatto se a Focatto assumir a taxa do gateway, 
+        // ou sai do Prestador se a Focatto quiser comissão limpa de 10%.
+        // Vamos considerar que a taxa do gateway é cobrada e a comissão da Focatto é limpa (exemplo em que a taxa do gateway é descontada da parte do prestador, ou seja, Focatto retém sua comissão cheia e o prestador assume a taxa de processamento).
+        // Focatto retém: comissaoBrutaFocatto
+        // Gateway retém: taxGateway
+        // Prestador recebe o líquido restante: valVenda - comissaoBrutaFocatto - taxGateway.
+        
+        let valorPrestador = valVenda - comissaoBrutaFocatto - taxGateway;
+        let valorFocatto = comissaoBrutaFocatto;
+
+        // Se o valor do prestador ficar negativo devido a taxas gigantescas em vendas muito pequenas
+        if (valorPrestador < 0) {
+            valorPrestador = 0;
+            valorFocatto = valVenda - taxGateway;
+        }
+
+        // Cálculo das porcentagens para o gráfico de barra
+        const pctSeller = (valorPrestador / valVenda) * 100;
+        const pctPlatform = (valorFocatto / valVenda) * 100;
+        const pctGateway = (taxGateway / valVenda) * 100;
+
+        updateUI(valorPrestador, valorFocatto, taxGateway, pctSeller, pctPlatform, pctGateway);
+    }
+
+    // Função para atualizar a tela com os resultados
+    function updateUI(seller, platform, gateway, pctSeller, pctPlatform, pctGateway) {
+        document.getElementById('val-seller').innerText = formatCurrency(seller);
+        document.getElementById('val-platform').innerText = formatCurrency(platform);
+        document.getElementById('val-gateway').innerText = formatCurrency(gateway);
+
+        // Atualizar as larguras das barras
+        const barSeller = document.getElementById('bar-seller');
+        const barPlatform = document.getElementById('bar-platform');
+        const barGateway = document.getElementById('bar-gateway');
+
+        barSeller.style.width = pctSeller.toFixed(1) + '%';
+        barSeller.innerText = pctSeller > 8 ? pctSeller.toFixed(0) + '%' : '';
+
+        barPlatform.style.width = pctPlatform.toFixed(1) + '%';
+        barPlatform.innerText = pctPlatform > 8 ? pctPlatform.toFixed(0) + '%' : '';
+
+        barGateway.style.width = pctGateway.toFixed(1) + '%';
+        barGateway.innerText = pctGateway > 8 ? pctGateway.toFixed(0) + '%' : '';
+    }
+
+    function formatCurrency(value) {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    }
+
+    // Funcionalidade de Checklist
+    const CHECKLIST_ITEMS_KEY = 'focatto_payments_checklist';
+    let checklistStates = {};
+
+    function loadChecklist() {
+        const saved = localStorage.getItem(CHECKLIST_ITEMS_KEY);
+        if (saved) {
+            try {
+                checklistStates = JSON.parse(saved);
+                Object.keys(checklistStates).forEach(id => {
+                    const el = document.querySelector(`[onclick*="'${id}'"]`);
+                    if (el && checklistStates[id]) {
+                        el.classList.add('completed');
+                    }
+                });
+            } catch (e) {
+                checklistStates = {};
+            }
+        }
+        updateProgress();
+    }
+
+    function toggleCheck(element, itemId) {
+        element.classList.toggle('completed');
+        const isCompleted = element.classList.contains('completed');
+        checklistStates[itemId] = isCompleted;
+        localStorage.setItem(CHECKLIST_ITEMS_KEY, JSON.stringify(checklistStates));
+        updateProgress();
+    }
+
+    function updateProgress() {
+        const totalItems = document.querySelectorAll('.check-item').length;
+        const checkedItems = document.querySelectorAll('.check-item.completed').length;
+        const percentage = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0;
+
+        document.getElementById('checklist-progress').style.width = percentage + '%';
+        document.getElementById('progress-percentage').innerText = percentage + '%';
+    }
+
+    // Funcionalidade de Accordion
+    function toggleAccordion(itemId) {
+        const el = document.getElementById(itemId);
+        const isActive = el.classList.contains('active');
+        
+        // Opcional: fechar outros accordions
+        document.querySelectorAll('.accordion-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        if (!isActive) {
+            el.classList.add('active');
+        }
+    }
+
+    // Inicialização da página
+    window.onload = function() {
+        calculate();
+        loadChecklist();
+    };
+</script>
+</body>
+</html>

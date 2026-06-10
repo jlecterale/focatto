@@ -77,6 +77,21 @@ export async function getUserProducts(userId: string): Promise<ProductData[]> {
   }
 }
 
+export async function getUserApprovedProducts(userId: string): Promise<ProductData[]> {
+  try {
+    const q = query(
+      collection(db, "products"),
+      where("userId", "==", userId),
+      where("status", "==", "approved"),
+      orderBy("createdAt", "desc"),
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() } as ProductData));
+  } catch {
+    return [];
+  }
+}
+
 export async function getProductsByCategory(category: string): Promise<ProductData[]> {
   try {
     const q = query(

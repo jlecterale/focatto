@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getUserData, getTeacherProfile } from "../../../lib/userService";
 import { getSellerStats, getSellerRatings, getUserRatingForSeller, addRating } from "../../../lib/ratingService";
-import { getUserProducts } from "../../../lib/productService";
+import { getUserApprovedProducts } from "../../../lib/productService";
 import type { UserData, SellerStats, ProductData, RatingData, TeacherData } from "../../../lib/roles";
 import {
   ArrowLeft, Star, MapPin, ShieldCheck, WhatsappLogo, Clock,
@@ -42,7 +42,7 @@ export default function VendedorPage() {
         getUserData(sellerId),
         getSellerStats(sellerId),
         getSellerRatings(sellerId),
-        getUserProducts(sellerId),
+        getUserApprovedProducts(sellerId),
       ]);
       setSeller(sellerData);
       setStats(sellerStats);
