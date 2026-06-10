@@ -9,12 +9,14 @@ import { getUserApprovedProducts } from "../../../lib/productService";
 import type { UserData, SellerStats, ProductData, RatingData, TeacherData } from "../../../lib/roles";
 import {
   ArrowLeft, Star, MapPin, ShieldCheck, WhatsappLogo, Clock,
-  Sparkle, MusicNote, HeartStraight, Smiley, Tag, Package, GraduationCap
+  Sparkle, MusicNote, HeartStraight, Smiley, Tag, Package, GraduationCap, Phone, ChatCircleDots
 } from "@phosphor-icons/react";
 import { useAuth } from "../../../contexts/AuthContext";
 import LoginModal from "../../../components/LoginModal";
 import { toast } from "sonner";
 import NotificationBell from "../../../components/NotificationBell";
+import ChatHeaderButton from "../../../components/ChatHeaderButton";
+import { createOrGetChat } from "../../../lib/chatService";
 
 export default function VendedorPage() {
   const params = useParams();
@@ -64,6 +66,27 @@ export default function VendedorPage() {
     }
     load();
   }, [sellerId, user]);
+
+  async function handleStartChat() {
+    if (!user) { setShowLogin(true); return; }
+    if (!seller) return;
+    if (user.uid === sellerId) {
+      return;
+    }
+    try {
+      const chatId = await createOrGetChat(
+        user.uid,
+        user.displayName || user.email || "Comprador",
+        user.photoURL || "",
+        sellerId,
+        seller.displayName || "Vendedor",
+        seller.photoURL || "",
+      );
+      router.push(`/chat?id=${chatId}`);
+    } catch (error) {
+      console.error("Erro ao iniciar chat:", error);
+    }
+  }
 
   async function handleSubmitRating() {
     if (!user || !sellerId || ratingValue === 0) return;
@@ -130,6 +153,7 @@ export default function VendedorPage() {
             <div className="h-5 w-px bg-[#2a2827]" />
             <img src="/focattolecter.png" alt="Logo" className="h-7 w-auto object-contain invert brightness-110 mix-blend-screen" />
           </div>
+          <ChatHeaderButton />
           <NotificationBell />
         </div>
       </header>
@@ -398,17 +422,35 @@ export default function VendedorPage() {
             <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] shadow-xl sticky top-24">
               <h3 className="text-xs font-bold uppercase tracking-wider text-surface-400 mb-4">Contato</h3>
 
-              {/* WhatsApp */}
+              {/* Contact Buttons */}
               {seller.phone && (
-                <a
-                  href={`https://wa.me/55${seller.phone.replace(/\D/g, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-emerald-600/20 w-full mb-3"
-                >
-                  <WhatsappLogo size={16} weight="fill" />
-                  Falar no WhatsApp
-                </a>
+                <div className="flex flex-col gap-2 mb-3">
+                  <a
+                    href={`https://wa.me/55${seller.phone.replace(/\D/g, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-emerald-600/20 w-full"
+                  >
+                    <WhatsappLogo size={16} weight="fill" />
+                    Falar no WhatsApp
+                  </a>
+                  <a
+                    href={`tel:${seller.phone.replace(/\D/g, "")}`}
+                    className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-blue-600/20 w-full"
+                  >
+                    <Phone size={16} weight="fill" />
+                    Ligar para Vendedor
+                  </a>
+                  {(!user || user.uid !== sellerId) && (
+                    <button
+                      onClick={handleStartChat}
+                      className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#ef7c2c] hover:bg-[#d46a22] text-white text-xs font-semibold transition-all shadow-lg hover:shadow-[#ef7c2c]/20 w-full cursor-pointer"
+                    >
+                      <ChatCircleDots size={16} weight="fill" />
+                      Chat Interno
+                    </button>
+                  )}
+                </div>
               )}
 
               {/* Email */}

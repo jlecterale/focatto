@@ -12,6 +12,7 @@ import {
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import NotificationBell from "../../../components/NotificationBell";
+import ChatHeaderButton from "../../../components/ChatHeaderButton";
 
 export default function AdminUsuariosPage() {
   const { user, logout } = useAuth();
@@ -138,6 +139,7 @@ export default function AdminUsuariosPage() {
                 </p>
               </div>
             </div>
+            <ChatHeaderButton />
             <NotificationBell />
             <button onClick={logout}
               id="admin-users-logout-btn"

@@ -16,10 +16,12 @@ import { useAuth } from "../../../contexts/AuthContext";
 import LoginModal from "../../../components/LoginModal";
 import type { ProductData, UserData, RatingData, SellerStats } from "../../../lib/roles";
 import {
-  ArrowLeft, Star, MapPin, User, Tag, ShieldCheck, Clock, WhatsappLogo, HeartStraight,
+  ArrowLeft, Star, MapPin, User, Tag, ShieldCheck, Clock, WhatsappLogo, HeartStraight, Phone, ChatCircleDots,
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import NotificationBell from "../../../components/NotificationBell";
+import ChatHeaderButton from "../../../components/ChatHeaderButton";
+import { createOrGetChat } from "../../../lib/chatService";
 
 export default function AnuncioDetalhePage() {
   const params = useParams();
@@ -90,6 +92,33 @@ export default function AnuncioDetalhePage() {
     }
   }
 
+  async function handleStartChat() {
+    if (!user) { setShowLogin(true); return; }
+    if (!product || !seller) {
+      toast.error("Erro: Anunciante não encontrado.");
+      return;
+    }
+    if (user.uid === product.userId) {
+      toast.error("Você não pode iniciar um chat com você mesmo.");
+      return;
+    }
+    try {
+      const chatId = await createOrGetChat(
+        user.uid,
+        user.displayName || user.email || "Comprador",
+        user.photoURL || "",
+        product.userId,
+        seller.displayName || "Anunciante",
+        seller.photoURL || "",
+        { id: productId, title: product.title, photo: product.photos?.[0] || "" }
+      );
+      router.push(`/chat?id=${chatId}`);
+    } catch (error) {
+      console.error("Erro ao iniciar chat:", error);
+      toast.error("Erro ao iniciar chat interno.");
+    }
+  }
+
   function formatDate(ts: number) {
     return new Date(ts).toLocaleDateString("pt-BR", {
       day: "2-digit", month: "long", year: "numeric",
@@ -131,6 +160,7 @@ export default function AnuncioDetalhePage() {
             <div className="h-5 w-px bg-[#2a2827]" />
             <img src="/focattolecter.png" alt="Logo" className="h-7 w-auto object-contain invert brightness-110 mix-blend-screen" />
           </div>
+          <ChatHeaderButton />
           <NotificationBell />
         </div>
       </header>
@@ -252,15 +282,38 @@ export default function AnuncioDetalhePage() {
 
               {/* Contact */}
               {seller?.phone && (
-                <a
-                  href={`https://wa.me/55${seller.phone.replace(/\D/g, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-emerald-600/20 w-full"
-                >
-                  <WhatsappLogo size={16} weight="fill" />
-                  Falar no WhatsApp
-                </a>
+                <div className="flex flex-col gap-2">
+                  {/* WhatsApp */}
+                  <a
+                    href={`https://wa.me/55${seller.phone.replace(/\D/g, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-emerald-600/20 w-full"
+                  >
+                    <WhatsappLogo size={16} weight="fill" />
+                    Falar no WhatsApp
+                  </a>
+
+                  {/* Direct Call */}
+                  <a
+                    href={`tel:${seller.phone.replace(/\D/g, "")}`}
+                    className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-blue-600/20 w-full"
+                  >
+                    <Phone size={16} weight="fill" />
+                    Ligar para Anunciante
+                  </a>
+
+                  {/* Internal Chat */}
+                  {(!user || user.uid !== product?.userId) && (
+                    <button
+                      onClick={handleStartChat}
+                      className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#ef7c2c] hover:bg-[#d46a22] text-white text-xs font-semibold transition-all shadow-lg hover:shadow-[#ef7c2c]/20 w-full cursor-pointer"
+                    >
+                      <ChatCircleDots size={16} weight="fill" />
+                      Chat Interno
+                    </button>
+                  )}
+                </div>
               )}
 
               {product.userEmail && (

@@ -15,6 +15,7 @@ import {
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import NotificationBell from "../../components/NotificationBell";
+import ChatHeaderButton from "../../components/ChatHeaderButton";
 
 const CATEGORIES = [
   "Guitarra", "Violão", "Baixo", "Bateria", "Teclado", "Saxofone", "Violino",
@@ -241,6 +242,7 @@ export default function MeusAnunciosPage() {
             </div>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+            <ChatHeaderButton />
             <NotificationBell />
             <button onClick={() => setShowForm(true)}
               id="announcements-create-modal-trigger"

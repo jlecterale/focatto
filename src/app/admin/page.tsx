@@ -15,6 +15,7 @@ import type { ProductData, VerificationRequest, UserData, LuthierData, TeacherDa
 import { ROLES } from "../../lib/roles";
 import { toast } from "sonner";
 import NotificationBell from "../../components/NotificationBell";
+import ChatHeaderButton from "../../components/ChatHeaderButton";
 
 type Tab = "pendentes" | "luthier" | "acessorios" | "instrumentos" | "usuarios" | "professores";
 
@@ -803,6 +804,7 @@ export default function AdminPage() {
             </Link>
 
             <div className="flex items-center gap-1.5 sm:gap-3">
+              <ChatHeaderButton />
               <NotificationBell />
               <Link
                 href="/profile"

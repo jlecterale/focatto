@@ -19,14 +19,18 @@ import {
   GraduationCap,
   Plus,
   ArrowLeft,
-  ShieldCheck
+  ShieldCheck,
+  Phone,
+  ChatCircleDots
 } from "@phosphor-icons/react";
 import { useAuth } from "../contexts/AuthContext";
 import LoginModal from "../components/LoginModal";
 import BannerCarousel from "../components/BannerCarousel";
 import NotificationBell from "../components/NotificationBell";
-import { ROLES } from "../lib/roles";
+import ChatHeaderButton from "../components/ChatHeaderButton";
+import { ROLES, UserData } from "../lib/roles";
 import { getUserData } from "../lib/userService";
+import { createOrGetChat } from "../lib/chatService";
 import { toast } from "sonner";
 
 // Dynamically import the Map component to prevent SSR issues with Leaflet
@@ -44,6 +48,7 @@ const Map = dynamic(() => import("../Map"), {
 
 interface ItemLocation {
   id: string;
+  userId?: string;
   title: string;
   city: string;
   state: string;
@@ -65,18 +70,18 @@ interface ItemLocation {
 }
 
 const mockProducts: ItemLocation[] = [
-  { id: "p1", title: "Gibson Les Paul Custom 1978", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 29000, type: "produto", category: "Guitarra", photo: "/gibson_les_paul.png", premiumTier: "tier1", isPremium: true },
-  { id: "p2", title: "Fender Stratocaster American Standard", city: "Curitiba", state: "PR", neighborhood: "Centro", price: 12500, type: "produto", category: "Guitarra", photo: "/fender_stratocaster.png" },
-  { id: "p3", title: "Violão Taylor 214ce Deluxe", city: "Belo Horizonte", state: "MG", neighborhood: "Savassi", price: 9800, type: "produto", category: "Violão", photo: "/taylor_acoustic.png", premiumTier: "tier2", isPremium: true },
-  { id: "p4", title: "Cabo P10 Santo Angelo 5m", city: "São Paulo", state: "SP", neighborhood: "Vila Mariana", price: 150, type: "produto", category: "Acessório" },
-  { id: "p5", title: "Palhetas Dunlop Tortex (Pacote)", city: "Rio de Janeiro", state: "RJ", neighborhood: "Copacabana", price: 75, type: "produto", category: "Acessório" },
-  { id: "p6", title: "Pedal de Efeito Boss DS-1 Distortion", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 650, type: "produto", category: "Acessório" },
+  { id: "p1", title: "Gibson Les Paul Custom 1978", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 29000, type: "produto", category: "Guitarra", photo: "/gibson_les_paul.png", premiumTier: "tier1", isPremium: true, userId: "mock_seller_p1", phone: "11999999999" },
+  { id: "p2", title: "Fender Stratocaster American Standard", city: "Curitiba", state: "PR", neighborhood: "Centro", price: 12500, type: "produto", category: "Guitarra", photo: "/fender_stratocaster.png", userId: "mock_seller_p2", phone: "41988888888" },
+  { id: "p3", title: "Violão Taylor 214ce Deluxe", city: "Belo Horizonte", state: "MG", neighborhood: "Savassi", price: 9800, type: "produto", category: "Violão", photo: "/taylor_acoustic.png", premiumTier: "tier2", isPremium: true, userId: "mock_seller_p3", phone: "31977777777" },
+  { id: "p4", title: "Cabo P10 Santo Angelo 5m", city: "São Paulo", state: "SP", neighborhood: "Vila Mariana", price: 150, type: "produto", category: "Acessório", userId: "mock_seller_p4", phone: "11966666666" },
+  { id: "p5", title: "Palhetas Dunlop Tortex (Pacote)", city: "Rio de Janeiro", state: "RJ", neighborhood: "Copacabana", price: 75, type: "produto", category: "Acessório", userId: "mock_seller_p5", phone: "21955555555" },
+  { id: "p6", title: "Pedal de Efeito Boss DS-1 Distortion", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 650, type: "produto", category: "Acessório", userId: "mock_seller_p6", phone: "11944444444" },
 ];
 
 const mockLuthiers: ItemLocation[] = [
-  { id: "l1", title: "Guthier Luteria", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", type: "luthier", rating: 4.9, specialties: ["Regulagem", "Pintura"], premiumTier: "tier1", isPremium: true },
-  { id: "l2", title: "D'Alegria Custom Guitars", city: "Rio de Janeiro", state: "RJ", neighborhood: "Botafogo", type: "luthier", rating: 5.0, specialties: ["Construção", "Restauro"] },
-  { id: "l3", title: "Luthieria do Sul", city: "Porto Alegre", state: "RS", neighborhood: "Moinhos de Vento", type: "luthier", rating: 4.8, specialties: ["Trastes", "Eletrônica"] },
+  { id: "l1", title: "Guthier Luteria", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", type: "luthier", rating: 4.9, specialties: ["Regulagem", "Pintura"], premiumTier: "tier1", isPremium: true, userId: "l1", phone: "11999999999" },
+  { id: "l2", title: "D'Alegria Custom Guitars", city: "Rio de Janeiro", state: "RJ", neighborhood: "Botafogo", type: "luthier", rating: 5.0, specialties: ["Construção", "Restauro"], userId: "l2", phone: "21988888888" },
+  { id: "l3", title: "Luthieria do Sul", city: "Porto Alegre", state: "RS", neighborhood: "Moinhos de Vento", type: "luthier", rating: 4.8, specialties: ["Trastes", "Eletrônica"], userId: "l3", phone: "51977777777" },
 ];
 
 const mockTeachers: ItemLocation[] = [
@@ -163,6 +168,72 @@ export default function HomePage() {
     loadProfile();
   }, [user]);
 
+  const [selectedItemSeller, setSelectedItemSeller] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    if (!selectedItem) {
+      setSelectedItemSeller(null);
+      return;
+    }
+    if (selectedItem.type === "produto" && selectedItem.userId) {
+      getUserData(selectedItem.userId)
+        .then((data) => {
+          setSelectedItemSeller(data);
+        })
+        .catch((err) => {
+          console.error("Error fetching seller details:", err);
+          setSelectedItemSeller(null);
+        });
+    } else {
+      setSelectedItemSeller(null);
+    }
+  }, [selectedItem]);
+
+  const handleStartChat = async () => {
+    if (!user) {
+      setShowLogin(true);
+      return;
+    }
+    const targetUserId = selectedItem?.userId || selectedItemSeller?.uid;
+    if (!targetUserId) {
+      toast.error("Erro: Anunciante não encontrado.");
+      return;
+    }
+    if (user.uid === targetUserId) {
+      toast.error("Você não pode iniciar um chat com você mesmo.");
+      return;
+    }
+    try {
+      const sellerName = selectedItem?.type === "produto" 
+        ? (selectedItemSeller?.displayName || "Anunciante") 
+        : selectedItem?.title || "Anunciante";
+      const sellerPhoto = selectedItem?.type === "produto"
+        ? (selectedItemSeller?.photoURL || "")
+        : selectedItem?.photo || "";
+        
+      const prodContext = selectedItem?.type === "produto" ? {
+        id: selectedItem.id,
+        title: selectedItem.title,
+        photo: selectedItem.photo || ""
+      } : undefined;
+
+      const chatId = await createOrGetChat(
+        user.uid,
+        user.displayName || user.email || "Comprador",
+        user.photoURL || "",
+        targetUserId,
+        sellerName,
+        sellerPhoto,
+        prodContext
+      );
+
+      router.push(`/chat?id=${chatId}`);
+    } catch (error) {
+      console.error("Erro ao iniciar chat:", error);
+      toast.error("Erro ao iniciar chat interno.");
+    }
+  };
+
   // Sidebar Filter States
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<"todas" | "instrumentos" | "acessorios" | "luthier" | "professor">("todas");
@@ -240,6 +311,7 @@ export default function HomePage() {
             const data = doc.data();
             productsList.push({
               id: doc.id,
+              userId: data.userId || "",
               title: data.title || "Sem título",
               city: data.city || "São Paulo",
               state: data.state || "SP",
@@ -268,6 +340,7 @@ export default function HomePage() {
             }
             luthiersList.push({
               id: doc.id,
+              userId: doc.id,
               title: data.name || "Sem nome",
               city: data.city || "São Paulo",
               state: data.state || "SP",
@@ -276,6 +349,7 @@ export default function HomePage() {
               rating: data.averageRating || 5.0,
               specialties: data.specialties || [],
               photo: data.photo,
+              phone: data.phone || "",
               premiumTier: data.premiumTier || undefined,
               isPremium: data.isPremium || false,
             });
@@ -296,6 +370,7 @@ export default function HomePage() {
             }
             teachersList.push({
               id: doc.id,
+              userId: doc.id,
               title: data.name || "Sem nome",
               city: data.city || "São Paulo",
               state: data.state || "SP",
@@ -707,6 +782,7 @@ export default function HomePage() {
                     )}
                   </a>
                 )}
+                <ChatHeaderButton />
                 <NotificationBell />
                 <a
                   href="/profile"
@@ -1182,18 +1258,41 @@ export default function HomePage() {
                             )}
                           </>
                         )}
-                        {selectedItem.phone && (
-                          <a
-                            href={`https://wa.me/55${selectedItem.phone.replace(/\D/g, "")}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-3 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-emerald-600/20"
-                          >
-                            <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.888-9.886.002-5.48-4.421-9.929-9.893-9.929-5.462 0-9.898 4.438-9.9 9.888-.001 2.124.6 3.736 1.597 5.4l-.994 3.635 3.737-.98c.002.001.002.001.002.001zm10.292-6.568c-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.667.149-.198.297-.766.967-.94 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.15-.174.2-.298.3-.496.099-.198.05-.371-.025-.52-.075-.149-.667-1.61-.915-2.203-.242-.579-.487-.501-.667-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347z"/>
-                            </svg>
-                            Falar no WhatsApp
-                          </a>
+                        {(selectedItem.phone || selectedItemSeller?.phone) && (
+                          <div className="flex flex-col gap-2 mt-3">
+                            {/* WhatsApp Button */}
+                            <a
+                              href={`https://wa.me/55${(selectedItem.phone || selectedItemSeller?.phone || "").replace(/\D/g, "")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-emerald-600/20 w-full"
+                            >
+                              <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.888-9.886.002-5.48-4.421-9.929-9.893-9.929-5.462 0-9.898 4.438-9.9 9.888-.001 2.124.6 3.736 1.597 5.4l-.994 3.635 3.737-.98c.002.001.002.001.002.001zm10.292-6.568c-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.667.149-.198.297-.766.967-.94 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.15-.174.2-.298.3-.496.099-.198.05-.371-.025-.52-.075-.149-.667-1.61-.915-2.203-.242-.579-.487-.501-.667-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347z"/>
+                              </svg>
+                              Falar no WhatsApp
+                            </a>
+
+                            {/* Direct Call Button */}
+                            <a
+                              href={`tel:${(selectedItem.phone || selectedItemSeller?.phone || "").replace(/\D/g, "")}`}
+                              className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-blue-600/20 w-full"
+                            >
+                              <Phone size={16} weight="fill" />
+                              Ligar para Anunciante
+                            </a>
+
+                            {/* Internal Chat Button */}
+                            {(!user || user.uid !== (selectedItem.userId || selectedItemSeller?.uid)) && (
+                              <button
+                                onClick={handleStartChat}
+                                className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#ef7c2c] hover:bg-[#d46a22] text-white text-xs font-semibold transition-all shadow-lg hover:shadow-[#ef7c2c]/20 w-full cursor-pointer"
+                              >
+                                <ChatCircleDots size={16} weight="fill" />
+                                Chat Interno
+                              </button>
+                            )}
+                          </div>
                         )}
                         <div className="flex items-center gap-2 mt-2">
                           <button

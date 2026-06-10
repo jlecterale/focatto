@@ -10,6 +10,23 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 
 ## 📅 Histórico de Intervenções
 
+### 10/06/2026 — Chat Interno e Opção de Ligação Direta para Anunciantes
+*   **Objetivo**: Implementar um sistema de chat interno em tempo real via Firestore e adicionar um botão de ligação direta (protocolo `tel:`), além do WhatsApp existente, em todas as páginas de contato com anunciantes. Adicionar o botão `<ChatHeaderButton />` em todos os cabeçalhos para acesso rápido às conversas com badge de mensagens não lidas.
+*   **Arquivos Criados/Modificados**:
+    *   [`src/lib/chatService.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/chatService.ts) — Novo serviço Firebase: criação/busca de chats (`createOrGetChat`), envio de mensagens (`sendMessage`), escuta em tempo real (`listenToMessages`, `listenToUserChats`), contagem de não lidas.
+    *   [`src/components/ChatHeaderButton.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/components/ChatHeaderButton.tsx) — Botão de cabeçalho com badge de contagem de mensagens não lidas em tempo real.
+    *   [`src/app/chat/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/chat/page.tsx) — Página completa de chat: lista de conversas à esquerda, área de mensagens à direita, responsiva para mobile.
+    *   [`src/app/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/page.tsx) — Adicionados botões WhatsApp, Ligar e Chat Interno no card de detalhe do anúncio; `<ChatHeaderButton />` no header.
+    *   [`src/app/anuncio/[id]/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/anuncio/[id]/page.tsx) — Botões de WhatsApp, Ligação e Chat Interno no painel lateral; `<ChatHeaderButton />` no header.
+    *   [`src/app/vendedor/[id]/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/vendedor/[id]/page.tsx) — Botões de WhatsApp, Ligação e Chat Interno na sidebar de contato; `<ChatHeaderButton />` no header.
+    *   [`src/app/meus-anuncios/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/meus-anuncios/page.tsx) — `<ChatHeaderButton />` adicionado ao header.
+    *   [`src/app/profile/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/profile/page.tsx) — `<ChatHeaderButton />` adicionado ao header.
+    *   Painel admin: [`src/app/admin/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/admin/page.tsx), [`admin/produtos/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/admin/produtos/page.tsx), [`admin/usuarios/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/admin/usuarios/page.tsx), [`admin/verificacoes/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/admin/verificacoes/page.tsx) — `<ChatHeaderButton />` adicionado a todos os cabeçalhos administrativos.
+*   **Schema Firestore**:
+    *   `chats/{chatId}`: `participants[]`, `participantNames{}`, `participantPhotos{}`, `unreadCount{}`, `lastMessage`, `lastMessageAt`, `relatedProduct?{}`.
+    *   `chats/{chatId}/messages/{msgId}`: `senderId`, `text`, `createdAt`.
+*   **Estado**: Concluído e validado com build de produção (zero erros TypeScript).
+
 ### 10/06/2026 — Notificações em Tempo Real para Anúncios Favoritados
 *   **Objetivo**: Configurar o Firebase e a aplicação para notificar em tempo real quando um anúncio de um usuário for favoritado por outra pessoa. A notificação deve ser exibida através de um painel dropdown no cabeçalho (com badge de contagem de não lidas) e alertas de toast imediatos em tempo real.
 *   **Arquivos Criados/Modificados**:
