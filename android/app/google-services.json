@@ -1,0 +1,35 @@
+{
+  "_comment": "PLACEHOLDER: registre o app Android (br.com.focatto.app) no Firebase Console (projeto 'focatto'), adicione a impressao digital SHA-1 e substitua este arquivo pelo google-services.json baixado. O login com Google no Android so funciona com o arquivo real.",
+  "project_info": {
+    "project_number": "469248226385",
+    "project_id": "focatto",
+    "storage_bucket": "focatto.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:469248226385:android:0000000000000000000000",
+        "android_client_info": {
+          "package_name": "br.com.focatto.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "469248226385-SUBSTITUA_PELO_WEB_CLIENT_ID.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAIZ9IcXqAGPSrGJh5sVTBbmcwRlBfyuU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

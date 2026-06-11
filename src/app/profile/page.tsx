@@ -93,7 +93,7 @@ const LUTHIER_SPECIALTIES_LIST = [
 ];
 
 export default function ProfilePage() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading, logout, deleteAccount } = useAuth();
   const router = useRouter();
   const [profile, setProfile] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -141,6 +141,12 @@ export default function ProfilePage() {
   const [premiumBilling, setPremiumBilling] = useState<"monthly" | "yearly">("yearly");
   const [premiumTier, setPremiumTier] = useState<1 | 2>(1); // default to 1 (Pro / Complete)
   const [submittingPremium, setSubmittingPremium] = useState(false);
+
+  // Account deletion (exigência das lojas: App Store 5.1.1(v) / Google Play)
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   // Activity / Role toggles
   const [isProfessional, setIsProfessional] = useState(false);
@@ -680,6 +686,36 @@ export default function ProfilePage() {
       toast.error("Erro ao ativar plano premium.");
     } finally {
       setSubmittingPremium(false);
+    }
+  }
+
+  const isPasswordProvider = user?.providerData[0]?.providerId === "password";
+
+  async function handleDeleteAccount() {
+    if (!user) return;
+    if (deleteConfirmText.trim().toUpperCase() !== "EXCLUIR") {
+      toast.error('Digite "EXCLUIR" para confirmar.');
+      return;
+    }
+    if (isPasswordProvider && !deletePassword) {
+      toast.error("Digite sua senha para confirmar a exclusão.");
+      return;
+    }
+    setDeletingAccount(true);
+    try {
+      await deleteAccount(isPasswordProvider ? deletePassword : undefined);
+      toast.success("Sua conta e todos os seus dados foram excluídos.");
+      router.push("/");
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code;
+      const messages: Record<string, string> = {
+        "auth/wrong-password": "Senha incorreta.",
+        "auth/invalid-credential": "Senha incorreta.",
+        "auth/too-many-requests": "Muitas tentativas. Tente novamente mais tarde.",
+        "auth/popup-closed-by-user": "Reautenticação cancelada.",
+      };
+      toast.error(messages[code ?? ""] || "Erro ao excluir a conta. Tente novamente.");
+      setDeletingAccount(false);
     }
   }
 
@@ -2030,7 +2066,102 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
+
+        {/* Danger Zone: exclusão de conta (sempre acessível no perfil) */}
+        <div className="bg-[#141211] rounded-2xl p-6 border border-red-500/20 space-y-4">
+          <div className="flex items-center gap-2">
+            <Trash size={18} className="text-red-400" />
+            <h3 className="text-sm font-bold uppercase tracking-wider text-red-400">Zona de Perigo</h3>
+          </div>
+          <p className="text-xs text-surface-400 leading-relaxed">
+            Excluir sua conta remove permanentemente seu perfil, anúncios, favoritos,
+            propostas, conversas, avaliações, notificações e arquivos enviados.
+            Esta ação não pode ser desfeita.
+          </p>
+          <button
+            onClick={() => setShowDeleteAccountModal(true)}
+            id="profile-delete-account-btn"
+            className="py-2.5 px-5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20 transition-colors"
+          >
+            Excluir minha conta
+          </button>
+        </div>
       </main>
+
+      {/* Delete Account Modal */}
+      {showDeleteAccountModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-4">
+          <div className="w-full max-w-[90vw] sm:max-w-md bg-[#0c0a09] border border-red-500/30 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 pt-6 pb-2">
+              <h2 className="text-lg font-bold text-red-400">Excluir Conta</h2>
+              <button
+                onClick={() => {
+                  setShowDeleteAccountModal(false);
+                  setDeleteConfirmText("");
+                  setDeletePassword("");
+                }}
+                id="profile-close-delete-account-modal-btn"
+                aria-label="Fechar modal de exclusão de conta"
+                className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[#181615] transition-all"
+              >
+                <XCircle size={18} />
+              </button>
+            </div>
+            <div className="px-6 pb-6 pt-2 space-y-4">
+              <p className="text-xs text-surface-400 leading-relaxed">
+                Esta ação é <strong className="text-red-400">permanente e irreversível</strong>.
+                Todos os seus dados serão excluídos: perfil, anúncios, favoritos, propostas,
+                conversas, avaliações, notificações e arquivos enviados (fotos e documentos).
+              </p>
+              <div className="space-y-1.5">
+                <label htmlFor="delete-account-confirm-input" className="text-xs text-surface-400">
+                  Digite <strong className="text-red-400">EXCLUIR</strong> para confirmar:
+                </label>
+                <input
+                  type="text"
+                  id="delete-account-confirm-input"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="EXCLUIR"
+                  className={inputBase}
+                  autoComplete="off"
+                />
+              </div>
+              {isPasswordProvider && (
+                <div className="space-y-1.5">
+                  <label htmlFor="delete-account-password-input" className="text-xs text-surface-400">
+                    Confirme sua senha:
+                  </label>
+                  <input
+                    type="password"
+                    id="delete-account-password-input"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    placeholder="Sua senha"
+                    className={inputBase}
+                    autoComplete="current-password"
+                  />
+                </div>
+              )}
+              {!isPasswordProvider && (
+                <p className="text-[10px] text-surface-500">
+                  Por segurança, pode ser solicitado que você confirme seu login
+                  ({user?.providerData[0]?.providerId === "apple.com" ? "Apple" : "Google"}) antes da exclusão.
+                </p>
+              )}
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deletingAccount || deleteConfirmText.trim().toUpperCase() !== "EXCLUIR"}
+                id="profile-confirm-delete-account-btn"
+                className="w-full py-3 rounded-xl bg-red-500 text-white font-bold text-sm transition-all duration-200 hover:bg-red-600 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {deletingAccount ? <Spinner size={16} className="animate-spin" /> : <Trash size={16} />}
+                {deletingAccount ? "Excluindo conta..." : "Excluir conta permanentemente"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Verification Modal */}
       {showVerificationModal && (

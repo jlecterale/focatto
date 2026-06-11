@@ -10,6 +10,23 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 
 ## 📅 Histórico de Intervenções
 
+### 11/06/2026 — App Mobile Android/iOS com Capacitor
+*   **Objetivo**: Criar o app mobile do Focatto (Android e iOS) com Capacitor 7 no mesmo repositório, seguindo os requisitos de publicação da Play Store e App Store: Sign in with Apple no iOS (guideline 4.8), exclusão completa de conta no perfil (App Store 5.1.1(v) e política do Google Play), workflow de CI e documentação.
+*   **Arquitetura**: Estratégia *remote URL* — o WebView nativo carrega o site Next.js em produção (SSR e rotas dinâmicas inviabilizam export estático) e o bridge do Capacitor é injetado para os plugins nativos funcionarem. `mobile/www/` contém apenas o shell offline.
+*   **Arquivos Criados/Modificados**:
+    *   `capacitor.config.ts` — Configuração do app (`br.com.focatto.app`, remote URL, splash, status bar, FirebaseAuthentication).
+    *   `android/`, `ios/App/` — Projetos nativos gerados (`npx cap add`), com `google-services.json`/`GoogleService-Info.plist` placeholders, entitlement de Sign in with Apple, `PrivacyInfo.xcprivacy` e strings de privacidade no `Info.plist`.
+    *   `src/lib/native.ts` — Helpers de detecção de plataforma.
+    *   `src/lib/accountService.ts` — Exclusão completa da conta: produtos, favoritos, propostas, chats, avaliações, notificações, verificações, perfis de professor/luthier, arquivos do Storage, doc do usuário e credencial do Firebase Auth (com reautenticação quando exigida).
+    *   `src/contexts/AuthContext.tsx` — `loginWithApple`, login Google nativo via `@capacitor-firebase/authentication` e `deleteAccount`.
+    *   `src/components/LoginModal.tsx` — Botão "Entrar com Apple" (exibido no app iOS).
+    *   `src/app/profile/page.tsx` — "Zona de Perigo" com modal de exclusão de conta (confirmação digitada + senha quando aplicável).
+    *   `src/components/CapacitorInit.tsx` + `src/app/layout.tsx` — Inicialização nativa (splash, status bar, botão voltar do Android) e viewport com `viewport-fit=cover`.
+    *   `.github/workflows/mobile.yml` — CI: build web, `cap sync` e APK de debug a cada mudança.
+    *   `mobile/README.md` — Setup do Firebase e checklist de publicação nas lojas; `CLAUDE.md` — guia do app para o Claude Code; `.npmrc` — `legacy-peer-deps` (peer firebase@^11 vs firebase@12).
+*   **Pendências manuais**: registrar os apps Android/iOS no Firebase Console e substituir os arquivos de config placeholders; habilitar capability Sign in with Apple; gerar ícones/splash com `@capacitor/assets`; configurar keystore de release.
+*   **Estado**: Concluído e validado com build de produção web; APK validado no CI.
+
 ### 10/06/2026 — Chat Interno e Opção de Ligação Direta para Anunciantes
 *   **Objetivo**: Implementar um sistema de chat interno em tempo real via Firestore e adicionar um botão de ligação direta (protocolo `tel:`), além do WhatsApp existente, em todas as páginas de contato com anunciantes. Adicionar o botão `<ChatHeaderButton />` em todos os cabeçalhos para acesso rápido às conversas com badge de mensagens não lidas.
 *   **Arquivos Criados/Modificados**:
@@ -164,7 +181,45 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 *   **Framework**: Next.js v16.2.7 (App Router), React 19.
 *   **Estilização**: Tailwind CSS v4.0.0-alpha, PostCSS.
 *   **Banco de Dados/Autenticação**: Firebase Client SDK (Firestore + Auth).
+*   **Mobile**: Capacitor 7 (Android + iOS) com estratégia remote URL; login nativo Google/Apple via `@capacitor-firebase/authentication`. Ver `mobile/README.md` e `CLAUDE.md`.
 *   **Design**: Ícones do Phosphor React e Lucide React. UI moderna com foco em responsividade e UX para o público musical.
+
+---
+
+## 🧰 Skills Sugeridas para Agentes/LLMs
+
+Sugestões de "skills" (procedimentos reutilizáveis) que qualquer LLM/agente pode seguir ao trabalhar neste repositório. Cada skill lista o gatilho, os passos e os critérios de pronto.
+
+### Skill: `web-feature`
+*   **Quando usar**: criar/alterar páginas, componentes ou serviços do site.
+*   **Passos**: (1) localizar serviços existentes em `src/lib/*Service.ts` antes de criar novos; (2) seguir o padrão visual dark (`#0b0908`/`#141211`, accent `#ef7c2c`→`#d4ae12`, cantos `rounded-xl/2xl`); (3) textos de UI em pt-BR; (4) toasts via `sonner`; (5) rodar `npm run build` (zero erros TypeScript).
+*   **Pronto quando**: build de produção passa e o histórico em `agents.md` foi atualizado.
+
+### Skill: `firestore-schema`
+*   **Quando usar**: criar coleção ou campo novo no Firestore.
+*   **Passos**: (1) atualizar `firestore.rules` e `firestore.indexes.json`; (2) tipar em `src/lib/roles.ts`; (3) criar funções de acesso no service correspondente; (4) **adicionar a limpeza da nova coleção em `src/lib/accountService.ts` (`deleteUserAccount`)** — exigência das lojas de apps; (5) validar com os emuladores (`firebase emulators:start`).
+*   **Pronto quando**: regras, índices, tipos e exclusão de conta cobrem a nova coleção.
+
+### Skill: `mobile-sync`
+*   **Quando usar**: qualquer mudança em `capacitor.config.ts`, instalação/remoção de plugin Capacitor ou alteração que afete o app nativo.
+*   **Passos**: (1) `npx cap sync`; (2) commitar as mudanças geradas em `android/` e `ios/`; (3) conferir que o workflow `mobile.yml` continua verde; (4) código que usa plugin nativo deve passar por `src/lib/native.ts` e `await import(...)`.
+*   **Pronto quando**: `cap sync` roda sem erros e o APK de debug compila no CI.
+
+### Skill: `native-auth`
+*   **Quando usar**: mexer em login, logout, registro ou exclusão de conta.
+*   **Passos**: (1) toda mudança vai em `src/contexts/AuthContext.tsx` (web e nativo compartilham o fluxo); (2) no nativo, OAuth usa `@capacitor-firebase/authentication` + `signInWithCredential` (popups não funcionam em WebView); (3) Apple Sign-In mantém `skipNativeAuth: true`; (4) tratar `auth/requires-recent-login` com reautenticação; (5) testar os três provedores: senha, Google e Apple.
+*   **Pronto quando**: web e app continuam autenticando e `onAuthStateChanged` reflete a sessão.
+
+### Skill: `store-compliance`
+*   **Quando usar**: antes de qualquer release nas lojas ou mudança que toque dados do usuário.
+*   **Passos**: (1) revisar o checklist de `mobile/README.md`; (2) garantir exclusão de conta funcional (Perfil → Zona de Perigo); (3) Sign in with Apple visível sempre que houver login Google no iOS; (4) atualizar `PrivacyInfo.xcprivacy` e o Data Safety do Play Console se a coleta de dados mudou; (5) incrementar versões (`versionCode`/`MARKETING_VERSION`).
+*   **Pronto quando**: checklist completo sem pendências novas.
+
+### Skill: `release-android` / `release-ios`
+*   **Quando usar**: gerar builds de release.
+*   **Passos Android**: substituir `google-services.json` real → keystore configurada → `npm run mobile:android:release` → AAB no Play Console.
+*   **Passos iOS** (exige macOS): substituir `GoogleService-Info.plist` real + `REVERSED_CLIENT_ID` no `Info.plist` → `npx cap sync ios` → `pod install` → arquivar no Xcode → App Store Connect.
+*   **Pronto quando**: build assinado e enviado, com notas de review descrevendo os recursos nativos.
 
 ---
 
