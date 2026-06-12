@@ -8,7 +8,21 @@
 const PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "focatto";
 
 // Defina NEXT_PUBLIC_SITE_URL no ambiente de deploy com o domínio público real.
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://focatto.firebaseapp.com";
+// Normaliza o valor (protocolo ausente, URL inválida) para nunca lançar em
+// build/runtime — `new URL()` com valor malformado quebraria o app inteiro.
+const DEFAULT_SITE_URL = "https://focatto.firebaseapp.com";
+
+function resolveSiteUrl(): string {
+  const raw = (process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL).trim();
+  const withProtocol = /^https?:\/\//.test(raw) ? raw : `https://${raw}`;
+  try {
+    return new URL(withProtocol).origin;
+  } catch {
+    return DEFAULT_SITE_URL;
+  }
+}
+
+export const SITE_URL = resolveSiteUrl();
 
 interface FirestoreValue {
   stringValue?: string;
@@ -97,6 +111,8 @@ export async function fetchApprovedProductIds(max = 1000): Promise<string[]> {
         body: JSON.stringify({
           structuredQuery: {
             from: [{ collectionId: "products" }],
+            // Projeção apenas do nome do documento: o sitemap só precisa dos IDs.
+            select: { fields: [{ fieldPath: "__name__" }] },
             where: {
               fieldFilter: {
                 field: { fieldPath: "status" },

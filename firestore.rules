@@ -35,7 +35,9 @@ service cloud.firestore {
 
       // Dados sensíveis (CPF/CNPJ e endereço completo) ficam fora do
       // documento público, legíveis apenas pelo dono e por admins.
-      match /private/{docId} {
+      // Path restrito ao documento único "profile" para evitar a criação
+      // de documentos arbitrários na subcoleção.
+      match /private/profile {
         allow read: if isAuth() && (request.auth.uid == userId || isAdmin());
         allow write: if isAuth() && request.auth.uid == userId;
       }
