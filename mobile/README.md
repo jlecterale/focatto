@@ -36,6 +36,63 @@ CAP_SERVER_URL=http://SEU_IP:3000 npx cap sync
 
 O workflow `.github/workflows/mobile.yml` valida o build web, roda `cap sync` e gera o APK de debug a cada mudança no código.
 
+## Toolchain Android (Gradle, JDK e SDK)
+
+| Ferramenta | Versão | Onde fica |
+| --- | --- | --- |
+| Gradle | 9.0.0 | `android/gradle/wrapper/gradle-wrapper.properties` |
+| Android Gradle Plugin (AGP) | 8.13.0 | `android/build.gradle` |
+| JDK | **21 (obrigatório)** | `JAVA_HOME` / `org.gradle.java.home` |
+| compileSdk / targetSdk | 35 | `android/variables.gradle` |
+
+> Esses arquivos **não** são sobrescritos pelo `cap sync` (apenas `capacitor.build.gradle`, `capacitor.settings.gradle`, `public/` e `capacitor.config.json` são). Os bumps de Gradle/AGP persistem.
+
+### JDK 21 é obrigatório
+
+O Capacitor 7 fixa `sourceCompatibility`/`targetCompatibility = VERSION_21` nos seus próprios módulos (`@capacitor/android`, `@capacitor-firebase/authentication`). Compilar com um JDK mais antigo gera:
+
+```
+java.lang.IllegalArgumentException: error: invalid source release: 21
+```
+
+Isso acontece porque o Gradle está rodando num JDK < 21 (comum em máquinas com o JDK 17 dos projetos React Native). **Não dá para baixar o alvo para 17** — os módulos do Capacitor falhariam igual. Soluções:
+
+```bash
+# Opção A — usar o JDK 21 só para este projeto (recomendado), sem mexer no JDK padrão:
+#   descomente e ajuste a linha em android/gradle.properties:
+#   org.gradle.java.home=/caminho/para/jdk-21
+
+# Opção B — exportar JAVA_HOME ao rodar o build:
+export JAVA_HOME=/caminho/para/jdk-21
+npm run mobile:android:debug
+
+# Instalar o JDK 21 (exemplos):
+sdk install java 21-tem            # SDKMAN
+sudo apt install openjdk-21-jdk    # Debian/Ubuntu
+brew install --cask temurin@21     # macOS
+```
+
+### Build sem Android Studio (só com o Android SDK)
+
+Você **não precisa do Android Studio** — assim como em projetos React Native, basta o SDK por linha de comando + JDK 21. O `npm run mobile:android:debug` já chama o `gradlew` diretamente (o script `cap:android` apenas *abre* o Studio por conveniência; é opcional).
+
+```bash
+# 1. Instale o command-line tools do Android SDK e os pacotes necessários:
+sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+# 2. Aponte o SDK (uma das opções):
+export ANDROID_HOME=$HOME/Android/Sdk          # ou ANDROID_SDK_ROOT
+#   ou crie android/local.properties (gitignored) com:
+#   sdk.dir=/caminho/para/Android/Sdk
+
+# 3. Gere o APK de debug (usa o gradlew, sem Studio):
+npm run mobile:android:debug
+# APK em: android/app/build/outputs/apk/debug/app-debug.apk
+
+# Instalar no aparelho conectado:
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+```
+
 ## Configuração obrigatória antes de publicar
 
 ### 1. Firebase (Google Sign-In nativo)
@@ -96,3 +153,6 @@ npx @capacitor/assets generate --iconBackgroundColor '#0b0908' --splashBackgroun
 | Login Apple falha | Capability/provedor Apple não habilitados (Apple Developer + Firebase) |
 | App abre tela offline com internet | `PRODUCTION_URL` incorreta em `capacitor.config.ts` |
 | Mudanças no config não refletem | Rodar `npx cap sync` após editar `capacitor.config.ts` |
+| `invalid source release: 21` | Gradle rodando em JDK < 21; aponte para um JDK 21 (ver "JDK 21 é obrigatório") |
+| `SDK location not found` | Defina `ANDROID_HOME`/`ANDROID_SDK_ROOT` ou crie `android/local.properties` com `sdk.dir=` |
+| `Could not resolve com.android.tools.build:gradle` | Sem acesso ao `dl.google.com` (Maven do Google) na rede do build |

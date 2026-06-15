@@ -10,6 +10,18 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 
 ## 📅 Histórico de Intervenções
 
+### 15/06/2026 — Upgrade do Android para Gradle 9 + JDK 21 e build sem Android Studio
+*   **Objetivo**: Atualizar o projeto Android para Gradle 9, resolver o erro `invalid source release: 21` no `mobile:android:debug` e documentar o build sem Android Studio (apenas com o Android SDK).
+*   **Arquivos Modificados**:
+    *   `android/gradle/wrapper/gradle-wrapper.properties` — Gradle `8.11.1` → `9.0.0`.
+    *   `android/build.gradle` — AGP `8.7.2` → `8.13.0` (mínimo compatível com Gradle 9); `task clean` migrado para `tasks.register('clean', Delete)` usando `rootProject.layout.buildDirectory` (o `Project.buildDir` foi removido no Gradle 9).
+    *   `android/gradle.properties` — `-Xmx2048m`, encoding UTF-8 e dica comentada de `org.gradle.java.home` para JDK 21.
+    *   `mobile/README.md` — nova seção "Toolchain Android" (Gradle/AGP/JDK), "JDK 21 é obrigatório", "Build sem Android Studio" e novos itens na tabela de troubleshooting; `CLAUDE.md` — seção "Toolchain Android".
+*   **Causa do erro `invalid source release: 21`**: o Capacitor 7 fixa `VERSION_21` nos próprios módulos (`@capacitor/android`, `@capacitor-firebase/authentication`), então o build exige JDK 21; baixar o alvo para 17 não resolve. A correção é rodar o Gradle num JDK 21 (`org.gradle.java.home`/`JAVA_HOME`).
+*   **Build sem Android Studio**: `npm run mobile:android:debug` já usa o `gradlew` diretamente — basta Android SDK (`ANDROID_HOME`/`local.properties`) + JDK 21; `cap:android` (abrir o Studio) é opcional.
+*   **Verificação**: Gradle 9.0.0 baixado e executado sobre JDK 21 com sucesso; `build.gradle` avaliado sem erros sob Gradle 9. A resolução do AGP/Google Maven não roda no sandbox (egress bloqueado para `dl.google.com`); validação completa do APK fica para o CI (que usa JDK 21 e tem acesso ao Maven).
+*   **Estado**: Concluído; verificação final do APK pelo workflow.
+
 ### 11/06/2026 — App Mobile Android/iOS com Capacitor
 *   **Objetivo**: Criar o app mobile do Focatto (Android e iOS) com Capacitor 7 no mesmo repositório, seguindo os requisitos de publicação da Play Store e App Store: Sign in with Apple no iOS (guideline 4.8), exclusão completa de conta no perfil (App Store 5.1.1(v) e política do Google Play), workflow de CI e documentação.
 *   **Arquitetura**: Estratégia *remote URL* — o WebView nativo carrega o site Next.js em produção (SSR e rotas dinâmicas inviabilizam export estático) e o bridge do Capacitor é injetado para os plugins nativos funcionarem. `mobile/www/` contém apenas o shell offline.

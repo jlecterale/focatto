@@ -34,6 +34,13 @@ npm run cap:ios                  # abre Xcode (somente macOS)
 8. **CI**: `.github/workflows/mobile.yml` builda web + APK debug a cada push. Mantenha-o verde.
 9. **agents.md**: ao concluir uma tarefa, registre o resumo da alteração no histórico do `agents.md` (diretriz do repositório).
 
+## Toolchain Android
+
+- **Gradle 9.0.0** (`android/gradle/wrapper/gradle-wrapper.properties`) + **AGP 8.13.0** (`android/build.gradle`). Esses arquivos não são sobrescritos pelo `cap sync`, então os bumps persistem.
+- **JDK 21 é obrigatório**: o Capacitor 7 fixa `VERSION_21` nos próprios módulos. Rodar o Gradle num JDK < 21 gera `invalid source release: 21`. Não adianta baixar o alvo para 17. Aponte o Gradle para um JDK 21 via `org.gradle.java.home` (em `android/gradle.properties`) ou `JAVA_HOME`. O CI já usa `java-version: 21`.
+- **Build sem Android Studio**: `npm run mobile:android:debug` chama o `gradlew` direto — só precisa do Android SDK (`ANDROID_HOME`/`local.properties`) + JDK 21. `cap:android` só abre o Studio (opcional).
+- No Gradle 9, `Project.buildDir` foi removido; o `clean` usa `rootProject.layout.buildDirectory`. Não reintroduza `buildDir`.
+
 ## Armadilhas conhecidas
 
 - `.npmrc` tem `legacy-peer-deps=true` porque `@capacitor-firebase/authentication` declara peer `firebase@^11` e o projeto usa `firebase@12` (compatível). Não remova sem testar `npm ci`.
