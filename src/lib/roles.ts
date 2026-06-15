@@ -160,6 +160,7 @@ export interface VerificationRequest {
 export interface RatingData {
   id?: string;
   productId?: string;
+  proposalId?: string;
   sellerId: string;
   userId: string;
   userName: string;

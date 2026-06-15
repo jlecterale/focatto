@@ -197,9 +197,14 @@ service cloud.firestore {
       allow read: if true;
 
       // Authenticated users can create ratings (but not for themselves)
+      // Must be linked to an accepted proposal (concluded sale)
       allow create: if isAuth()
         && request.resource.data.userId == request.auth.uid
-        && request.resource.data.sellerId != request.auth.uid;
+        && request.resource.data.sellerId != request.auth.uid
+        && request.resource.data.proposalId is string
+        && get(/databases/$(database)/documents/proposals/$(request.resource.data.proposalId)).data.status == 'accepted'
+        && get(/databases/$(database)/documents/proposals/$(request.resource.data.proposalId)).data.sellerId == request.resource.data.sellerId
+        && get(/databases/$(database)/documents/proposals/$(request.resource.data.proposalId)).data.receiverId == request.auth.uid;
 
       // Only admins can update (approve/reject) or delete profile ratings
       allow update: if isAdmin();

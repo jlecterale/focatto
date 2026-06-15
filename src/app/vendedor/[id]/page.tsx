@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getUserData, getTeacherProfile } from "../../../lib/userService";
-import { getSellerStats, getSellerRatings, getUserRatingForSeller, addRating } from "../../../lib/ratingService";
+import { getSellerStats, getSellerRatings, getUserRatingForSeller, addRating, getAcceptedProposal } from "../../../lib/ratingService";
 import { getUserApprovedProducts } from "../../../lib/productService";
-import type { UserData, SellerStats, ProductData, RatingData, TeacherData } from "../../../lib/roles";
+import type { UserData, SellerStats, ProductData, RatingData, TeacherData, ProposalData } from "../../../lib/roles";
 import {
   ArrowLeft, Star, MapPin, ShieldCheck, WhatsappLogo, Clock,
   Sparkle, MusicNote, HeartStraight, Smiley, Tag, Package, GraduationCap, Phone, ChatCircleDots
@@ -37,6 +37,7 @@ export default function VendedorPage() {
   const [ratingValue, setRatingValue] = useState(0);
   const [ratingComment, setRatingComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [acceptedProposal, setAcceptedProposal] = useState<ProposalData | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -59,8 +60,12 @@ export default function VendedorPage() {
       }
 
       if (user) {
-        const existing = await getUserRatingForSeller(sellerId, user.uid);
+        const [existing, proposal] = await Promise.all([
+          getUserRatingForSeller(sellerId, user.uid),
+          getAcceptedProposal(sellerId, user.uid),
+        ]);
         setUserRating(existing);
+        setAcceptedProposal(proposal);
       }
 
       setLoading(false);
@@ -90,7 +95,7 @@ export default function VendedorPage() {
   }
 
   async function handleSubmitRating() {
-    if (!user || !sellerId || ratingValue === 0) return;
+    if (!user || !sellerId || ratingValue === 0 || !acceptedProposal?.id) return;
     setSubmitting(true);
     try {
       await addRating(
@@ -99,6 +104,7 @@ export default function VendedorPage() {
         user.displayName || user.email || "Anônimo",
         ratingValue,
         ratingComment,
+        acceptedProposal.id,
       );
       setRatingValue(0);
       setRatingComment("");
@@ -554,37 +560,48 @@ export default function VendedorPage() {
               {user ? (
                 user.uid !== sellerId ? (
                   !userRating ? (
-                    <div className="mt-4 pt-4 border-t border-[#22201e]">
-                      <h4 className="text-xs font-bold text-white mb-2">Avaliar este perfil</h4>
-                      <div className="flex items-center gap-1 mb-2">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            onClick={() => setRatingValue(star)}
-                            className="cursor-pointer transition-all hover:scale-110"
-                          >
-                            <Star
-                              size={20}
-                              weight={star <= ratingValue ? "fill" : "regular"}
-                              className={star <= ratingValue ? "text-amber-400" : "text-surface-600 hover:text-amber-400/50"}
-                            />
-                          </button>
-                        ))}
+                    acceptedProposal ? (
+                      <div className="mt-4 pt-4 border-t border-[#22201e]">
+                        <h4 className="text-xs font-bold text-white mb-2">Avaliar este perfil</h4>
+                        <p className="text-[10px] text-surface-400 mb-3 bg-[#181615] p-2 rounded-lg border border-[#2a2827]/50">
+                          Com base na sua compra de: <strong>{acceptedProposal.productTitle}</strong>
+                        </p>
+                        <div className="flex items-center gap-1 mb-2">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              onClick={() => setRatingValue(star)}
+                              className="cursor-pointer transition-all hover:scale-110"
+                            >
+                              <Star
+                                size={20}
+                                weight={star <= ratingValue ? "fill" : "regular"}
+                                className={star <= ratingValue ? "text-amber-400" : "text-surface-600 hover:text-amber-400/50"}
+                              />
+                            </button>
+                          ))}
+                        </div>
+                        <textarea
+                          value={ratingComment}
+                          onChange={(e) => setRatingComment(e.target.value)}
+                          placeholder="Comente sua experiência com este vendedor (opcional)"
+                          className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c] resize-none h-16 mb-2"
+                        />
+                        <button
+                          onClick={handleSubmitRating}
+                          disabled={ratingValue === 0 || submitting}
+                          className="w-full py-2 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold transition-all hover:shadow-[0_4px_15px_rgba(239,124,44,0.3)] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-center"
+                        >
+                          {submitting ? "Enviando..." : "Enviar Avaliação"}
+                        </button>
                       </div>
-                      <textarea
-                        value={ratingComment}
-                        onChange={(e) => setRatingComment(e.target.value)}
-                        placeholder="Comente sua experiência com este vendedor (opcional)"
-                        className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c] resize-none h-16 mb-2"
-                      />
-                      <button
-                        onClick={handleSubmitRating}
-                        disabled={ratingValue === 0 || submitting}
-                        className="w-full py-2 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold transition-all hover:shadow-[0_4px_15px_rgba(239,124,44,0.3)] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-center"
-                      >
-                        {submitting ? "Enviando..." : "Enviar Avaliação"}
-                      </button>
-                    </div>
+                    ) : (
+                      <div className="mt-4 pt-4 border-t border-[#22201e]">
+                        <p className="text-xs text-surface-400 text-center bg-[#181615] py-3 px-4 rounded-xl border border-[#2a2827] leading-relaxed">
+                          Apenas compradores com vendas concluídas (proposta aceita) com este vendedor podem avaliá-lo.
+                        </p>
+                      </div>
+                    )
                   ) : (
                     <div className="mt-4 pt-4 border-t border-[#22201e]">
                       <p className="text-xs text-surface-400 flex items-center gap-1.5 justify-center bg-[#181615] py-2 rounded-lg border border-[#2a2827]">

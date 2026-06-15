@@ -10,6 +10,15 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 
 ## 📅 Histórico de Intervenções
 
+### 15/06/2026 — Restrição de Avaliação de Vendedor a Vendas Concluídas
+*   **Objetivo**: Vincular o sistema de avaliação de vendedores à conclusão de uma venda (proposta de compra ou troca aceita), impedindo que qualquer usuário avalie perfis sem ter transacionado com eles.
+*   **Arquivos Modificados**:
+    *   [`src/lib/roles.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/roles.ts) — Adicionado campo `proposalId` à interface `RatingData`.
+    *   [`src/lib/ratingService.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/ratingService.ts) — Criada a função `getAcceptedProposal` para buscar propostas aceitas e atualizada `addRating` para receber e validar a proposta associada.
+    *   [`src/app/vendedor/[id]/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/vendedor/[id]/page.tsx) — Carregamento de proposta aceita e condicionamento do formulário de avaliação à existência dessa transação.
+    *   [`firestore.rules`](file:///c:/Users/USER%201/Desktop/focatto/firestore.rules) — Atualizada a regra de criação de `ratings` no Firestore para validar a proposta associada no servidor.
+*   **Estado**: Concluído e verificado com build de produção (zero erros) e deploy das regras do Firestore concluído.
+
 ### 15/06/2026 — Rede Social Integrada e Gestão de Equipamentos no Perfil
 *   **Objetivo**: Implementar uma rede social completa integrada aos perfis (com posts de fotos, vídeos do YouTube e áudios do SoundCloud), limite de upload de fotos por plano, reações com emojis, menções de usuários e locais, funcionalidade de seguir perfis com controle de notificações, aba Social de gerenciamento no Perfil privado e atalhos de integração no cabeçalho e páginas públicas.
 *   **Arquivos Criados/Modificados**:
