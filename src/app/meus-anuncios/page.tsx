@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { getUserData } from "../../lib/userService";
 import {
-  createProduct, getUserProducts, getSellerProductsFavorites, getSentProposals, createProposal,
+  createProduct, updateProduct, deleteProduct, getUserProducts, getSellerProductsFavorites, getSentProposals, createProposal,
 } from "../../lib/productService";
 import type { ProductData, FavoriteData, ProposalData } from "../../lib/roles";
+import { formatCep } from "../../lib/validation";
+import { lookupCep } from "../../lib/cep";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Compass, SignOut, Package, Plus, Spinner, ArrowLeft, Clock, CheckCircle, XCircle,
-  MapPin, CurrencyDollar, Tag, FileImage, Trash, HeartStraight, ArrowsLeftRight,
+  MapPin, CurrencyDollar, Tag, FileImage, Trash, HeartStraight, ArrowsLeftRight, PencilSimple,
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import NotificationBell from "../../components/NotificationBell";
@@ -33,9 +35,11 @@ function getConditionsForCategory(cat: string) {
   return DEFAULT_CONDITIONS;
 }
 
-export default function MeusAnunciosPage() {
+function MeusAnunciosContent() {
   const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editParam = searchParams.get("edit");
   const [products, setProducts] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -55,11 +59,90 @@ export default function MeusAnunciosPage() {
   };
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
+  const [neighborhood, setNeighborhood] = useState("");
+  const [cep, setCep] = useState("");
+  const [cepLoading, setCepLoading] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
+  // Quando definido, o formulário está editando este anúncio (em vez de criar).
+  const [editingId, setEditingId] = useState<string | null>(null);
+  // Fotos já salvas no anúncio que o dono optou por manter (URLs do Storage).
+  const [existingPhotos, setExistingPhotos] = useState<string[]>([]);
+
   const photoInputRef = useRef<HTMLInputElement>(null);
+
+  const MAX_PHOTOS = 6;
+
+  function resetForm() {
+    setEditingId(null);
+    setTitle("");
+    setDescription("");
+    setPrice("");
+    setCategory(CATEGORIES[0]);
+    setCondition(getConditionsForCategory(CATEGORIES[0])[0]);
+    setCity("");
+    setState("");
+    setNeighborhood("");
+    setCep("");
+    setPhotos([]);
+    photoPreviews.forEach((url) => URL.revokeObjectURL(url));
+    setPhotoPreviews([]);
+    setExistingPhotos([]);
+  }
+
+  function openCreateForm() {
+    resetForm();
+    setShowForm(true);
+  }
+
+  function handleEditProduct(product: ProductData) {
+    setEditingId(product.id!);
+    setTitle(product.title || "");
+    setDescription(product.description || "");
+    setPrice(product.price != null ? String(product.price) : "");
+    const cat = product.category || CATEGORIES[0];
+    setCategory(cat);
+    setCondition(product.condition || getConditionsForCategory(cat)[0]);
+    setCity(product.city || "");
+    setState(product.state || "");
+    setNeighborhood(product.neighborhood || "");
+    setCep(product.cep ? formatCep(product.cep) : "");
+    setExistingPhotos(product.photos || []);
+    setPhotos([]);
+    photoPreviews.forEach((url) => URL.revokeObjectURL(url));
+    setPhotoPreviews([]);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function handleCepChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const formatted = formatCep(e.target.value);
+    setCep(formatted);
+    const clean = formatted.replace(/\D/g, "");
+    if (clean.length === 8) {
+      setCepLoading(true);
+      const addr = await lookupCep(clean);
+      setCepLoading(false);
+      if (addr) {
+        if (addr.city) setCity(addr.city);
+        if (addr.state) setState(addr.state);
+        if (addr.neighborhood) setNeighborhood(addr.neighborhood);
+      }
+    }
+  }
+
+  async function handleDeleteProduct(productId: string) {
+    if (!confirm("Tem certeza que deseja excluir este anúncio permanentemente?")) return;
+    try {
+      await deleteProduct(productId);
+      toast.success("Anúncio excluído com sucesso!");
+      setProducts((prev) => prev.filter((p) => p.id !== productId));
+    } catch {
+      toast.error("Erro ao excluir o anúncio.");
+    }
+  }
 
   const [allFavorites, setAllFavorites] = useState<FavoriteData[]>([]);
   const [allProposals, setAllProposals] = useState<ProposalData[]>([]);
@@ -149,6 +232,19 @@ export default function MeusAnunciosPage() {
     loadProducts();
   }, [user]);
 
+  // Abre direto o formulário de edição quando chega via /meus-anuncios?edit=<id>
+  // (ex.: botão "Editar" na página de perfil), uma única vez por id.
+  const handledEditParam = useRef<string | null>(null);
+  useEffect(() => {
+    if (!editParam || products.length === 0) return;
+    if (handledEditParam.current === editParam) return;
+    const target = products.find((p) => p.id === editParam);
+    if (target) {
+      handledEditParam.current = editParam;
+      handleEditProduct(target);
+    }
+  }, [editParam, products]);
+
   async function loadProducts() {
     if (!user) return;
     setLoading(true);
@@ -170,17 +266,24 @@ export default function MeusAnunciosPage() {
 
   function handlePhotosSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
-    const newPhotos = [...photos, ...files].slice(0, 6);
+    // O limite de fotos considera as já salvas (em edição) somadas às novas.
+    const available = MAX_PHOTOS - existingPhotos.length - photos.length;
+    const newPhotos = [...photos, ...files.slice(0, Math.max(0, available))];
     setPhotos(newPhotos);
     // Revoga os object URLs antigos antes de gerar novos, evitando vazamento de memória.
     photoPreviews.forEach((url) => URL.revokeObjectURL(url));
     setPhotoPreviews(newPhotos.map((f) => URL.createObjectURL(f)));
+    e.target.value = "";
   }
 
   function removePhoto(index: number) {
     if (photoPreviews[index]) URL.revokeObjectURL(photoPreviews[index]);
     setPhotos((prev) => prev.filter((_, i) => i !== index));
     setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function removeExistingPhoto(index: number) {
+    setExistingPhotos((prev) => prev.filter((_, i) => i !== index));
   }
 
   async function handleSubmit() {
@@ -190,40 +293,44 @@ export default function MeusAnunciosPage() {
     if (description.trim().length > 5000) { toast.error("A descrição deve ter no máximo 5.000 caracteres."); return; }
     if (!price || Number(price) <= 0 || !Number.isFinite(Number(price))) { toast.error("Preço inválido."); return; }
     if (!city.trim() || !state.trim()) { toast.error("Cidade e estado são obrigatórios."); return; }
+    if (editingId && existingPhotos.length + photos.length === 0) {
+      toast.error("O anúncio precisa de pelo menos uma foto.");
+      return;
+    }
+
+    const productFields = {
+      title: title.trim(),
+      description: description.trim(),
+      price: Number(price),
+      category,
+      condition,
+      city: city.trim(),
+      state: state.trim(),
+      neighborhood: neighborhood.trim(),
+      cep: cep.replace(/\D/g, ""),
+    };
 
     setSubmitting(true);
     try {
-      const profile = await getUserData(user.uid);
-      await createProduct(
-        user.uid,
-        user.email || "",
-        profile?.displayName || user.displayName || "Usuário",
-        {
-          title: title.trim(),
-          description: description.trim(),
-          price: Number(price),
-          category,
-          condition,
-          city: city.trim(),
-          state: state.trim(),
-        },
-        photos,
-      );
-      toast.success("Anúncio enviado para aprovação!");
+      if (editingId) {
+        await updateProduct(editingId, user.uid, productFields, existingPhotos, photos);
+        toast.success("Anúncio atualizado e reenviado para aprovação!");
+      } else {
+        const profile = await getUserData(user.uid);
+        await createProduct(
+          user.uid,
+          user.email || "",
+          profile?.displayName || user.displayName || "Usuário",
+          productFields,
+          photos,
+        );
+        toast.success("Anúncio enviado para aprovação!");
+      }
       setShowForm(false);
-      setTitle("");
-      setDescription("");
-      setPrice("");
-      setCategory(CATEGORIES[0]);
-      setCondition(getConditionsForCategory(CATEGORIES[0])[0]);
-      setCity("");
-      setState("");
-      setPhotos([]);
-      photoPreviews.forEach((url) => URL.revokeObjectURL(url));
-      setPhotoPreviews([]);
+      resetForm();
       loadProducts();
     } catch {
-      toast.error("Erro ao criar anúncio.");
+      toast.error(editingId ? "Erro ao atualizar anúncio." : "Erro ao criar anúncio.");
     } finally {
       setSubmitting(false);
     }
@@ -274,7 +381,7 @@ export default function MeusAnunciosPage() {
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
             <ChatHeaderButton />
             <NotificationBell />
-            <button onClick={() => setShowForm(true)}
+            <button onClick={openCreateForm}
               id="announcements-create-modal-trigger"
               className="flex items-center gap-1.5 py-2 sm:py-2.5 px-3 sm:px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold transition-all hover:shadow-[0_4px_15px_rgba(239,124,44,0.3)]"
             >
@@ -293,12 +400,12 @@ export default function MeusAnunciosPage() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
-        {/* Product Creation Form */}
+        {/* Product Creation / Edit Form */}
         {showForm && (
           <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-surface-400">Criar Anúncio</h2>
-              <button onClick={() => setShowForm(false)}
+              <h2 className="text-sm font-bold uppercase tracking-wider text-surface-400">{editingId ? "Editar Anúncio" : "Criar Anúncio"}</h2>
+              <button onClick={() => { setShowForm(false); resetForm(); }}
                 id="announcements-close-form-btn"
                 aria-label="Fechar formulário de anúncio"
                 className="text-surface-400 hover:text-white"
@@ -307,7 +414,11 @@ export default function MeusAnunciosPage() {
               </button>
             </div>
 
-            <p className="text-xs text-surface-500 -mt-2">Seu anúncio será analisado e aprovado por nossa equipe antes de ficar visível.</p>
+            <p className="text-xs text-surface-500 -mt-2">
+              {editingId
+                ? "Ao salvar, o anúncio volta para análise da nossa equipe antes de ficar visível novamente."
+                : "Seu anúncio será analisado e aprovado por nossa equipe antes de ficar visível."}
+            </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
@@ -349,6 +460,30 @@ export default function MeusAnunciosPage() {
               </div>
 
               <div>
+                <label htmlFor="announcement-cep-input" className="block text-xs text-surface-400 mb-1.5">
+                  CEP <span className="text-surface-500">(preenche cidade/bairro)</span>
+                </label>
+                <div className="relative">
+                  <input type="text" id="announcement-cep-input" value={cep} onChange={handleCepChange}
+                    placeholder="00000-000"
+                    inputMode="numeric"
+                    className={inputBase}
+                  />
+                  {cepLoading && (
+                    <Spinner size={14} className="animate-spin text-[#ef7c2c] absolute right-3 top-1/2 -translate-y-1/2" />
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="announcement-neighborhood-input" className="block text-xs text-surface-400 mb-1.5">Bairro</label>
+                <input type="text" id="announcement-neighborhood-input" value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)}
+                  placeholder="Ex: Pinheiros"
+                  className={inputBase}
+                />
+              </div>
+
+              <div>
                 <label htmlFor="announcement-city-input" className="block text-xs text-surface-400 mb-1.5">Cidade *</label>
                 <input type="text" id="announcement-city-input" value={city} onChange={(e) => setCity(e.target.value)}
                   placeholder="São Paulo"
@@ -368,17 +503,29 @@ export default function MeusAnunciosPage() {
               <div className="sm:col-span-2">
                 <label htmlFor="announcement-photos-input" className="block text-xs text-surface-400 mb-1.5">Fotos (máx. 6)</label>
                 <div className="flex flex-wrap gap-2">
-                  {photoPreviews.map((preview, idx) => (
-                    <div key={idx} className="relative h-20 w-20 rounded-xl border border-[#2a2827] overflow-hidden">
-                      <img src={preview} alt="" className="h-full w-full object-cover" />
-                      <button onClick={() => removePhoto(idx)}
+                  {existingPhotos.map((url, idx) => (
+                    <div key={`existing-${idx}`} className="relative h-20 w-20 rounded-xl border border-[#2a2827] overflow-hidden">
+                      <img loading="lazy" decoding="async" src={url} alt="" className="h-full w-full object-cover" />
+                      <button onClick={() => removeExistingPhoto(idx)}
+                        aria-label="Remover foto"
                         className="absolute top-0.5 right-0.5 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center"
                       >
                         <Trash size={10} className="text-red-400" />
                       </button>
                     </div>
                   ))}
-                  {photos.length < 6 && (
+                  {photoPreviews.map((preview, idx) => (
+                    <div key={`new-${idx}`} className="relative h-20 w-20 rounded-xl border border-[#2a2827] overflow-hidden">
+                      <img src={preview} alt="" className="h-full w-full object-cover" />
+                      <button onClick={() => removePhoto(idx)}
+                        aria-label="Remover foto"
+                        className="absolute top-0.5 right-0.5 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center"
+                      >
+                        <Trash size={10} className="text-red-400" />
+                      </button>
+                    </div>
+                  ))}
+                  {existingPhotos.length + photos.length < MAX_PHOTOS && (
                     <button onClick={() => photoInputRef.current?.click()}
                       id="announcement-photos-trigger-btn"
                       aria-label="Adicionar fotos"
@@ -397,7 +544,7 @@ export default function MeusAnunciosPage() {
               className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white font-semibold text-sm transition-all hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {submitting ? <Spinner size={16} className="animate-spin" /> : null}
-              Enviar para Aprovação
+              {editingId ? "Salvar e Reenviar para Aprovação" : "Enviar para Aprovação"}
             </button>
           </div>
         )}
@@ -413,7 +560,7 @@ export default function MeusAnunciosPage() {
             <div className="text-center py-8">
               <Package size={40} className="mx-auto text-surface-500 mb-3" />
               <p className="text-sm text-surface-400">Você ainda não tem anúncios.</p>
-              <button onClick={() => setShowForm(true)}
+              <button onClick={openCreateForm}
                 id="announcements-create-first-btn"
                 className="mt-3 py-2 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold"
               >
@@ -432,6 +579,7 @@ export default function MeusAnunciosPage() {
                       <p className="text-xs text-surface-400 mt-0.5">
                         <MapPin size={10} className="inline mr-0.5" />
                         {product.city}, {product.state}
+                        {product.neighborhood ? ` - ${product.neighborhood}` : ""}
                         {product.price ? ` | R$ ${product.price.toLocaleString("pt-BR")}` : ""}
                         {` | ${product.views || 0} visualizações`}
                       </p>
@@ -452,6 +600,24 @@ export default function MeusAnunciosPage() {
                       ))}
                     </div>
                   )}
+
+                  {/* Management actions */}
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#1c1a19]/60">
+                    <button
+                      onClick={() => handleEditProduct(product)}
+                      className="flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-[#181615] border border-[#2a2827] hover:border-[#ef7c2c]/40 text-surface-300 hover:text-white transition-all text-[11px] font-semibold cursor-pointer"
+                    >
+                      <PencilSimple size={12} />
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product.id!)}
+                      className="flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all text-[11px] font-semibold cursor-pointer"
+                    >
+                      <Trash size={12} />
+                      Excluir
+                    </button>
+                  </div>
 
                   {/* Interested buyers (Favorites) */}
                   {(() => {
@@ -727,5 +893,19 @@ export default function MeusAnunciosPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MeusAnunciosPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
+          <Spinner size={24} className="animate-spin text-[#ef7c2c]" />
+        </div>
+      }
+    >
+      <MeusAnunciosContent />
+    </Suspense>
   );
 }

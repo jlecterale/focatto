@@ -276,7 +276,7 @@ export default function AnuncioDetalhePage() {
                 <MapPin size={14} className="text-[#ef7c2c] mt-0.5 flex-shrink-0" />
                 <span>
                   {product.city}, {product.state}
-                  {seller?.address?.neighborhood ? ` - ${seller.address.neighborhood}` : ""}
+                  {product.neighborhood ? ` - ${product.neighborhood}` : (seller?.address?.neighborhood ? ` - ${seller.address.neighborhood}` : "")}
                 </span>
               </div>
 

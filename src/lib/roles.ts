@@ -55,6 +55,8 @@ export interface ProductData {
   condition: string;
   city: string;
   state: string;
+  neighborhood?: string;
+  cep?: string;
   photos: string[];
   status: ProductStatus;
   adminNotes: string;

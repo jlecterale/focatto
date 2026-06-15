@@ -1319,6 +1319,7 @@ export default function HomePage() {
                     <Map
                       city={selectedItem.city}
                       state={selectedItem.state}
+                      neighborhood={selectedItem.neighborhood}
                       popupText={
                         selectedItem.type === "produto" 
                           ? `${selectedItem.title} - R$ ${selectedItem.price?.toLocaleString("pt-BR")}`

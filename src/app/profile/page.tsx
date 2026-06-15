@@ -1027,10 +1027,11 @@ export default function ProfilePage() {
                               Excluir
                             </button>
                             <Link
-                              href="/meus-anuncios"
+                              href={`/meus-anuncios?edit=${product.id}`}
                               className="flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-[#181615] border border-[#2a2827] hover:border-[#ef7c2c]/30 text-surface-300 hover:text-white transition-all text-[11px] font-semibold"
                             >
-                              Gerenciar
+                              <PencilSimple size={12} />
+                              Editar
                             </Link>
                           </div>
                         </div>
