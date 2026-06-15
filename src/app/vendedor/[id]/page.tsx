@@ -13,6 +13,7 @@ import {
 } from "@phosphor-icons/react";
 import { useAuth } from "../../../contexts/AuthContext";
 import LoginModal from "../../../components/LoginModal";
+import FollowButton from "../../../components/social/FollowButton";
 import { toast } from "sonner";
 import NotificationBell from "../../../components/NotificationBell";
 import ChatHeaderButton from "../../../components/ChatHeaderButton";
@@ -423,35 +424,52 @@ export default function VendedorPage() {
               <h3 className="text-xs font-bold uppercase tracking-wider text-surface-400 mb-4">Contato</h3>
 
               {/* Contact Buttons */}
-              {seller.phone && (
-                <div className="flex flex-col gap-2 mb-3">
-                  <a
-                    href={`https://wa.me/55${seller.phone.replace(/\D/g, "")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-emerald-600/20 w-full"
-                  >
-                    <WhatsappLogo size={16} weight="fill" />
-                    Falar no WhatsApp
-                  </a>
-                  <a
-                    href={`tel:${seller.phone.replace(/\D/g, "")}`}
-                    className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-blue-600/20 w-full"
-                  >
-                    <Phone size={16} weight="fill" />
-                    Ligar para Vendedor
-                  </a>
-                  {(!user || user.uid !== sellerId) && (
-                    <button
-                      onClick={handleStartChat}
-                      className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#ef7c2c] hover:bg-[#d46a22] text-white text-xs font-semibold transition-all shadow-lg hover:shadow-[#ef7c2c]/20 w-full cursor-pointer"
+              <div className="flex flex-col gap-2 mb-3">
+                {seller.phone && (
+                  <>
+                    <a
+                      href={`https://wa.me/55${seller.phone.replace(/\D/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-emerald-600/20 w-full"
                     >
-                      <ChatCircleDots size={16} weight="fill" />
-                      Chat Interno
-                    </button>
-                  )}
-                </div>
-              )}
+                      <WhatsappLogo size={16} weight="fill" />
+                      Falar no WhatsApp
+                    </a>
+                    <a
+                      href={`tel:${seller.phone.replace(/\D/g, "")}`}
+                      className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-lg hover:shadow-blue-600/20 w-full"
+                    >
+                      <Phone size={16} weight="fill" />
+                      Ligar para Vendedor
+                    </a>
+                  </>
+                )}
+                {(!user || user.uid !== sellerId) && (
+                  <button
+                    onClick={handleStartChat}
+                    className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#ef7c2c] hover:bg-[#d46a22] text-white text-xs font-semibold transition-all shadow-lg hover:shadow-[#ef7c2c]/20 w-full cursor-pointer"
+                  >
+                    <ChatCircleDots size={16} weight="fill" />
+                    Chat Interno
+                  </button>
+                )}
+                <Link
+                  href={`/social/${sellerId}`}
+                  className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold transition-all shadow-lg hover:shadow-[#ef7c2c]/20 w-full cursor-pointer text-center"
+                >
+                  <MusicNote size={16} weight="bold" />
+                  Ver Perfil Social
+                </Link>
+                {(!user || user.uid !== sellerId) && (
+                  <FollowButton
+                    targetUserId={sellerId}
+                    targetUserName={seller.displayName}
+                    targetUserPhoto={seller.photoURL}
+                    className="w-full justify-center"
+                  />
+                )}
+              </div>
 
               {/* Email */}
               {seller.email && (

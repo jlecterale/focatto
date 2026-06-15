@@ -755,12 +755,22 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-row items-center justify-between gap-2 sm:gap-4">
-          <div className="flex items-center">
-            <img 
-              src="/focattolecter.png" 
-              alt="Focattolecter Logo" 
-              className="h-10 sm:h-14 md:h-20 w-auto object-contain invert brightness-110 mix-blend-screen" 
-            />
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link href="/" className="flex items-center">
+              <img 
+                src="/focattolecter.png" 
+                alt="Focattolecter Logo" 
+                className="h-10 sm:h-14 md:h-20 w-auto object-contain invert brightness-110 mix-blend-screen" 
+              />
+            </Link>
+            <span className="hidden sm:inline-block h-6 w-px bg-white/10" />
+            <Link
+              href="/social"
+              className="text-xs sm:text-sm font-semibold text-surface-300 hover:text-[#ef7c2c] transition-colors px-2.5 py-1.5 rounded-lg flex items-center gap-1.5"
+            >
+              <Compass size={16} />
+              Comunidade
+            </Link>
           </div>
 
           {/* Auth */}

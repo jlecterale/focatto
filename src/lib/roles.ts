@@ -135,6 +135,12 @@ export interface UserData {
   premiumTier?: string;
   // "" indica assinatura cancelada (mantido por compatibilidade com docs existentes)
   premiumBilling?: "monthly" | "yearly" | "";
+  // === Campos Sociais ===
+  social?: {
+    equipments: EquipmentItem[];
+    contactOptions: SocialContactOptions;
+  };
+  totalPhotosUploaded?: number;
 }
 
 export interface VerificationRequest {
@@ -210,12 +216,90 @@ export interface NotificationData {
   userId: string; // Recipient: owner of the ad (sellerId)
   senderId: string; // The user who favorited the ad
   senderName: string; // Name of the user who favorited
-  type: "favorite" | "proposal" | "rating" | "system";
+  type: "favorite" | "proposal" | "rating" | "system" | "new_post" | "new_follower";
   title: string;
   message: string;
   productId?: string;
   productTitle?: string;
+  postId?: string;
   read: boolean;
   createdAt: number;
 }
+
+// === SOCIAL TYPES ===
+
+export interface EquipmentItem {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string | null;
+  createdAt: number;
+}
+
+export interface SocialContactOptions {
+  internalChatEnabled: boolean;
+  whatsappEnabled: boolean;
+  whatsappNumber: string | null;
+}
+
+export interface PostData {
+  id?: string;
+  userId: string;
+  userName: string;
+  userPhoto: string;
+  type: "photo" | "youtube" | "soundcloud";
+  text: string;
+  images: string[];
+  youtubeUrl: string | null;
+  soundcloudUrl: string | null;
+  location: string | null;
+  taggedUsers: TaggedUser[];
+  reactions: Record<string, string[]>;
+  totalReactions: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface TaggedUser {
+  userId: string;
+  displayName: string;
+  photoURL: string | null;
+}
+
+export type ReactionType = "like" | "love" | "fire" | "rock" | "clap" | "wow";
+
+export const REACTION_EMOJIS: Record<ReactionType, { emoji: string; label: string }> = {
+  like: { emoji: "👍", label: "Gosto" },
+  love: { emoji: "❤️", label: "Amei" },
+  fire: { emoji: "🔥", label: "Fire" },
+  rock: { emoji: "🎸", label: "Rock" },
+  clap: { emoji: "👏", label: "Parabéns" },
+  wow: { emoji: "😮", label: "Uau" },
+};
+
+export interface UserFavoriteData {
+  id?: string;
+  followerId: string;
+  followerName: string;
+  followerPhoto: string | null;
+  targetUserId: string;
+  targetUserName: string;
+  targetUserPhoto: string | null;
+  notifyEnabled: boolean;
+  createdAt: number;
+}
+
+// Limites de fotos por plano social
+export const SOCIAL_PHOTO_LIMITS: Record<string, number> = {
+  free: 8,
+  tier2: 15, // Plus
+  tier1: 50, // Pro
+};
+
+// Limites de equipamentos por plano
+export const SOCIAL_EQUIPMENT_LIMITS: Record<string, number> = {
+  free: 5,
+  tier2: 10,
+  tier1: 20,
+};
 

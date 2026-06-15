@@ -21,11 +21,12 @@ export async function createNotification(
   userId: string,
   senderId: string,
   senderName: string,
-  type: "favorite" | "proposal" | "rating" | "system",
+  type: "favorite" | "proposal" | "rating" | "system" | "new_post" | "new_follower",
   title: string,
   message: string,
   productId?: string,
-  productTitle?: string
+  productTitle?: string,
+  postId?: string
 ): Promise<string> {
   const notificationData: Omit<NotificationData, "id"> = {
     userId,
@@ -36,6 +37,7 @@ export async function createNotification(
     message,
     productId,
     productTitle,
+    postId,
     read: false,
     createdAt: Date.now(),
   };

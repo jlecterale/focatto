@@ -26,6 +26,10 @@ import {
 import type { UserData, VerificationStatus, ProposalData, ProductData, FavoriteData } from "../../lib/roles";
 import NotificationBell from "../../components/NotificationBell";
 import ChatHeaderButton from "../../components/ChatHeaderButton";
+import EquipmentManager from "@/components/social/EquipmentManager";
+import ContactPanel from "@/components/social/ContactPanel";
+import { updateContactOptions, updateEquipments } from "@/lib/socialService";
+import type { EquipmentItem, SocialContactOptions } from "@/lib/roles";
 import {
   formatPhone,
   formatCpfCnpj,
@@ -164,7 +168,7 @@ export default function ProfilePage() {
 
   // Dashboard and Navigation
   const [isEditing, setIsEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState<"anuncios" | "favoritos" | "atividades" | "propostas">("anuncios");
+  const [activeTab, setActiveTab] = useState<"anuncios" | "favoritos" | "atividades" | "propostas" | "social">("anuncios");
 
   // User's own ads (My Ads)
   const [userProducts, setUserProducts] = useState<ProductData[]>([]);
@@ -729,6 +733,51 @@ export default function ProfilePage() {
     }
   }
 
+  const handleSaveContactOptions = async (options: SocialContactOptions) => {
+    if (!user) return;
+    try {
+      await updateContactOptions(user.uid, options);
+      setProfile((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          social: {
+            ...prev.social,
+            equipments: prev.social?.equipments || [],
+            contactOptions: options,
+          },
+        };
+      });
+      toast.success("Opções de contacto salvas!");
+    } catch {
+      toast.error("Erro ao salvar opções de contacto.");
+    }
+  };
+
+  const handleUpdateEquipments = async (newEquipments: EquipmentItem[]) => {
+    if (!user) return;
+    try {
+      await updateEquipments(user.uid, newEquipments);
+      setProfile((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          social: {
+            ...prev.social,
+            contactOptions: prev.social?.contactOptions || {
+              internalChatEnabled: true,
+              whatsappEnabled: false,
+              whatsappNumber: null,
+            },
+            equipments: newEquipments,
+          },
+        };
+      });
+    } catch {
+      toast.error("Erro ao atualizar equipamentos.");
+    }
+  };
+
   if (authLoading || (user && loading)) {
     return (
       <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
@@ -941,6 +990,17 @@ export default function ProfilePage() {
               >
                 <Handshake size={16} />
                 Propostas ({proposals.length})
+              </button>
+              <button
+                onClick={() => setActiveTab("social")}
+                className={`flex items-center gap-2 py-3 px-4 text-xs font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+                  activeTab === "social"
+                    ? "border-[#ef7c2c] text-white"
+                    : "border-transparent text-surface-400 hover:text-white"
+                }`}
+              >
+                <MusicNote size={16} />
+                Perfil Social
               </button>
             </div>
 
@@ -1368,6 +1428,50 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   )}
+                </div>
+              )}
+
+              {activeTab === "social" && (
+                <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Rede Social</h3>
+                      <p className="text-[10px] text-surface-500 mt-0.5">Gerencie sua presença social e equipamentos no Focatto</p>
+                    </div>
+                    <Link
+                      href={`/social/${user.uid}`}
+                      className="inline-flex items-center gap-1.5 py-2 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white text-xs font-semibold hover:shadow-[0_4px_15px_rgba(239,124,44,0.3)] transition-all cursor-pointer"
+                    >
+                      Ver Perfil Público ↗
+                    </Link>
+                  </div>
+
+                  <hr className="border-[#22201e]" />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Painel de Contacto */}
+                    <div className="space-y-4">
+                      <h4 className="text-xs font-bold text-[#ef7c2c] uppercase tracking-wider">Configurações de Contacto</h4>
+                      <ContactPanel
+                        userId={user.uid}
+                        isOwnProfile={true}
+                        contactOptions={profile?.social?.contactOptions}
+                        phone={profile?.phone}
+                        onSave={handleSaveContactOptions}
+                      />
+                    </div>
+
+                    {/* Gestão de Equipamentos */}
+                    <div className="space-y-4">
+                      <h4 className="text-xs font-bold text-[#ef7c2c] uppercase tracking-wider">Equipamentos</h4>
+                      <EquipmentManager
+                        userId={user.uid}
+                        equipments={profile?.social?.equipments || []}
+                        onUpdate={handleUpdateEquipments}
+                        planTier={profile?.premiumTier || "free"}
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

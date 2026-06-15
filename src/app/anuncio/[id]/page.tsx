@@ -322,13 +322,21 @@ export default function AnuncioDetalhePage() {
                 </div>
               )}
 
-              <Link
-                href={`/vendedor/${product.userId}`}
-                className="mt-4 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 text-xs font-semibold hover:bg-[#ef7c2c]/20 transition-all w-full"
-              >
-                Ver Perfil Completo
-                <ArrowLeft size={14} className="rotate-180" />
-              </Link>
+              <div className="flex flex-col gap-2 mt-4">
+                <Link
+                  href={`/vendedor/${product.userId}`}
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 text-xs font-semibold hover:bg-[#ef7c2c]/20 transition-all w-full"
+                >
+                  Ver Perfil Completo
+                  <ArrowLeft size={14} className="rotate-180" />
+                </Link>
+                <Link
+                  href={`/social/${product.userId}`}
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c]/20 to-[#d4ae12]/20 hover:from-[#ef7c2c]/30 hover:to-[#d4ae12]/30 text-white border border-[#ef7c2c]/30 text-xs font-semibold transition-all w-full"
+                >
+                  Ver Perfil Social
+                </Link>
+              </div>
             </div>
           </div>
 

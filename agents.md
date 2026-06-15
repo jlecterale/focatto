@@ -10,6 +10,29 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 
 ## 📅 Histórico de Intervenções
 
+### 15/06/2026 — Rede Social Integrada e Gestão de Equipamentos no Perfil
+*   **Objetivo**: Implementar uma rede social completa integrada aos perfis (com posts de fotos, vídeos do YouTube e áudios do SoundCloud), limite de upload de fotos por plano, reações com emojis, menções de usuários e locais, funcionalidade de seguir perfis com controle de notificações, aba Social de gerenciamento no Perfil privado e atalhos de integração no cabeçalho e páginas públicas.
+*   **Arquivos Criados/Modificados**:
+    *   [`src/app/social/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/social/page.tsx) — Feed Social Global com filtros dinâmicos de mídias, listagem de publicações, infinite scroll por cursor e sidebar de Perfis em Destaque.
+    *   [`src/app/social/[id]/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/social/[id]/page.tsx) — Perfil Social Público do utilizador com banner, avatar, estatísticas (seguidores, seguindo, posts), e abas para Publicações, Equipamentos e Sobre.
+    *   [`src/app/profile/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/profile/page.tsx) — Integração de nova aba "Perfil Social" contendo o `ContactPanel` (configurações) e o `EquipmentManager` (cadastro de equipamentos).
+    *   [`src/app/vendedor/[id]/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/vendedor/[id]/page.tsx) — Reorganização de botões de contato, integração do botão de follow (`<FollowButton />`) e atalho "Ver Perfil Social".
+    *   [`src/app/anuncio/[id]/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/anuncio/[id]/page.tsx) — Adicionado botão "Ver Perfil Social" no painel lateral do anunciante.
+    *   [`src/app/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/page.tsx) — Adicionado link "Comunidade" (para `/social`) ao lado da logomarca no cabeçalho principal.
+    *   [`src/lib/socialService.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/socialService.ts) — Novo serviço social Firebase: posts, reações, seguir/unfollow, cotas de fotos por plano, pesquisa de tags.
+    *   [`src/lib/roles.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/roles.ts) — Tipagem expandida com PostData, TaggedUser, ReactionType, UserFavoriteData, EquipmentItem, etc.
+    *   [`src/lib/notificationService.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/notificationService.ts) — Suporte a notificações de `new_post` e `new_follower`.
+    *   [`src/components/social/PostCard.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/components/social/PostCard.tsx) — Card com imagens/embeds, MapPin de local, marcações, e barra de 6 reações rápidas.
+    *   [`src/components/social/CreatePostModal.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/components/social/CreatePostModal.tsx) — Modal para criar posts por tipo (Foto/YouTube/SoundCloud) com verificador de cotas.
+    *   [`src/components/social/EquipmentManager.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/components/social/EquipmentManager.tsx) — Gestor de equipamentos com upload de imagem e limites baseados no plano.
+    *   [`src/components/social/FollowButton.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/components/social/FollowButton.tsx) — Botão premium com controle granular de notificações por perfil seguido.
+    *   [`src/components/social/ContactPanel.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/components/social/ContactPanel.tsx) — Painel dinâmico para início de chat interno, redirecionamento WhatsApp e ligação direta.
+    *   [`src/components/social/UserSearchSelect.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/components/social/UserSearchSelect.tsx) — Input autocomplete com debounce para busca e marcação de pessoas.
+    *   [`firestore.rules`](file:///c:/Users/USER%201/Desktop/focatto/firestore.rules) & [`storage.rules`](file:///c:/Users/USER%201/Desktop/focatto/storage.rules) — Regras de segurança para posts, equipamentos, fotos e favoritos.
+    *   [`firestore.indexes.json`](file:///c:/Users/USER%201/Desktop/focatto/firestore.indexes.json) — 5 novos índices compostos para ordenação e filtragem das coleções sociais.
+    *   [`src/index.css`](file:///c:/Users/USER%201/Desktop/focatto/src/index.css) — Novas animações para o motor social (reactionPulse, bounceIn, fadeSlideUp).
+*   **Estado**: Concluído e verificado com build de produção (zero erros de compilação ou TypeScript).
+
 ### 10/06/2026 — Chat Interno e Opção de Ligação Direta para Anunciantes
 *   **Objetivo**: Implementar um sistema de chat interno em tempo real via Firestore e adicionar um botão de ligação direta (protocolo `tel:`), além do WhatsApp existente, em todas as páginas de contato com anunciantes. Adicionar o botão `<ChatHeaderButton />` em todos os cabeçalhos para acesso rápido às conversas com badge de mensagens não lidas.
 *   **Arquivos Criados/Modificados**:
