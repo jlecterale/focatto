@@ -16,6 +16,8 @@ npm run build                    # build web — SEMPRE rode antes de finalizar 
 npm run lint                     # lint
 npx cap sync                     # após mudar capacitor.config.ts ou instalar plugin
 npm run mobile:android:debug     # APK de debug (exige Android SDK)
+npm run mobile:android:run       # builda + sobe emulador/dispositivo + instala (cap run)
+npm run mobile:emulator          # sobe um AVD, espera o boot e instala o APK
 npm run cap:ios                  # abre Xcode (somente macOS)
 ```
 

@@ -29,6 +29,8 @@ npm run cap:android              # abre no Android Studio
 npm run cap:ios                  # abre no Xcode (somente macOS)
 npm run mobile:android:debug     # gera APK de debug
 npm run mobile:android:release   # gera AAB de release (exige keystore)
+npm run mobile:android:run       # builda, sobe o emulador/dispositivo e instala (cap run)
+npm run mobile:emulator          # sobe um AVD, espera o boot e instala o APK de debug
 
 # Desenvolvimento apontando para o dev server local:
 CAP_SERVER_URL=http://SEU_IP:3000 npx cap sync
@@ -92,6 +94,34 @@ npm run mobile:android:debug
 # Instalar no aparelho conectado:
 adb install -r android/app/build/outputs/apk/debug/app-debug.apk
 ```
+
+### Rodar no emulador e instalar o APK
+
+Duas opções, ambas sem Android Studio:
+
+```bash
+# Opção 1 — caminho do Capacitor (interativo): builda, deixa você escolher o
+# alvo (emulador ou aparelho), sobe o emulador e instala:
+npm run mobile:android:run
+
+# Opção 2 — script automático: sobe o primeiro AVD, espera o boot, instala o
+# APK de debug e abre o app:
+npm run mobile:emulator
+npm run mobile:emulator -- Pixel_7   # escolhendo um AVD específico
+```
+
+Se você ainda não tem um emulador (AVD), crie um uma única vez:
+
+```bash
+sdkmanager "emulator" "platform-tools" "system-images;android-35;google_apis;x86_64"
+avdmanager create avd -n Focatto_API35 \
+  -k "system-images;android-35;google_apis;x86_64" -d pixel_7
+```
+
+> O emulador carrega o site de produção (estratégia remote URL), então precisa
+> de internet. Para testar contra um servidor local, suba `npm run dev` e rode
+> `CAP_SERVER_URL=http://10.0.2.2:3000 npx cap sync android` antes (no emulador,
+> `10.0.2.2` é o `localhost` da máquina host).
 
 ## Configuração obrigatória antes de publicar
 

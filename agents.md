@@ -19,6 +19,7 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
     *   `mobile/README.md` — nova seção "Toolchain Android" (Gradle/AGP/JDK), "JDK 21 é obrigatório", "Build sem Android Studio" e novos itens na tabela de troubleshooting; `CLAUDE.md` — seção "Toolchain Android".
 *   **Causa do erro `invalid source release: 21`**: o Capacitor 7 fixa `VERSION_21` nos próprios módulos (`@capacitor/android`, `@capacitor-firebase/authentication`), então o build exige JDK 21; baixar o alvo para 17 não resolve. A correção é rodar o Gradle num JDK 21 (`org.gradle.java.home`/`JAVA_HOME`).
 *   **Build sem Android Studio**: `npm run mobile:android:debug` já usa o `gradlew` diretamente — basta Android SDK (`ANDROID_HOME`/`local.properties`) + JDK 21; `cap:android` (abrir o Studio) é opcional.
+*   **Emulador/instalação**: adicionados `npm run mobile:android:run` (`cap run android`: builda, sobe o alvo e instala) e `npm run mobile:emulator` (`scripts/android-emulator.sh`: sobe um AVD, espera o boot, instala o APK de debug e abre o app).
 *   **Verificação**: Gradle 9.0.0 baixado e executado sobre JDK 21 com sucesso; `build.gradle` avaliado sem erros sob Gradle 9. A resolução do AGP/Google Maven não roda no sandbox (egress bloqueado para `dl.google.com`); validação completa do APK fica para o CI (que usa JDK 21 e tem acesso ao Maven).
 *   **Estado**: Concluído; verificação final do APK pelo workflow.
 
