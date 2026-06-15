@@ -12,7 +12,7 @@ import {
   Wrench,
   Storefront
 } from "@phosphor-icons/react";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "../firebase";
 
 interface BannerProduct {
@@ -105,7 +105,7 @@ export default function BannerCarousel() {
         return;
       }
       try {
-        const q = query(collection(db, "banners"), where("active", "==", true));
+        const q = query(collection(db, "banners"), where("active", "==", true), limit(10));
         const querySnapshot = await getDocs(q);
         
         if (!querySnapshot.empty) {

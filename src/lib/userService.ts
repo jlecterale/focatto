@@ -1,11 +1,15 @@
-import { doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, query, orderBy, where } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, query, orderBy, where, limit } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase";
 import {
   ADMIN_EMAILS, ROLES, type UserRole, type UserData, type UserAddress,
-  type VerificationRequest, type VerificationStatus, type TeacherData,
-  type LuthierData,
+  type UserPrivateData, type VerificationRequest, type VerificationStatus,
+  type TeacherData, type LuthierData,
 } from "./roles";
+
+// Teto de segurança para listagens administrativas, evitando o download
+// de coleções inteiras conforme a base cresce.
+const ADMIN_LIST_LIMIT = 500;
 
 const DEFAULT_ADDRESS: UserAddress = {
   cep: "",
@@ -88,6 +92,24 @@ export async function updateUserProfile(uid: string, data: Partial<UserData>) {
   });
 }
 
+export async function getUserPrivateData(uid: string): Promise<UserPrivateData | null> {
+  try {
+    const privateRef = doc(db, "users", uid, "private", "profile");
+    const snap = await getDoc(privateRef);
+    if (snap.exists()) {
+      return snap.data() as UserPrivateData;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export async function setUserPrivateData(uid: string, data: UserPrivateData) {
+  const privateRef = doc(db, "users", uid, "private", "profile");
+  await setDoc(privateRef, { ...data, updatedAt: Date.now() }, { merge: true });
+}
+
 export async function uploadProfilePhoto(uid: string, file: File): Promise<string> {
   const storageRef = ref(storage, `avatars/${uid}/profile`);
   await uploadBytes(storageRef, file);
@@ -146,7 +168,7 @@ export async function getPendingVerifications(): Promise<VerificationRequest[]> 
 
 export async function getAllVerifications(): Promise<VerificationRequest[]> {
   try {
-    const q = query(collection(db, "verifications"), orderBy("submittedAt", "desc"));
+    const q = query(collection(db, "verifications"), orderBy("submittedAt", "desc"), limit(ADMIN_LIST_LIMIT));
     const snap = await getDocs(q);
     return snap.docs.map((d) => ({ id: d.id, ...d.data() } as VerificationRequest));
   } catch {
@@ -160,9 +182,10 @@ export async function getProfessionalUsers(): Promise<UserData[]> {
       collection(db, "users"),
       where("isProfessional", "==", true),
       orderBy("createdAt", "desc"),
+      limit(ADMIN_LIST_LIMIT),
     );
     const snap = await getDocs(q);
-    return snap.docs.map((d) => ({ uid: d.id, ...d.data() } as unknown as UserData));
+    return snap.docs.map((d) => ({ ...(d.data() as UserData), uid: d.id }));
   } catch {
     return [];
   }
@@ -174,9 +197,10 @@ export async function getTeacherUsers(): Promise<UserData[]> {
       collection(db, "users"),
       where("isTeacher", "==", true),
       orderBy("createdAt", "desc"),
+      limit(ADMIN_LIST_LIMIT),
     );
     const snap = await getDocs(q);
-    return snap.docs.map((d) => ({ uid: d.id, ...d.data() } as unknown as UserData));
+    return snap.docs.map((d) => ({ ...(d.data() as UserData), uid: d.id }));
   } catch {
     return [];
   }
@@ -184,9 +208,9 @@ export async function getTeacherUsers(): Promise<UserData[]> {
 
 export async function getAllUsers(): Promise<UserData[]> {
   try {
-    const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
+    const q = query(collection(db, "users"), orderBy("createdAt", "desc"), limit(ADMIN_LIST_LIMIT));
     const snap = await getDocs(q);
-    return snap.docs.map((d) => ({ uid: d.id, ...d.data() } as unknown as UserData));
+    return snap.docs.map((d) => ({ ...(d.data() as UserData), uid: d.id }));
   } catch {
     return [];
   }

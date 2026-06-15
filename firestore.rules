@@ -32,6 +32,15 @@ service cloud.firestore {
 
       // Only admins can delete users
       allow delete: if isAdmin();
+
+      // Dados sensíveis (CPF/CNPJ e endereço completo) ficam fora do
+      // documento público, legíveis apenas pelo dono e por admins.
+      // Path restrito ao documento único "profile" para evitar a criação
+      // de documentos arbitrários na subcoleção.
+      match /private/profile {
+        allow read: if isAuth() && (request.auth.uid == userId || isAdmin());
+        allow write: if isAuth() && request.auth.uid == userId;
+      }
     }
 
     // Products collection
@@ -126,9 +135,11 @@ service cloud.firestore {
         // Only chat participants can read messages
         allow read: if isAuth() && get(/databases/$(database)/documents/chats/$(chatId)).data.participants.hasAny([request.auth.uid]);
 
-        // Participants can send messages
+        // Participants can send messages (com limite de tamanho contra abuso)
         allow create: if isAuth() &&
           request.resource.data.senderId == request.auth.uid &&
+          request.resource.data.text is string &&
+          request.resource.data.text.size() <= 2000 &&
           get(/databases/$(database)/documents/chats/$(chatId)).data.participants.hasAny([request.auth.uid]);
 
         allow update, delete: if false;
@@ -212,12 +223,28 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Banners collection (carrossel da home). Sem esta regra o catch-all
+    // nega a leitura e o BannerCarousel sempre cai no fallback local.
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
     // Notifications collection
     match /notifications/{notificationId} {
       // Users can read their own notifications
       allow read: if isAuth() && resource.data.userId == request.auth.uid;
-      // Authenticated users can create notifications (e.g. when favoriting)
-      allow create: if isAuth() && request.resource.data.senderId == request.auth.uid;
+      // Authenticated users can create notifications (e.g. when favoriting).
+      // Valida o formato para limitar abuso (payloads gigantes / tipos arbitrários).
+      allow create: if isAuth()
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.userId is string
+        && request.resource.data.type in ['favorite', 'proposal', 'rating', 'system']
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 200
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 1000
+        && request.resource.data.read == false;
       // Users can update (read/unread) and delete their own notifications
       allow update, delete: if isAuth() && resource.data.userId == request.auth.uid;
     }

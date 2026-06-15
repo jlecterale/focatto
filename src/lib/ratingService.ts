@@ -1,6 +1,6 @@
 import {
   doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs,
-  query, where, orderBy, Timestamp,
+  query, where, orderBy, Timestamp, limit,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import type { RatingData, SellerStats } from "./roles";
@@ -28,14 +28,16 @@ export async function addRating(
 // Get all approved ratings for a seller
 export async function getSellerRatings(sellerId: string): Promise<RatingData[]> {
   try {
+    // Filtros de igualdade são resolvidos no servidor sem exigir índice composto;
+    // a ordenação fica no cliente para evitar um índice sellerId+status+createdAt.
     const q = query(
       collection(db, "ratings"),
-      where("sellerId", "==", sellerId)
+      where("sellerId", "==", sellerId),
+      where("status", "==", "approved")
     );
     const snap = await getDocs(q);
-    const allRatings = snap.docs.map((d) => ({ id: d.id, ...d.data() } as RatingData));
-    return allRatings
-      .filter((r) => r.status === "approved")
+    return snap.docs
+      .map((d) => ({ id: d.id, ...d.data() } as RatingData))
       .sort((a, b) => b.createdAt - a.createdAt);
   } catch (err) {
     console.error("Error in getSellerRatings:", err);
@@ -48,11 +50,13 @@ export async function getUserRatingForSeller(sellerId: string, userId: string): 
   try {
     const q = query(
       collection(db, "ratings"),
-      where("userId", "==", userId)
+      where("userId", "==", userId),
+      where("sellerId", "==", sellerId),
+      limit(1)
     );
     const snap = await getDocs(q);
-    const found = snap.docs.find((d) => d.data().sellerId === sellerId);
-    if (!found) return null;
+    if (snap.empty) return null;
+    const found = snap.docs[0];
     return { id: found.id, ...found.data() } as RatingData;
   } catch (err) {
     console.error("Error in getUserRatingForSeller:", err);

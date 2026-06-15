@@ -9,6 +9,26 @@ export const ADMIN_EMAILS = [
   "jfreire.comercial@gmail.com",
 ];
 
+// Identidade do superadmin usada apenas para gating de UI no client.
+// A autorização real é feita pelas regras do Firestore (role == 'admin').
+export const SUPER_ADMIN_EMAIL = "jfreire.comercial@gmail.com";
+export const SUPER_ADMIN_UID = "LULBKAMCpaXhlwZxBGL3PjHQ7n73";
+
+export function isSuperAdmin(email?: string | null, uid?: string | null): boolean {
+  return (
+    (email || "").toLowerCase().trim() === SUPER_ADMIN_EMAIL ||
+    (uid || "") === SUPER_ADMIN_UID
+  );
+}
+
+// Dados sensíveis (CPF/CNPJ e endereço completo) armazenados em
+// users/{uid}/private/profile, legíveis apenas pelo dono e admins.
+export interface UserPrivateData {
+  cpfCnpj?: string;
+  address?: UserAddress;
+  updatedAt?: number;
+}
+
 export interface UserAddress {
   cep: string;
   street: string;
@@ -35,6 +55,8 @@ export interface ProductData {
   condition: string;
   city: string;
   state: string;
+  neighborhood?: string;
+  cep?: string;
   photos: string[];
   status: ProductStatus;
   adminNotes: string;
@@ -113,7 +135,8 @@ export interface UserData {
   updatedAt: number;
   isPremium?: boolean;
   premiumTier?: string;
-  premiumBilling?: "monthly" | "yearly";
+  // "" indica assinatura cancelada (mantido por compatibilidade com docs existentes)
+  premiumBilling?: "monthly" | "yearly" | "";
 }
 
 export interface VerificationRequest {

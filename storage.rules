@@ -36,10 +36,11 @@ service firebase.storage {
       // Only authenticated users can upload product images (validated size & type)
       allow create: if isAuthenticated() && isValidImage(10);
 
-      // Only the product seller (owner) or an admin can update or delete product images
+      // Only the product seller (owner) or an admin can update or delete product images.
+      // Product documents store the owner under "userId" (see ProductData in src/lib/roles.ts).
       allow update, delete: if isAdmin() || (
-        isAuthenticated() && 
-        request.auth.uid == firestore.get(/databases/(default)/documents/products/$(productId)).data.sellerId
+        isAuthenticated() &&
+        request.auth.uid == firestore.get(/databases/(default)/documents/products/$(productId)).data.userId
       );
     }
 

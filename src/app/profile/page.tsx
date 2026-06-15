@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   getUserData,
+  getUserPrivateData,
+  setUserPrivateData,
   updateUserProfile,
   uploadProfilePhoto,
   submitVerificationRequest,
@@ -407,21 +409,26 @@ export default function ProfilePage() {
       const data = await getUserData(user.uid);
       if (data) {
         setProfile(data);
-        setDisplayName(data.displayName);
+        setDisplayName(data.displayName || "");
         setPhone(formatPhone(data.phone || ""));
-        setCpfCnpj(formatCpfCnpj(data.cpfCnpj || ""));
-        setBio(data.bio);
+        setBio(data.bio || "");
         setSellerAbout(data.sellerAbout || "");
         setSellerMusic(data.sellerMusic || "");
         setSellerHobbies(data.sellerHobbies || "");
         setSellerFunFacts(data.sellerFunFacts || "");
-        setCep(formatCep(data.address.cep || ""));
-        setStreet(data.address.street);
-        setNumber(data.address.number);
-        setComplement(data.address.complement);
-        setNeighborhood(data.address.neighborhood);
-        setCity(data.address.city);
-        setState(data.address.state);
+
+        // CPF/CNPJ e endereço completo moram na subcoleção privada;
+        // documentos antigos ainda podem tê-los no doc público (fallback).
+        const privateData = await getUserPrivateData(user.uid);
+        const address = privateData?.address || data.address;
+        setCpfCnpj(formatCpfCnpj(privateData?.cpfCnpj || data.cpfCnpj || ""));
+        setCep(formatCep(address?.cep || ""));
+        setStreet(address?.street || "");
+        setNumber(address?.number || "");
+        setComplement(address?.complement || "");
+        setNeighborhood(address?.neighborhood || data.address?.neighborhood || "");
+        setCity(address?.city || data.address?.city || "");
+        setState(address?.state || data.address?.state || "");
 
         setIsProfessional(data.isProfessional || data.luthierStatus === "pending" || false);
         setIsTeacher(data.isTeacher || data.teacherStatus === "pending" || false);
@@ -500,16 +507,26 @@ export default function ProfilePage() {
         : "none";
       const nextIsTeacher = nextTeacherStatus === "approved";
 
+      // O documento público mantém apenas a localização exibida no site
+      // (cidade/estado/bairro); CPF/CNPJ e endereço completo vão para a
+      // subcoleção privada (users/{uid}/private), legível só pelo dono e admins.
+      const publicAddress = { cep: "", street: "", number: "", complement: "", neighborhood, city, state };
+
+      await setUserPrivateData(user.uid, {
+        cpfCnpj,
+        address: { cep, street, number, complement, neighborhood, city, state },
+      });
+
       await updateUserProfile(user.uid, {
         displayName,
         phone,
-        cpfCnpj,
+        cpfCnpj: "",
         bio,
         sellerAbout,
         sellerMusic,
         sellerHobbies,
         sellerFunFacts,
-        address: { cep, street, number, complement, neighborhood, city, state },
+        address: publicAddress,
         isProfessional: nextIsProfessional,
         isTeacher: nextIsTeacher,
         luthierStatus: nextLuthierStatus,
@@ -566,13 +583,13 @@ export default function ProfilePage() {
               ...prev,
               displayName,
               phone,
-              cpfCnpj,
+              cpfCnpj: "",
               bio,
               sellerAbout,
               sellerMusic,
               sellerHobbies,
               sellerFunFacts,
-              address: { cep, street, number, complement, neighborhood, city, state },
+              address: publicAddress,
               isProfessional: nextIsProfessional,
               isTeacher: nextIsTeacher,
               luthierStatus: nextLuthierStatus,
@@ -597,15 +614,16 @@ export default function ProfilePage() {
     setUploadingPhoto(true);
     try {
       const url = await uploadProfilePhoto(user.uid, file);
-      setProfile((prev) => {
-        if (prev?.isTeacher || prev?.teacherStatus === "pending") {
-          updateTeacherProfile(user.uid, { photoURL: url });
-        }
-        if (prev?.isProfessional || prev?.luthierStatus === "pending") {
-          updateLuthierProfile(user.uid, { photo: url });
-        }
-        return prev ? { ...prev, photoURL: url } : prev;
-      });
+      // Sincroniza a foto nos perfis de professor/luthier fora do updater do
+      // setState (updaters precisam ser puros) e aguardando o resultado para
+      // não falhar silenciosamente.
+      if (profile?.isTeacher || profile?.teacherStatus === "pending") {
+        await updateTeacherProfile(user.uid, { photoURL: url });
+      }
+      if (profile?.isProfessional || profile?.luthierStatus === "pending") {
+        await updateLuthierProfile(user.uid, { photo: url });
+      }
+      setProfile((prev) => (prev ? { ...prev, photoURL: url } : prev));
       toast.success("Foto atualizada!");
     } catch {
       toast.error("Erro ao enviar foto.");
@@ -617,6 +635,8 @@ export default function ProfilePage() {
   function handleDocumentSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
+      // Revoga o object URL anterior para não vazar memória a cada seleção.
+      if (documentPreview) URL.revokeObjectURL(documentPreview);
       setDocumentFile(file);
       setDocumentPreview(URL.createObjectURL(file));
     }
@@ -625,9 +645,19 @@ export default function ProfilePage() {
   function handleFaceSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
+      if (facePreview) URL.revokeObjectURL(facePreview);
       setFaceFile(file);
       setFacePreview(URL.createObjectURL(file));
     }
+  }
+
+  function clearVerificationFiles() {
+    if (documentPreview) URL.revokeObjectURL(documentPreview);
+    if (facePreview) URL.revokeObjectURL(facePreview);
+    setDocumentFile(null);
+    setFaceFile(null);
+    setDocumentPreview("");
+    setFacePreview("");
   }
 
   async function handleSubmitVerification() {
@@ -647,10 +677,7 @@ export default function ProfilePage() {
       setProfile((prev) => (prev ? { ...prev, verificationStatus: "pending" } : prev));
       toast.success("Solicitação de verificação enviada!");
       setShowVerificationModal(false);
-      setDocumentFile(null);
-      setFaceFile(null);
-      setDocumentPreview("");
-      setFacePreview("");
+      clearVerificationFiles();
     } catch {
       toast.error("Erro ao enviar verificação.");
     } finally {
@@ -663,7 +690,7 @@ export default function ProfilePage() {
     setSubmittingPremium(true);
     try {
       const isYearly = premiumBilling === "yearly";
-      const updatedData = {
+      const updatedData: Partial<UserData> = {
         isPremium: true,
         premiumTier: premiumTier === 1 ? "tier1" : "tier2",
         premiumBilling: premiumBilling,
@@ -671,9 +698,9 @@ export default function ProfilePage() {
         verificationStatus: "approved" as VerificationStatus,
       };
 
-      await updateUserProfile(user.uid, updatedData as any);
+      await updateUserProfile(user.uid, updatedData);
 
-      setProfile((prev) => prev ? { ...prev, ...updatedData } as any : prev);
+      setProfile((prev) => (prev ? { ...prev, ...updatedData } : prev));
       toast.success(`Plano Focatto ${premiumTier === 1 ? "Pro" : "Plus"} (${isYearly ? "Anual" : "Mensal"}) ativado!`);
       setShowPremiumModal(false);
     } catch {
@@ -686,21 +713,15 @@ export default function ProfilePage() {
   async function handleCancelPremium() {
     if (!user || !profile) return;
     try {
-      const updatedData = {
+      const updatedData: Partial<UserData> = {
         isPremium: false,
         premiumTier: "",
         premiumBilling: "",
       };
 
-      await updateUserProfile(user.uid, updatedData as any);
+      await updateUserProfile(user.uid, updatedData);
 
-      setProfile((prev) => {
-        if (!prev) return null;
-        const newProf = { ...prev };
-        delete (newProf as any).premiumTier;
-        delete (newProf as any).premiumBilling;
-        return { ...newProf, isPremium: false };
-      });
+      setProfile((prev) => (prev ? { ...prev, ...updatedData } : prev));
 
       toast.success("Assinatura cancelada com sucesso!");
     } catch {
@@ -965,7 +986,7 @@ export default function ProfilePage() {
                             <div className="min-w-0 flex-1 flex gap-3">
                               <div className="h-12 w-12 rounded-lg bg-[#181615] border border-[#2a2827] flex-shrink-0 overflow-hidden flex items-center justify-center">
                                 {product.photos && product.photos[0] ? (
-                                  <img src={product.photos[0]} alt="" className="h-full w-full object-cover" />
+                                  <img loading="lazy" decoding="async" src={product.photos[0]} alt="" className="h-full w-full object-cover" />
                                 ) : (
                                   <Tag size={20} className="text-[#d4ae12]" />
                                 )}
@@ -1006,10 +1027,11 @@ export default function ProfilePage() {
                               Excluir
                             </button>
                             <Link
-                              href="/meus-anuncios"
+                              href={`/meus-anuncios?edit=${product.id}`}
                               className="flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-[#181615] border border-[#2a2827] hover:border-[#ef7c2c]/30 text-surface-300 hover:text-white transition-all text-[11px] font-semibold"
                             >
-                              Gerenciar
+                              <PencilSimple size={12} />
+                              Editar
                             </Link>
                           </div>
                         </div>
@@ -1051,7 +1073,7 @@ export default function ProfilePage() {
                             <div className="min-w-0 flex-1 flex gap-3">
                               <div className="h-12 w-12 rounded-lg bg-[#181615] border border-[#2a2827] flex-shrink-0 overflow-hidden flex items-center justify-center">
                                 {product.photos && product.photos[0] ? (
-                                  <img src={product.photos[0]} alt="" className="h-full w-full object-cover" />
+                                  <img loading="lazy" decoding="async" src={product.photos[0]} alt="" className="h-full w-full object-cover" />
                                 ) : (
                                   <Tag size={20} className="text-[#d4ae12]" />
                                 )}
@@ -1294,7 +1316,7 @@ export default function ProfilePage() {
                                 <div className="flex gap-2 mt-1">
                                   {prop.tradePhotos.map((photo, idx) => (
                                     <a key={idx} href={photo} target="_blank" rel="noopener noreferrer">
-                                      <img
+                                      <img loading="lazy" decoding="async"
                                         src={photo}
                                         alt={`Item de troca ${idx + 1}`}
                                         className="h-14 w-14 rounded-lg object-cover border border-[#2a2827] hover:opacity-80 transition-opacity"
@@ -2041,10 +2063,7 @@ export default function ProfilePage() {
               <button
                 onClick={() => {
                   setShowVerificationModal(false);
-                  setDocumentFile(null);
-                  setFaceFile(null);
-                  setDocumentPreview("");
-                  setFacePreview("");
+                  clearVerificationFiles();
                 }}
                 id="profile-close-verif-modal-btn"
                 aria-label="Fechar modal de verificação"

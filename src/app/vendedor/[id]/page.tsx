@@ -389,7 +389,7 @@ export default function VendedorPage() {
                     >
                       <div className="h-28 bg-[#0d0b0a] flex items-center justify-center overflow-hidden">
                         {product.photos && product.photos.length > 0 ? (
-                          <img src={product.photos[0]} alt={product.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          <img loading="lazy" decoding="async" src={product.photos[0]} alt={product.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
                         ) : (
                           <Tag size={24} className="text-surface-600" />
                         )}

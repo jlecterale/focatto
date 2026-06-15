@@ -169,7 +169,7 @@ export default function AdminVerificacoesPage() {
                         rel="noopener noreferrer"
                         className="block h-32 sm:h-40 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
                       >
-                        <img
+                        <img loading="lazy" decoding="async"
                           src={ver.documentPhoto}
                           alt="Documento"
                           className="h-full w-full object-contain"
@@ -184,7 +184,7 @@ export default function AdminVerificacoesPage() {
                         rel="noopener noreferrer"
                         className="block h-32 sm:h-40 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
                       >
-                        <img
+                        <img loading="lazy" decoding="async"
                           src={ver.facePhoto}
                           alt="Selfie"
                           className="h-full w-full object-contain"

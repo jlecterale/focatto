@@ -28,15 +28,13 @@ function ProductCard({
   product,
   onReview,
   reviewingId,
-  adminNotes,
-  setAdminNotes,
 }: {
   product: ProductData;
-  onReview: (id: string, status: "approved" | "rejected") => void;
+  onReview: (id: string, status: "approved" | "rejected", notes: string) => void;
   reviewingId: string | null;
-  adminNotes: string;
-  setAdminNotes: (v: string) => void;
 }) {
+  // Notas locais por card: evita que o texto digitado em um item vaze para os demais.
+  const [adminNotes, setAdminNotes] = useState("");
   return (
     <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
       <div className="flex items-center justify-between">
@@ -86,7 +84,7 @@ function ProductCard({
             rows={2} className={inputBase}
           />
           <div className="flex gap-3">
-            <button onClick={() => onReview(product.id!, "approved")}
+            <button onClick={() => onReview(product.id!, "approved", adminNotes)}
               disabled={reviewingId === product.id}
               id={`approve-prod-${product.id}`}
               className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold hover:bg-emerald-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
@@ -94,7 +92,7 @@ function ProductCard({
               {reviewingId === product.id ? <Spinner size={14} className="animate-spin" /> : <CheckCircle size={14} />}
               Aprovar
             </button>
-            <button onClick={() => onReview(product.id!, "rejected")}
+            <button onClick={() => onReview(product.id!, "rejected", adminNotes)}
               disabled={reviewingId === product.id}
               id={`reject-prod-${product.id}`}
               className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
@@ -121,15 +119,12 @@ function VerificationCard({
   ver,
   onReview,
   reviewingId,
-  adminNotes,
-  setAdminNotes,
 }: {
   ver: VerificationRequest;
-  onReview: (id: string, userId: string, status: "approved" | "rejected") => void;
+  onReview: (id: string, userId: string, status: "approved" | "rejected", notes: string) => void;
   reviewingId: string | null;
-  adminNotes: string;
-  setAdminNotes: (v: string) => void;
 }) {
+  const [adminNotes, setAdminNotes] = useState("");
   return (
     <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
       <div className="flex items-center justify-between">
@@ -170,7 +165,7 @@ function VerificationCard({
             rows={2} className={inputBase}
           />
           <div className="flex gap-3">
-            <button onClick={() => onReview(ver.id, ver.userId, "approved")}
+            <button onClick={() => onReview(ver.id, ver.userId, "approved", adminNotes)}
               disabled={reviewingId === ver.id}
               id={`approve-ver-${ver.id}`}
               className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold hover:bg-emerald-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
@@ -178,7 +173,7 @@ function VerificationCard({
               {reviewingId === ver.id ? <Spinner size={14} className="animate-spin" /> : <CheckCircle size={14} />}
               Aprovar
             </button>
-            <button onClick={() => onReview(ver.id, ver.userId, "rejected")}
+            <button onClick={() => onReview(ver.id, ver.userId, "rejected", adminNotes)}
               disabled={reviewingId === ver.id}
               id={`reject-ver-${ver.id}`}
               className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
@@ -205,15 +200,12 @@ function PendingLuthierCard({
   luthier,
   onReview,
   reviewingId,
-  adminNotes,
-  setAdminNotes,
 }: {
   luthier: LuthierData;
-  onReview: (uid: string, status: "approved" | "rejected") => void;
+  onReview: (uid: string, status: "approved" | "rejected", notes: string) => void;
   reviewingId: string | null;
-  adminNotes: string;
-  setAdminNotes: (v: string) => void;
 }) {
+  const [adminNotes, setAdminNotes] = useState("");
   return (
     <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
       <div className="flex items-center justify-between">
@@ -253,7 +245,7 @@ function PendingLuthierCard({
         />
         <div className="flex gap-3">
           <button
-            onClick={() => onReview(luthier.userId, "approved")}
+            onClick={() => onReview(luthier.userId, "approved", adminNotes)}
             disabled={reviewingId === luthier.userId}
             className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold hover:bg-emerald-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer"
           >
@@ -261,7 +253,7 @@ function PendingLuthierCard({
             Aprovar Luthier
           </button>
           <button
-            onClick={() => onReview(luthier.userId, "rejected")}
+            onClick={() => onReview(luthier.userId, "rejected", adminNotes)}
             disabled={reviewingId === luthier.userId}
             className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer"
           >
@@ -278,15 +270,12 @@ function PendingTeacherCard({
   teacher,
   onReview,
   reviewingId,
-  adminNotes,
-  setAdminNotes,
 }: {
   teacher: TeacherData;
-  onReview: (uid: string, status: "approved" | "rejected") => void;
+  onReview: (uid: string, status: "approved" | "rejected", notes: string) => void;
   reviewingId: string | null;
-  adminNotes: string;
-  setAdminNotes: (v: string) => void;
 }) {
+  const [adminNotes, setAdminNotes] = useState("");
   return (
     <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
       <div className="flex items-center justify-between">
@@ -342,7 +331,7 @@ function PendingTeacherCard({
         />
         <div className="flex gap-3">
           <button
-            onClick={() => onReview(teacher.userId, "approved")}
+            onClick={() => onReview(teacher.userId, "approved", adminNotes)}
             disabled={reviewingId === teacher.userId}
             className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold hover:bg-emerald-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer"
           >
@@ -350,7 +339,7 @@ function PendingTeacherCard({
             Aprovar Professor
           </button>
           <button
-            onClick={() => onReview(teacher.userId, "rejected")}
+            onClick={() => onReview(teacher.userId, "rejected", adminNotes)}
             disabled={reviewingId === teacher.userId}
             className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer"
           >
@@ -367,15 +356,12 @@ function PendingRatingCard({
   rating,
   onReview,
   reviewingId,
-  adminNotes,
-  setAdminNotes,
 }: {
   rating: RatingData;
-  onReview: (id: string, status: "approved" | "rejected") => void;
+  onReview: (id: string, status: "approved" | "rejected", notes: string) => void;
   reviewingId: string | null;
-  adminNotes: string;
-  setAdminNotes: (v: string) => void;
 }) {
+  const [adminNotes, setAdminNotes] = useState("");
   return (
     <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
       <div className="flex items-center justify-between">
@@ -420,7 +406,7 @@ function PendingRatingCard({
         />
         <div className="flex gap-3">
           <button
-            onClick={() => onReview(rating.id!, "approved")}
+            onClick={() => onReview(rating.id!, "approved", adminNotes)}
             disabled={reviewingId === rating.id}
             className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold hover:bg-emerald-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer animate-none"
           >
@@ -428,7 +414,7 @@ function PendingRatingCard({
             Aprovar Avaliação
           </button>
           <button
-            onClick={() => onReview(rating.id!, "rejected")}
+            onClick={() => onReview(rating.id!, "rejected", adminNotes)}
             disabled={reviewingId === rating.id}
             className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer animate-none"
           >
@@ -519,7 +505,7 @@ function UserCard({
         >
           Prof.
         </button>
-        <button onClick={() => onToggleTeacher(u.uid, !!u.isTeacher)}
+        <button onClick={() => onToggleTeacher(u.uid, !u.isTeacher)}
           disabled={toggling === u.uid}
           id={`toggle-teacher-${u.uid}`}
           className={`text-[10px] font-semibold py-2 px-3 rounded-lg border transition-all disabled:opacity-60 ${
@@ -551,11 +537,6 @@ export default function AdminPage() {
   const [teacherUsers, setTeacherUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [productAdminNotes, setProductAdminNotes] = useState("");
-  const [verAdminNotes, setVerAdminNotes] = useState("");
-  const [luthierAdminNotes, setLuthierAdminNotes] = useState("");
-  const [teacherAdminNotes, setTeacherAdminNotes] = useState("");
-  const [ratingAdminNotes, setRatingAdminNotes] = useState("");
   const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [togglingUser, setTogglingUser] = useState<string | null>(null);
   const [userSearch, setUserSearch] = useState("");
@@ -634,20 +615,20 @@ export default function AdminPage() {
           break;
         }
       }
-    } catch {
+    } catch (err) {
+      console.error("Error loading admin tab data:", err);
       toast.error("Erro ao carregar dados.");
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleProductReview(productId: string, status: "approved" | "rejected") {
+  async function handleProductReview(productId: string, status: "approved" | "rejected", notes: string) {
     if (!user) return;
     setReviewingId(productId);
     try {
-      await reviewProduct(productId, status, productAdminNotes, user.uid);
+      await reviewProduct(productId, status, notes, user.uid);
       toast.success(`Produto ${status === "approved" ? "aprovado" : "rejeitado"}!`);
-      setProductAdminNotes("");
       loadTabData();
     } catch {
       toast.error("Erro ao processar produto.");
@@ -656,13 +637,12 @@ export default function AdminPage() {
     }
   }
 
-  async function handleVerReview(verId: string, userId: string, status: "approved" | "rejected") {
+  async function handleVerReview(verId: string, userId: string, status: "approved" | "rejected", notes: string) {
     if (!user) return;
     setReviewingId(verId);
     try {
-      await reviewVerification(verId, userId, status, verAdminNotes, user.uid);
+      await reviewVerification(verId, userId, status, notes, user.uid);
       toast.success(`Verificação ${status === "approved" ? "aprovada" : "rejeitada"}!`);
-      setVerAdminNotes("");
       loadTabData();
     } catch {
       toast.error("Erro ao processar verificação.");
@@ -671,13 +651,12 @@ export default function AdminPage() {
     }
   }
 
-  async function handleLuthierReview(userId: string, status: "approved" | "rejected") {
+  async function handleLuthierReview(userId: string, status: "approved" | "rejected", notes: string) {
     if (!user) return;
     setReviewingId(userId);
     try {
-      await reviewLuthier(userId, status, luthierAdminNotes, user.uid);
+      await reviewLuthier(userId, status, notes, user.uid);
       toast.success(`Cadastro de luthier ${status === "approved" ? "aprovado" : "rejeitado"}!`);
-      setLuthierAdminNotes("");
       loadTabData();
     } catch {
       toast.error("Erro ao processar luthier.");
@@ -686,13 +665,12 @@ export default function AdminPage() {
     }
   }
 
-  async function handleTeacherReview(userId: string, status: "approved" | "rejected") {
+  async function handleTeacherReview(userId: string, status: "approved" | "rejected", notes: string) {
     if (!user) return;
     setReviewingId(userId);
     try {
-      await reviewTeacher(userId, status, teacherAdminNotes, user.uid);
+      await reviewTeacher(userId, status, notes, user.uid);
       toast.success(`Cadastro de professor ${status === "approved" ? "aprovado" : "rejeitado"}!`);
-      setTeacherAdminNotes("");
       loadTabData();
     } catch {
       toast.error("Erro ao processar professor.");
@@ -701,13 +679,12 @@ export default function AdminPage() {
     }
   }
 
-  async function handleRatingReview(ratingId: string, status: "approved" | "rejected") {
+  async function handleRatingReview(ratingId: string, status: "approved" | "rejected", notes: string) {
     if (!user) return;
     setReviewingId(ratingId);
     try {
-      await reviewRating(ratingId, status, ratingAdminNotes, user.uid);
+      await reviewRating(ratingId, status, notes, user.uid);
       toast.success(`Avaliação de perfil ${status === "approved" ? "aprovada" : "rejeitada"}!`);
-      setRatingAdminNotes("");
       loadTabData();
     } catch {
       toast.error("Erro ao processar avaliação.");
@@ -928,8 +905,6 @@ export default function AdminPage() {
                             product={p}
                             onReview={handleProductReview}
                             reviewingId={reviewingId}
-                            adminNotes={productAdminNotes}
-                            setAdminNotes={setProductAdminNotes}
                           />
                         ))}
                       </div>
@@ -954,8 +929,6 @@ export default function AdminPage() {
                             ver={v}
                             onReview={handleVerReview}
                             reviewingId={reviewingId}
-                            adminNotes={verAdminNotes}
-                            setAdminNotes={setVerAdminNotes}
                           />
                         ))}
                       </div>
@@ -980,8 +953,6 @@ export default function AdminPage() {
                             luthier={l}
                             onReview={handleLuthierReview}
                             reviewingId={reviewingId}
-                            adminNotes={luthierAdminNotes}
-                            setAdminNotes={setLuthierAdminNotes}
                           />
                         ))}
                       </div>
@@ -1006,8 +977,6 @@ export default function AdminPage() {
                             teacher={t}
                             onReview={handleTeacherReview}
                             reviewingId={reviewingId}
-                            adminNotes={teacherAdminNotes}
-                            setAdminNotes={setTeacherAdminNotes}
                           />
                         ))}
                       </div>
@@ -1032,8 +1001,6 @@ export default function AdminPage() {
                             rating={r}
                             onReview={handleRatingReview}
                             reviewingId={reviewingId}
-                            adminNotes={ratingAdminNotes}
-                            setAdminNotes={setRatingAdminNotes}
                           />
                         ))}
                       </div>
@@ -1122,8 +1089,6 @@ export default function AdminPage() {
                           product={p}
                           onReview={handleProductReview}
                           reviewingId={reviewingId}
-                          adminNotes={productAdminNotes}
-                          setAdminNotes={setProductAdminNotes}
                         />
                       ))}
                     </div>
@@ -1151,8 +1116,6 @@ export default function AdminPage() {
                           product={p}
                           onReview={handleProductReview}
                           reviewingId={reviewingId}
-                          adminNotes={productAdminNotes}
-                          setAdminNotes={setProductAdminNotes}
                         />
                       ))}
                     </div>

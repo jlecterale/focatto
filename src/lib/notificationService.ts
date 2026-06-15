@@ -104,6 +104,8 @@ export function listenToUserNotifications(
     },
     (err) => {
       console.error("Error listening to notifications:", err);
+      // Garante que o componente saia do estado de carregamento mesmo em erro.
+      callback([]);
     }
   );
 }

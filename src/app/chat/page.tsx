@@ -47,6 +47,12 @@ function ChatPageContent() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Dados do outro participante do chat ativo, derivados uma única vez.
+  const otherParticipantId =
+    activeChat && user ? activeChat.participants.find((uid) => uid !== user.uid) || "" : "";
+  const otherParticipantName = activeChat?.participantNames?.[otherParticipantId] || "Usuário";
+  const otherParticipantPhoto = activeChat?.participantPhotos?.[otherParticipantId] || "";
+
   // Redirect to home if not logged in
   useEffect(() => {
     if (!authLoading && !user) {
@@ -129,9 +135,15 @@ function ChatPageContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const MAX_MESSAGE_LENGTH = 2000;
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim() || !activeChat || !user || sending) return;
+    if (inputText.length > MAX_MESSAGE_LENGTH) {
+      toast.error(`A mensagem deve ter no máximo ${MAX_MESSAGE_LENGTH} caracteres.`);
+      return;
+    }
 
     setSending(true);
     const textToSend = inputText.trim();
@@ -285,7 +297,7 @@ function ChatPageContent() {
                       {/* Avatar */}
                       <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center text-sm font-bold text-white flex-shrink-0 overflow-hidden">
                         {otherPhoto ? (
-                          <img src={otherPhoto} alt={otherName} className="h-full w-full object-cover" />
+                          <img loading="lazy" decoding="async" src={otherPhoto} alt={otherName} className="h-full w-full object-cover" />
                         ) : (
                           otherName.charAt(0).toUpperCase()
                         )}
@@ -347,20 +359,20 @@ function ChatPageContent() {
                     </button>
 
                     <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center text-sm font-bold text-white flex-shrink-0 overflow-hidden">
-                      {activeChat.participantPhotos[activeChat.participants.find((uid) => uid !== user.uid) || ""] ? (
+                      {otherParticipantPhoto ? (
                         <img
-                          src={activeChat.participantPhotos[activeChat.participants.find((uid) => uid !== user.uid) || ""]}
+                          src={otherParticipantPhoto}
                           alt="Outro usuário"
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        (activeChat.participantNames[activeChat.participants.find((uid) => uid !== user.uid) || ""] || "U").charAt(0).toUpperCase()
+                        otherParticipantName.charAt(0).toUpperCase()
                       )}
                     </div>
 
                     <div className="min-w-0">
                       <h3 className="text-xs font-bold text-white flex items-center gap-1">
-                        {activeChat.participantNames[activeChat.participants.find((uid) => uid !== user.uid) || ""] || "Usuário"}
+                        {otherParticipantName}
                         {otherUser?.isVerified && (
                           <ShieldCheck size={14} className="text-blue-400" weight="fill" />
                         )}

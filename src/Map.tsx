@@ -5,8 +5,7 @@ import L from "leaflet";
 
 // Fix Leaflet marker icon issue
 const fixLeafletIcon = () => {
-  // @ts-ignore
-  delete L.Icon.Default.prototype._getIconUrl;
+  delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
   L.Icon.Default.mergeOptions({
     iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
     iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
@@ -19,6 +18,7 @@ interface MapProps {
   longitude?: number;
   city?: string;
   state?: string;
+  neighborhood?: string;
   popupText?: string;
   zoom?: number;
   className?: string;
@@ -59,6 +59,7 @@ export default function Map({
   longitude,
   city,
   state,
+  neighborhood,
   popupText,
   zoom = 13,
   className = "h-[300px] w-full rounded-xl overflow-hidden shadow-card border border-surface-700/50",
@@ -77,23 +78,51 @@ export default function Map({
     }
 
     if (city && state) {
-      const query = `${city}, ${state}, Brasil`;
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data && data.length > 0) {
-            setCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
-          } else {
-            const uppercaseState = state.toUpperCase().trim();
-            const capitalCoords = stateCapitals[uppercaseState] || [-23.55, -46.633];
-            setCoords(capitalCoords);
+      // Nominatim tem rate-limit rígido; aborta após 5s e cancela ao
+      // desmontar/trocar de item. Tenta do mais específico (com bairro) ao
+      // mais genérico (cidade) e só então cai para a capital do estado.
+      let cancelled = false;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const uppercaseState = state.toUpperCase().trim();
+      const fallbackToCapital = () => {
+        if (cancelled) return;
+        setCoords(stateCapitals[uppercaseState] || [-23.55, -46.633]);
+      };
+
+      const candidates = [
+        neighborhood ? `${neighborhood}, ${city}, ${state}, Brasil` : "",
+        `${city}, ${state}, Brasil`,
+      ].filter(Boolean);
+
+      const geocode = async () => {
+        for (const q of candidates) {
+          try {
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`,
+              { signal: controller.signal },
+            );
+            const data = await res.json();
+            if (cancelled) return;
+            if (data && data.length > 0) {
+              setCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+              return;
+            }
+          } catch {
+            // Erro de rede ou abort (timeout/unmount): interrompe as tentativas.
+            break;
           }
-        })
-        .catch(() => {
-          const uppercaseState = state.toUpperCase().trim();
-          const capitalCoords = stateCapitals[uppercaseState] || [-23.55, -46.633];
-          setCoords(capitalCoords);
-        });
+        }
+        fallbackToCapital();
+      };
+
+      geocode().finally(() => clearTimeout(timeoutId));
+
+      return () => {
+        cancelled = true;
+        controller.abort();
+        clearTimeout(timeoutId);
+      };
     } else if (state) {
       const uppercaseState = state.toUpperCase().trim();
       const capitalCoords = stateCapitals[uppercaseState] || [-23.55, -46.633];
@@ -101,7 +130,7 @@ export default function Map({
     } else {
       setCoords([-23.55, -46.633]);
     }
-  }, [latitude, longitude, city, state]);
+  }, [latitude, longitude, city, state, neighborhood]);
 
   useEffect(() => {
     if (!mapContainerRef.current || !coords) return;

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { collection, getDocs, limit, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import dynamic from "next/dynamic";
@@ -69,6 +70,10 @@ interface ItemLocation {
   isPremium?: boolean;
 }
 
+// Dados fictícios usados apenas em desenvolvimento: em produção uma base
+// vazia ou um erro de leitura não deve exibir anúncios falsos para o usuário.
+const SHOW_MOCKS = process.env.NODE_ENV === "development";
+
 const mockProducts: ItemLocation[] = [
   { id: "p1", title: "Gibson Les Paul Custom 1978", city: "São Paulo", state: "SP", neighborhood: "Pinheiros", price: 29000, type: "produto", category: "Guitarra", photo: "/gibson_les_paul.png", premiumTier: "tier1", isPremium: true, userId: "mock_seller_p1", phone: "11999999999" },
   { id: "p2", title: "Fender Stratocaster American Standard", city: "Curitiba", state: "PR", neighborhood: "Centro", price: 12500, type: "produto", category: "Guitarra", photo: "/fender_stratocaster.png", userId: "mock_seller_p2", phone: "41988888888" },
@@ -99,7 +104,7 @@ export default function HomePage() {
   const [selectedItem, setSelectedItem] = useState<ItemLocation | null>(null);
   const [loading, setLoading] = useState(true);
   
-  const [profile, setProfile] = useState<any | null>(null);
+  const [profile, setProfile] = useState<UserData | null>(null);
   const [showAnunciarModal, setShowAnunciarModal] = useState(false);
   const [adminPendingCount, setAdminPendingCount] = useState(0);
 
@@ -292,10 +297,13 @@ export default function HomePage() {
   // Fetch data from Firestore with fallback to mocks
   useEffect(() => {
     async function fetchData() {
+      const mockFallback = SHOW_MOCKS
+        ? (activeTab === "produtos" ? mockProducts : activeTab === "luthiers" ? mockLuthiers : mockTeachers)
+        : [];
+
       if (!db) {
-        const fallbacks = activeTab === "produtos" ? mockProducts : activeTab === "luthiers" ? mockLuthiers : mockTeachers;
-        setItems(fallbacks);
-        setSelectedItem(fallbacks[0] || null);
+        setItems(mockFallback);
+        setSelectedItem(mockFallback[0] || null);
         setLoading(false);
         return;
       }
@@ -325,7 +333,7 @@ export default function HomePage() {
             });
           });
 
-          const finalProducts = productsList.length > 0 ? productsList : mockProducts;
+          const finalProducts = productsList.length > 0 ? productsList : mockFallback;
           setItems(finalProducts);
           setSelectedItem(finalProducts[0] || null);
         } else if (activeTab === "luthiers") {
@@ -355,7 +363,7 @@ export default function HomePage() {
             });
           });
 
-          const finalLuthiers = luthiersList.length > 0 ? luthiersList : mockLuthiers;
+          const finalLuthiers = luthiersList.length > 0 ? luthiersList : mockFallback;
           setItems(finalLuthiers);
           setSelectedItem(finalLuthiers[0] || null);
         } else {
@@ -391,15 +399,14 @@ export default function HomePage() {
             });
           });
 
-          const finalTeachers = teachersList.length > 0 ? teachersList : mockTeachers;
+          const finalTeachers = teachersList.length > 0 ? teachersList : mockFallback;
           setItems(finalTeachers);
           setSelectedItem(finalTeachers[0] || null);
         }
       } catch (err) {
         console.error("Error loading data from Firestore:", err);
-        const fallbacks = activeTab === "produtos" ? mockProducts : activeTab === "luthiers" ? mockLuthiers : mockTeachers;
-        setItems(fallbacks);
-        setSelectedItem(fallbacks[0] || null);
+        setItems(mockFallback);
+        setSelectedItem(mockFallback[0] || null);
       } finally {
         setLoading(false);
       }
@@ -769,7 +776,7 @@ export default function HomePage() {
                   <span className="hidden sm:inline">Anunciar</span>
                 </button>
                 {userRole === ROLES.ADMIN && (
-                  <a
+                  <Link
                     href="/admin"
                     id="nav-admin"
                     className="text-xs text-[#ef7c2c] hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#ef7c2c]/30 hover:border-[#ef7c2c]/60 flex items-center gap-1.5"
@@ -780,11 +787,11 @@ export default function HomePage() {
                         {adminPendingCount}
                       </span>
                     )}
-                  </a>
+                  </Link>
                 )}
                 <ChatHeaderButton />
                 <NotificationBell />
-                <a
+                <Link
                   href="/profile"
                   id="nav-profile-link"
                   className="flex items-center gap-2 group"
@@ -797,7 +804,7 @@ export default function HomePage() {
                   <span className="text-sm text-surface-300 hidden sm:block max-w-[120px] truncate group-hover:text-white transition-colors">
                     {user.displayName || user.email}
                   </span>
-                </a>
+                </Link>
                 <button
                   onClick={logout}
                   id="btn-logout"
@@ -981,7 +988,7 @@ export default function HomePage() {
                           {/* Photo / Fallback Thumbnail */}
                           <div className="h-12 w-12 rounded-lg bg-[#181615] border border-[#2a2827] flex-shrink-0 overflow-hidden flex items-center justify-center">
                             {item.photo ? (
-                              <img src={item.photo} alt={item.title} className="h-full w-full object-cover" />
+                              <img src={item.photo} alt={item.title} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                             ) : (
                               item.type === "luthier" ? (
                                 <Wrench size={20} className="text-[#ef7c2c]" />
@@ -1312,6 +1319,7 @@ export default function HomePage() {
                     <Map
                       city={selectedItem.city}
                       state={selectedItem.state}
+                      neighborhood={selectedItem.neighborhood}
                       popupText={
                         selectedItem.type === "produto" 
                           ? `${selectedItem.title} - R$ ${selectedItem.price?.toLocaleString("pt-BR")}`
@@ -1434,18 +1442,18 @@ export default function HomePage() {
       <footer className="border-t border-[#1c1a19]/60 mt-12 sm:mt-16 py-6 sm:py-8 text-center text-xs text-surface-500 font-body">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col items-center gap-4">
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
-            <a href="/termos" id="footer-link-termos" className="hover:text-surface-300 transition-colors">
+            <Link href="/termos" id="footer-link-termos" className="hover:text-surface-300 transition-colors">
               Termos de Uso
-            </a>
-            <a href="/cookies" id="footer-link-cookies" className="hover:text-surface-300 transition-colors">
+            </Link>
+            <Link href="/cookies" id="footer-link-cookies" className="hover:text-surface-300 transition-colors">
               Política de Cookies
-            </a>
-            <a href="/plans" id="footer-link-plans" className="hover:text-surface-300 transition-colors">
+            </Link>
+            <Link href="/plans" id="footer-link-plans" className="hover:text-surface-300 transition-colors">
               Planos de Assinatura
-            </a>
-            <a href="/suporte" id="footer-link-suporte" className="hover:text-surface-300 transition-colors">
+            </Link>
+            <Link href="/suporte" id="footer-link-suporte" className="hover:text-surface-300 transition-colors">
               Contato de Suporte
-            </a>
+            </Link>
           </div>
           <p>&copy; {new Date().getFullYear()} Focattolecter. Todos os direitos reservados.</p>
         </div>

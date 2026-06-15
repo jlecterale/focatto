@@ -152,7 +152,7 @@ export default function AdminProdutosPage() {
                         <a key={idx} href={photo} target="_blank" rel="noopener noreferrer"
                           className="h-24 w-24 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden flex-shrink-0 hover:border-[#ef7c2c]/30 transition-colors"
                         >
-                          <img src={photo} alt="" className="h-full w-full object-cover" />
+                          <img loading="lazy" decoding="async" src={photo} alt="" className="h-full w-full object-cover" />
                         </a>
                       ))}
                     </div>

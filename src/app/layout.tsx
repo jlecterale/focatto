@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit, Playfair_Display } from "next/font/google";
 import "../index.css";
 import AuthProviderWrapper from "../components/AuthProviderWrapper";
+import { SITE_URL } from "../lib/seo";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -18,6 +19,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Focattolecter - Marketplace de Instrumentos Musicais",
   description: "Encontre instrumentos musicais e luthiers especializados perto de você.",
 };

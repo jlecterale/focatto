@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import AdminGuard from "../../../components/admin/AdminGuard";
 import { useAuth } from "../../../contexts/AuthContext";
 import { getAllUsers, adminUpdateUserRole, adminSetUserVerified, adminSetUserProfessional, adminSetUserTeacher, adminSetUserPremiumTier } from "../../../lib/userService";
-import { ROLES, type UserData, type UserRole } from "../../../lib/roles";
+import { ROLES, isSuperAdmin, type UserData, type UserRole } from "../../../lib/roles";
 import Link from "next/link";
 import {
   Compass, SignOut, Spinner, ArrowLeft, Users, ShieldCheck, Star, User,
@@ -16,9 +16,7 @@ import ChatHeaderButton from "../../../components/ChatHeaderButton";
 
 export default function AdminUsuariosPage() {
   const { user, logout } = useAuth();
-  const isSuperAdmin =
-    user?.email?.toLowerCase().trim() === "jfreire.comercial@gmail.com" ||
-    user?.uid === "LULBKAMCpaXhlwZxBGL3PjHQ7n73";
+  const superAdmin = isSuperAdmin(user?.email, user?.uid);
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingUid, setProcessingUid] = useState<string | null>(null);
@@ -75,6 +73,8 @@ export default function AdminUsuariosPage() {
       await adminSetUserProfessional(uid, newVal);
       setUsers((prev) => prev.map((u) => (u.uid === uid ? { ...u, isProfessional: newVal } : u)));
       toast.success(`Usuário ${newVal ? "marcado como profissional" : "removido como profissional"}.`);
+    } catch {
+      toast.error("Erro ao alterar status profissional.");
     } finally {
       setProcessingUid(null);
     }
@@ -259,7 +259,7 @@ export default function AdminUsuariosPage() {
                     </button>
 
                     {/* Alterar Assinatura (Apenas para jfreire.comercial@gmail.com) */}
-                    {isSuperAdmin && (
+                    {superAdmin && (
                       <div className="flex items-center gap-2 bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs font-semibold">
                         <span className="text-surface-400">Plano:</span>
                         <select
