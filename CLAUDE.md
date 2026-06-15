@@ -48,4 +48,5 @@ npm run cap:ios                  # abre Xcode (somente macOS)
 - `.npmrc` tem `legacy-peer-deps=true` porque `@capacitor-firebase/authentication` declara peer `firebase@^11` e o projeto usa `firebase@12` (compatível). Não remova sem testar `npm ci`.
 - O Next.js usa `experimental.serverActions` no config mas não há server actions em uso; o app depende disso continuar assim (remote URL exige o site no ar).
 - Mudou `PRODUCTION_URL` ou plugins? Rode `npx cap sync` e commite as alterações geradas em `android/` e `ios/`.
+- **App abre e não carrega nada**: a estratégia remote URL carrega o site publicado. Se a `PRODUCTION_URL` estiver errada ou o código novo ainda não estiver em produção, a tela fica vazia. Para desenvolver, aponte para o dev server local (`CAP_SERVER_URL=http://10.0.2.2:3000` no emulador; cleartext é habilitado automaticamente para `http://`). A splash usa `launchAutoHide: true` para não travar — não dependa de `SplashScreen.hide()` do JS, pois o site deployado pode não ter esse código.
 - Rotas dinâmicas impedem `output: "export"`; se um dia o site virar estático, o app pode passar a embarcar os assets (mudar `webDir` e remover `server.url`).

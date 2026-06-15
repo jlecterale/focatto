@@ -10,6 +10,15 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 
 ## 📅 Histórico de Intervenções
 
+### 15/06/2026 — Correção do app que abria no emulador sem carregar (remote URL)
+*   **Objetivo**: Resolver o app abrindo no emulador com tela em branco.
+*   **Causa**: `SplashScreen.launchAutoHide: false` dependia de `SplashScreen.hide()` (em `CapacitorInit`), mas a estratégia remote URL carrega o site **publicado**, que ainda não tem esse código — então a splash ficava presa. Some-se a isso a `PRODUCTION_URL` ser um palpite (não há a URL real no repo).
+*   **Arquivos Modificados**:
+    *   `capacitor.config.ts` — `launchAutoHide: true` (+ spinner), `webContentsDebuggingEnabled: true` no Android e `server.cleartext` automático quando `CAP_SERVER_URL` é `http://` (permite testar contra o dev server local; `10.0.2.2` é o host no emulador).
+    *   `mobile/README.md` / `CLAUDE.md` — seção "App abre mas não carrega nada" (verificar `PRODUCTION_URL` no Firebase App Hosting, testar com dev server local, diagnóstico via `adb logcat`/`chrome://inspect`).
+*   **Pendência do usuário**: confirmar a `PRODUCTION_URL` real (Firebase Console → App Hosting) ou desenvolver apontando para o dev server local até o deploy do código novo.
+*   **Estado**: Concluído; `cap sync` validado (cleartext alterna conforme o esquema da URL).
+
 ### 15/06/2026 — Upgrade do Android para Gradle 9 + JDK 21 e build sem Android Studio
 *   **Objetivo**: Atualizar o projeto Android para Gradle 9, resolver o erro `invalid source release: 21` no `mobile:android:debug` e documentar o build sem Android Studio (apenas com o Android SDK).
 *   **Arquivos Modificados**:

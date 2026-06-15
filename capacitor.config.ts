@@ -18,12 +18,18 @@ const PRODUCTION_URL = "https://focatto--focatto.us-central1.hosted.app";
 
 const serverUrl = process.env.CAP_SERVER_URL || PRODUCTION_URL;
 
+// Quando aponta para um dev server local (http), o Android bloqueia cleartext
+// por padrão. Habilita cleartext só nesse caso para o desenvolvimento funcionar
+// (ex.: CAP_SERVER_URL=http://10.0.2.2:3000 — 10.0.2.2 é o host no emulador).
+const isLocalHttp = serverUrl.startsWith("http://");
+
 const config: CapacitorConfig = {
   appId: "br.com.focatto.app",
   appName: "Focatto",
   webDir: "mobile/www",
   server: {
     url: serverUrl,
+    cleartext: isLocalHttp,
     // Permite navegar para os dominios do Firebase (auth handler) sem abrir
     // o navegador externo.
     allowNavigation: [
@@ -38,13 +44,20 @@ const config: CapacitorConfig = {
   },
   android: {
     allowMixedContent: false,
+    // Permite inspecionar o WebView via chrome://inspect em builds de debug.
+    webContentsDebuggingEnabled: true,
   },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 1500,
-      launchAutoHide: false,
+      // launchAutoHide: true para a splash sumir sozinha. Como o app carrega o
+      // site remoto, NÃO dependa de SplashScreen.hide() no JS — se o site
+      // deployado não tiver esse código (ou a URL estiver errada), a splash
+      // ficaria presa para sempre.
+      launchShowDuration: 2000,
+      launchAutoHide: true,
       backgroundColor: "#0b0908",
-      showSpinner: false,
+      showSpinner: true,
+      spinnerColor: "#ef7c2c",
       splashFullScreen: true,
       splashImmersive: true,
     },

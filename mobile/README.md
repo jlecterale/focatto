@@ -118,10 +118,42 @@ avdmanager create avd -n Focatto_API35 \
   -k "system-images;android-35;google_apis;x86_64" -d pixel_7
 ```
 
-> O emulador carrega o site de produção (estratégia remote URL), então precisa
-> de internet. Para testar contra um servidor local, suba `npm run dev` e rode
-> `CAP_SERVER_URL=http://10.0.2.2:3000 npx cap sync android` antes (no emulador,
-> `10.0.2.2` é o `localhost` da máquina host).
+### App abre mas não carrega nada (tela branca / preta)
+
+Por usar a estratégia *remote URL*, o WebView carrega uma URL externa — se ela
+não responder, a tela fica vazia. Causas e soluções:
+
+1. **A URL de produção (`PRODUCTION_URL` em `capacitor.config.ts`) está errada.**
+   O valor inicial é um palpite. Pegue a URL real no
+   [Firebase Console → App Hosting](https://console.firebase.google.com/project/focatto/apphosting)
+   (domínio do backend) ou via CLI:
+   ```bash
+   firebase apphosting:backends:list   # ou: firebase hosting:sites:list
+   ```
+   Ajuste `PRODUCTION_URL` e rode `npx cap sync android`.
+
+2. **O código novo do app ainda não está em produção.** A estratégia remote URL
+   carrega o site publicado. Recursos desta branch (login Apple, exclusão de
+   conta, `CapacitorInit`) só aparecem depois do deploy. Para desenvolver/testar
+   **antes** do deploy, aponte para o seu dev server local:
+   ```bash
+   npm run dev   # Next.js na porta 3000 (host)
+   # no emulador, o host é 10.0.2.2; cleartext é habilitado automaticamente p/ http:
+   CAP_SERVER_URL=http://10.0.2.2:3000 npm run mobile:android:run
+   # aparelho físico via USB na mesma rede: use o IP da sua máquina
+   CAP_SERVER_URL=http://192.168.0.X:3000 npm run mobile:android:run
+   ```
+
+3. **Diagnóstico.** Veja o que o WebView está fazendo:
+   ```bash
+   adb logcat | grep -iE "Capacitor|chromium|WebView|ERR_"
+   ```
+   Ou inspecione o WebView no desktop em `chrome://inspect` (debugging já está
+   habilitado em builds de debug via `webContentsDebuggingEnabled`).
+
+> A splash screen tem `launchAutoHide: true`: ela some sozinha mesmo se o site
+> não carregar, então você vê a página de erro do WebView (útil para diagnóstico)
+> em vez de uma splash travada.
 
 ## Configuração obrigatória antes de publicar
 
@@ -181,6 +213,7 @@ npx @capacitor/assets generate --iconBackgroundColor '#0b0908' --splashBackgroun
 | Login Google falha no Android | `google-services.json` placeholder ou SHA-1 não cadastrado no Firebase |
 | Login Google falha no iOS | `GoogleService-Info.plist` placeholder ou `REVERSED_CLIENT_ID` ausente no `Info.plist` |
 | Login Apple falha | Capability/provedor Apple não habilitados (Apple Developer + Firebase) |
+| App abre mas não carrega nada (tela branca) | `PRODUCTION_URL` errada ou código novo ainda não deployado — ver seção "App abre mas não carrega nada" |
 | App abre tela offline com internet | `PRODUCTION_URL` incorreta em `capacitor.config.ts` |
 | Mudanças no config não refletem | Rodar `npx cap sync` após editar `capacitor.config.ts` |
 | `invalid source release: 21` | Gradle rodando em JDK < 21; aponte para um JDK 21 (ver "JDK 21 é obrigatório") |
