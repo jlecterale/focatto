@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { X, Envelope, Lock, Eye, EyeSlash, GoogleLogo, Spinner, User } from "@phosphor-icons/react";
+import { X, Envelope, Lock, Eye, EyeSlash, GoogleLogo, AppleLogo, Spinner, User } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { useAuth } from "../contexts/AuthContext";
+import { isIosApp } from "../lib/native";
 
 type Mode = "login" | "register" | "forgot";
 
@@ -14,10 +15,17 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  const { login, loginWithGoogle, register, resetPassword } = useAuth();
+  const { login, loginWithGoogle, loginWithApple, register, resetPassword } = useAuth();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("login");
   const [loading, setLoading] = useState(false);
+  // Exigência da App Store (guideline 4.8): apps iOS que oferecem login de
+  // terceiros (Google) devem oferecer também o Sign in with Apple.
+  const [showAppleLogin, setShowAppleLogin] = useState(false);
+
+  useEffect(() => {
+    setShowAppleLogin(isIosApp());
+  }, []);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -151,6 +159,42 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     }
   }
 
+  async function handleAppleLogin() {
+    setLoading(true);
+    try {
+      const isNew = await loginWithApple();
+      toast.success(isNew ? "Conta criada com sucesso!" : "Login com Apple realizado!");
+      onClose();
+      if (isNew) {
+        router.push("/profile");
+      }
+    } catch (err: unknown) {
+      const error = err as { code?: string; message?: string };
+      const cancelled =
+        error.code === "auth/popup-closed-by-user" ||
+        /cancell?ed|1001/i.test(error.message || "");
+      if (!cancelled) {
+        toast.error("Erro ao autenticar com Apple.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const appleLoginButton = (idSuffix: string) =>
+    showAppleLogin ? (
+      <button
+        type="button"
+        id={`apple-${idSuffix}-btn`}
+        onClick={handleAppleLogin}
+        disabled={loading}
+        className="w-full py-3 rounded-xl bg-black border border-[#2a2827] text-white font-semibold text-sm transition-all duration-200 hover:bg-[#181615] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        <AppleLogo size={18} weight="fill" />
+        {idSuffix === "login" ? "Entrar com Apple" : "Cadastrar com Apple"}
+      </button>
+    ) : null;
+
   if (!isOpen) return null;
 
   const inputClasses =
@@ -256,6 +300,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 <GoogleLogo size={18} />
                 Entrar com Google
               </button>
+
+              {appleLoginButton("login")}
 
               <p className="text-xs text-surface-400 text-center mt-1">
                 Não tem uma conta?{" "}
@@ -368,6 +414,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 <GoogleLogo size={18} />
                 Cadastrar com Google
               </button>
+
+              {appleLoginButton("register")}
 
               <p className="text-xs text-surface-400 text-center mt-1">
                 Já tem uma conta?{" "}

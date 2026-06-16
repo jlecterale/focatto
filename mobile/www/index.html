@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <title>Focatto</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0b0908;
+        color: #fafaf9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        text-align: center;
+      }
+      .wrap {
+        padding: 24px;
+        max-width: 320px;
+      }
+      .logo {
+        width: 72px;
+        height: 72px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ef7c2c, #d4ae12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 8px;
+      }
+      p {
+        font-size: 13px;
+        color: #a8a29e;
+        line-height: 1.5;
+        margin: 0 0 24px;
+      }
+      button {
+        background: linear-gradient(90deg, #ef7c2c, #d4ae12);
+        color: #fff;
+        border: 0;
+        border-radius: 12px;
+        padding: 12px 28px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      Shell offline do app Focatto (Capacitor).
+      Esta pagina so aparece quando o dispositivo esta sem conexao no primeiro
+      carregamento; com rede, o WebView carrega o site de producao definido em
+      capacitor.config.ts (server.url).
+    -->
+    <div class="wrap">
+      <div class="logo">🧭</div>
+      <h1>Você está offline</h1>
+      <p>
+        O Focatto precisa de conexão com a internet para carregar o marketplace
+        de instrumentos musicais. Verifique sua rede e tente novamente.
+      </p>
+      <button onclick="window.location.reload()">Tentar novamente</button>
+    </div>
+  </body>
+</html>
