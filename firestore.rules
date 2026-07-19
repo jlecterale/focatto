@@ -19,10 +19,9 @@ service cloud.firestore {
       // Anyone can read public profiles
       allow read: if true;
 
-      // Users can create their own profile (cannot set role to admin unless whitelisted)
       allow create: if isAuth() && request.auth.uid == userId && (
         request.resource.data.role == 'user' ||
-        (request.resource.data.role == 'admin' && request.auth.token.email != null && request.auth.token.email.toLowerCase() == 'jfreire.comercial@gmail.com')
+        (request.resource.data.role == 'admin' && request.auth.token.email != null && request.auth.token.email == 'jfreire.comercial@gmail.com')
       );
 
       // Users can update their own non-role fields
