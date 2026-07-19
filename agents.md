@@ -10,6 +10,55 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 
 ## 📅 Histórico de Intervenções
 
+### 19/07/2026 — Correção de Falhas de Segurança, Bugs de Runtime, Dependências e Relatório Atualizado
+*   **Objetivo**: Mitigar e corrigir todas as 8 ocorrências apontadas no relatório de auditoria do Focatto. Implementar as correções ordenadas por importância, rodar testes redundantes de compilação (build) e lint, e atualizar o relatório interativo do Desktop.
+*   **Arquivos Criados/Modificados**:
+    *   [`src/app/api/cifraclub/route.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/app/api/cifraclub/route.ts) — Modificado. Adicionada validação de hostname contra domínio do Cifra Club contra ataques SSRF.
+    *   [`firestore.rules`](file:///c:/Users/USER%201/Desktop/focatto/firestore.rules) — Modificado. Reforçada regra de criação de usuários para prevenir escalação de privilégios admin.
+    *   [`src/contexts/AuthContext.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/contexts/AuthContext.tsx) — Modificado. Envolvido sync de usuário em try/catch/finally para evitar loading lock.
+    *   [`src/lib/productService.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/lib/productService.ts) — Modificado. Adicionado deleteObject do storage na remoção de produtos contra vazamento de mídias.
+    *   [`src/app/anuncio/[id]/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/anuncio/[id]/page.tsx) — Modificado. Acoplado o mapa interativo dinâmico Leaflet na barra lateral do anúncio.
+    *   [`src/firebase.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/firebase.ts) — Modificado. Removidos fallbacks de credenciais do Firebase.
+    *   [`package.json`](file:///c:/Users/USER%201/Desktop/focatto/package.json) & [`.eslintrc.json`](file:///c:/Users/USER%201/Desktop/focatto/.eslintrc.json) — Modificados. Instalado ESLint v8 e eslint-config-next. Adicionado overrides de postcss contra XSS.
+    *   [`C:\Users\USER 1\Desktop\focatto auditoria 19-07.html`](file:///C:/Users/USER%201/Desktop/focatto%20auditoria%2019-07.html) — Modificado. Atualizado com status 100% resolvido.
+*   **Estado**: Concluído com sucesso. Todos os testes (lint de zero erros e build de produção) validados com sucesso.
+
+### 14/07/2026 — Ajuste de Impressão do Pitch Centelha Focatto e Inclusão de Jonatas Freire (CEO)
+*   **Objetivo**: Reestruturar o arquivo do pitch HTML para corrigir a quebra de elementos e páginas na geração do PDF, exibir todas as tecnologias na versão impressa (ocultando abas dinâmicas) e incluir Jonatas Freire (CEO & Fundador) na equipe com sua respectiva foto circular e atribuições, além de atualizar as menções no Hero e rodapé. Remover também marcas rasuradas de membros antigos.
+*   **Arquivos Criados/Modificados**:
+    *   [`c:\Users\USER 1\Desktop\apresentacao focatto centelha\pitch_focatto_centelha.html`](file:///c:/Users/USER%201/Desktop/apresentacao%20focatto%20centelha/pitch_focatto_centelha.html) — Modificado. Remoção do texto de membro removido, modificação das regras CSS (adição de `@media print` específica com redimensionamentos, ocultamento de headers, quebras de páginas, exibição linear de abas de tecnologias, etc.) e adição de Jonatas Freire e Flávio Lima como co-autores da equipe.
+    *   [`c:\Users\USER 1\Desktop\apresentacao focatto centelha\jonatas.jpg`](file:///c:/Users/USER%201/Desktop/apresentacao%20focatto%20centelha/jonatas.jpg) — Criado. Copiado da imagem oficial do Desktop.
+    *   [`c:\Users\USER 1\Desktop\apresentacao focatto centelha\pitch_focatto_centelha.pdf`](file:///c:/Users/USER%201/Desktop/apresentacao%20focatto%20centelha/pitch_focatto_centelha.pdf) — Atualizado. Recriado com sucesso através da exportação headless do Chrome.
+*   **Estado**: Concluído e verificado com sucesso.
+
+### 08/07/2026 — Importação por URL Cifra Club, Edição de Cifras e Link do Deezer
+*   **Objetivo**: Adicionar a capacidade de importar cifras inserindo URLs do Cifra Club (musicas individuais ou coleções/playlists completas em lote) com preenchimento de campos de forma automatizada. Fornecer editor direto de cifras no visualizador, opção de salvar tom transposto permanentemente na música e adicionar suporte para links e botões de áudio do Deezer.
+*   **Arquivos Criados/Modificados**:
+    *   [`src/app/api/cifraclub/route.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/app/api/cifraclub/route.ts) — Nova rota de API de raspagem com tratamento de cabeçalhos e suporte a listas de reprodução.
+    *   [`src/app/agenda/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/agenda/page.tsx) — Inclusão de estados e handlers de importação por URL, checkboxes de seleção de lote, formulário de edição inline, gravação de tom transposto e campos de link do Deezer.
+*   **Estado**: Concluído e verificado via build de produção com sucesso.
+
+### 08/07/2026 — Ajuste de Cifras estilo Cifra Club e Auto-conversão de Pastes
+*   **Objetivo**: Adequar a visualização de cifras na agenda para renderizar acordes sobre a letra (alinhados horizontalmente) sem quebras visuais nas palavras. Adicionar conversão inteligente e imediata no paste e blur do formulário para viabilizar o uso do Cifra Club como base das cifras do app, além de botão para busca direta facilitada.
+*   **Arquivos Modificados**:
+    *   [`src/app/agenda/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/agenda/page.tsx) — Implementação de rotinas de análise harmônica, interceptores no formulário e reformatação do pre container de exibição.
+*   **Estado**: Concluído e verificado via build de produção com sucesso.
+
+### 08/07/2026 — Splash Landing Page de Seleção e Módulo de Agenda Musical (Louve App)
+*   **Objetivo**: Criar uma Landing Page premium como tela inicial do Focatto (`/`), direcionando o usuário para as verticais do app: Marketplace, Aulas de Música, Luthiers e Agenda Musical. O botão de Agenda Musical abre um modal de seleção rápida do tipo de grupo/banda (Ministério, GIG/Freelancer, Baile, Agência, Coral, Outros). Ao escolher, redireciona o usuário para o esqueleto funcional e personalizado da nova Agenda Musical (`/agenda?type=...`).
+*   **Arquivos Criados/Modificados**:
+    *   [`src/app/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/page.tsx) — Nova Landing Page premium com cards de glassmorphism, gradientes interativos e modal de tipos de bandas.
+    *   [`src/app/explore/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/explore/page.tsx) — Antiga página inicial movida para cá, adaptada para ler query strings (`?tab=...`) para ativar dinamicamente a aba correspondente do marketplace/luthiers/professores, e envolta em `Suspense` para conformidade de build.
+    *   [`src/app/agenda/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/agenda/page.tsx) — Nova página de Agenda com layouts, dicas e fluxos iniciais dedicados e personalizados para o tipo de banda escolhido, servindo como base para as funcionalidades de Escala e Cifras inspiradas no Louve App.
+*   **Estado**: Concluído e verificado com sucesso via build de produção do Next.js.
+
+### 24/06/2026 — Criação da Apresentação RecarGarage no Desktop
+*   **Objetivo**: Criar uma pasta no Desktop com arquivos de texto (.txt) e apresentação interativa (.html) detalhando o ecossistema RecarGarage/Focatto, a stack tecnológica, a arquitetura de segurança (Security Rules) e os planos de evolução futura, destacando o impacto social (fomento à luthieria e rede social de músicos).
+*   **Arquivos Criados**:
+    *   [`C:\Users\USER 1\Desktop\Apresentacao Focatto\apresentacao.txt`](file:///C:/Users/USER%201/Desktop/Apresentacao%20Focatto/apresentacao.txt) — Explicação textual e aprofundada de toda a lógica do projeto.
+    *   [`C:\Users\USER 1\Desktop\Apresentacao Focatto\apresentacao.html`](file:///C:/Users/USER%201/Desktop/Apresentacao%20Focatto/apresentacao.html) — Apresentação interativa de altíssima qualidade visual, incluindo simulador de ROI e explicação visual dinâmica do Ciclo Artístico Completo.
+*   **Estado**: Concluído e disponibilizado diretamente na área de trabalho do usuário.
+
 ### 15/06/2026 — Restrição de Avaliação de Vendedor a Vendas Concluídas
 *   **Objetivo**: Vincular o sistema de avaliação de vendedores à conclusão de uma venda (proposta de compra ou troca aceita), impedindo que qualquer usuário avalie perfis sem ter transacionado com eles.
 *   **Arquivos Modificados**:

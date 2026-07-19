@@ -22,6 +22,12 @@ import { toast } from "sonner";
 import NotificationBell from "../../../components/NotificationBell";
 import ChatHeaderButton from "../../../components/ChatHeaderButton";
 import { createOrGetChat } from "../../../lib/chatService";
+import dynamic from "next/dynamic";
+
+const Map = dynamic(() => import("../../../Map"), {
+  ssr: false,
+  loading: () => <div className="h-[150px] w-full rounded-xl bg-surface-900 animate-pulse border border-surface-850" />
+});
 
 export default function AnuncioDetalhePage() {
   const params = useParams();
@@ -336,6 +342,12 @@ export default function AnuncioDetalhePage() {
                 >
                   Ver Perfil Social
                 </Link>
+              </div>
+
+              {/* Map location */}
+              <div className="mt-5 pt-5 border-t border-surface-850">
+                <span className="block text-[10px] font-bold text-surface-450 uppercase tracking-wider mb-2">Localização</span>
+                <Map city={product.city} state={product.state} className="h-[150px] w-full rounded-xl" zoom={11} />
               </div>
             </div>
           </div>

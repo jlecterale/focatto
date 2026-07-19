@@ -38,18 +38,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
 
-      if (firebaseUser && !_skipEnsure.current) {
-        const { role } = await ensureUserDocument(
-          firebaseUser.uid,
-          firebaseUser.email,
-          firebaseUser.displayName
-        );
-        setUserRole(role);
-      } else if (!firebaseUser) {
-        setUserRole(null);
+      try {
+        if (firebaseUser && !_skipEnsure.current) {
+          const { role } = await ensureUserDocument(
+            firebaseUser.uid,
+            firebaseUser.email,
+            firebaseUser.displayName
+          );
+          setUserRole(role);
+        } else if (!firebaseUser) {
+          setUserRole(null);
+        }
+      } catch (err) {
+        console.error("Erro ao sincronizar dados de usuário no Firestore:", err);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     });
     return unsubscribe;
   }, []);

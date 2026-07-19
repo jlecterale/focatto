@@ -2,7 +2,7 @@ import {
   doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs,
   query, where, orderBy, deleteDoc, Timestamp, increment, limit,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "../firebase";
 import type { ProductData, ProductStatus, FavoriteData, ProposalData } from "./roles";
 import { createNotification } from "./notificationService";
@@ -167,8 +167,26 @@ export async function getApprovedProducts(): Promise<ProductData[]> {
   }
 }
 
-export async function deleteProduct(productId: string) {
-  await deleteDoc(doc(db, "products", productId));
+export async function deleteProduct(productId: string): Promise<void> {
+  const productRef = doc(db, "products", productId);
+  try {
+    const snap = await getDoc(productRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      const photos = data.photos || [];
+      for (const url of photos) {
+        try {
+          const imgRef = ref(storage, url);
+          await deleteObject(imgRef);
+        } catch (err) {
+          console.error("Erro ao deletar imagem associada no Storage:", err);
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Erro ao buscar produto para exclusão:", err);
+  }
+  await deleteDoc(productRef);
 }
 
 export async function incrementProductViews(productId: string): Promise<void> {
