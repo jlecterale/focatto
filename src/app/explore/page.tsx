@@ -528,7 +528,7 @@ function ExploreContent() {
   }, [filteredItems, selectedItem]);
 
   const filterContent = (
-    <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] flex flex-col gap-5 shadow-xl">
+    <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] flex flex-col gap-5 shadow-xl">
       
       {/* Search input with icon */}
       <div className="relative">
@@ -542,7 +542,7 @@ function ExploreContent() {
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Ex: Fender, Gibson, Regulagem..."
           aria-label="Pesquisar por instrumentos, acessórios ou luthiers"
-          className="w-full bg-[#181615] border border-[#2a2827] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]"
+          className="w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]"
         />
       </div>
 
@@ -556,7 +556,7 @@ function ExploreContent() {
             id="category-select"
             value={selectedCategory}
             onChange={(e) => handleCategoryChange(e.target.value as any)}
-            className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-2.5 text-xs text-white outline-none appearance-none transition-all duration-200 focus:border-[#ef7c2c] cursor-pointer"
+            className="w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-4 py-2.5 text-xs text-white outline-none appearance-none transition-all duration-200 focus:border-[#ef7c2c] cursor-pointer"
           >
             <option value="todas">🎸 Todas as Categorias</option>
             <option value="instrumentos">🎸 Instrumentos</option>
@@ -585,7 +585,7 @@ function ExploreContent() {
               className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
                 quickPriceFilter === null
                   ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
-                  : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
+                  : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
               }`}
             >
               Todas as Ofertas
@@ -596,7 +596,7 @@ function ExploreContent() {
               className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
                 quickPriceFilter === 1000
                   ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
-                  : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
+                  : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
               }`}
             >
               Até R$ 1.000
@@ -607,7 +607,7 @@ function ExploreContent() {
               className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
                 quickPriceFilter === 3000
                   ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
-                  : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
+                  : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
               }`}
             >
               Até R$ 3.000
@@ -618,7 +618,7 @@ function ExploreContent() {
               className={`py-1.5 px-3.5 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
                 quickPriceFilter === 5000
                   ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] border-transparent text-white shadow-[0_2px_8px_rgba(239,124,44,0.25)]"
-                  : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
+                  : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
               }`}
             >
               Até R$ 5.000
@@ -627,7 +627,7 @@ function ExploreContent() {
         </div>
       )}
 
-      <hr className="border-[#22201e]" />
+      <hr className="border-[var(--line)]" />
 
       {/* PRICE MIN / MAX INPUTS */}
       {selectedCategory !== "luthier" && (
@@ -642,7 +642,7 @@ function ExploreContent() {
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
               placeholder="Mínimo"
-              className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
+              className="w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-3 py-2 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -655,7 +655,7 @@ function ExploreContent() {
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
               placeholder="Máximo"
-              className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
+              className="w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-3 py-2 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
             />
           </div>
         </div>
@@ -674,7 +674,7 @@ function ExploreContent() {
             id="search-radius-checkbox"
             checked={searchRadius}
             onChange={(e) => setSearchRadius(e.target.checked)}
-            className="rounded border-[#2a2827] bg-[#181615] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
+            className="rounded border-[var(--line-2)] bg-[var(--panel-2)] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
           />
           Pesquisar por raio
         </label>
@@ -687,7 +687,7 @@ function ExploreContent() {
             onChange={(e) => setStateFilter(e.target.value)}
             placeholder="Estado (Ex: SP, RJ, MG)"
             aria-label="Filtrar por Estado (UF)"
-            className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
+            className="w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
           />
           <input
             type="text"
@@ -696,7 +696,7 @@ function ExploreContent() {
             onChange={(e) => setCityFilter(e.target.value)}
             placeholder="Município (Cidade)"
             aria-label="Filtrar por Município (Cidade)"
-            className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
+            className="w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
           />
           <input
             type="text"
@@ -705,12 +705,12 @@ function ExploreContent() {
             onChange={(e) => setNeighborhoodFilter(e.target.value)}
             placeholder="Bairro"
             aria-label="Filtrar por Bairro"
-            className="w-full bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
+            className="w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-3 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
           />
         </div>
       </div>
 
-      <hr className="border-[#22201e]" />
+      <hr className="border-[var(--line)]" />
 
       {/* ORDENAR POR PREÇO */}
       {selectedCategory !== "luthier" && (
@@ -725,7 +725,7 @@ function ExploreContent() {
               className={`w-full py-2 px-4 rounded-xl border text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
                 sortBy === "priceAsc"
                   ? "bg-[#ef7c2c]/10 border-[#ef7c2c] text-[#ef7c2c]"
-                  : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
+                  : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
               }`}
             >
               📈 Mais baixo
@@ -736,7 +736,7 @@ function ExploreContent() {
               className={`w-full py-2 px-4 rounded-xl border text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
                 sortBy === "priceDesc"
                   ? "bg-[#ef7c2c]/10 border-[#ef7c2c] text-[#ef7c2c]"
-                  : "bg-[#181615] border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
+                  : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30"
               }`}
             >
               📉 Mais caro
@@ -749,7 +749,7 @@ function ExploreContent() {
       <button
         onClick={clearFilters}
         id="clear-filters-btn"
-        className="w-full py-2.5 rounded-xl border border-[#2a2827] hover:border-[#ef7c2c] text-surface-400 hover:text-[#ef7c2c] text-xs font-bold transition-all duration-200 cursor-pointer flex items-center justify-center"
+        className="w-full py-2.5 rounded-xl border border-[var(--line-2)] hover:border-[#ef7c2c] text-surface-400 hover:text-[#ef7c2c] text-xs font-bold transition-all duration-200 cursor-pointer flex items-center justify-center"
       >
         Limpar filtros
       </button>
@@ -757,12 +757,12 @@ function ExploreContent() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans relative overflow-x-hidden">
       {/* Premium Top Glow */}
       <div className="absolute top-0 left-0 w-full h-[600px] bg-[radial-gradient(ellipse_at_top_left,rgba(239,124,44,0.07),transparent_50%)] pointer-events-none z-0" />
 
       {/* Header */}
-      <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+      <header className="border-b border-[var(--panel-2)]/60 bg-[var(--bg)]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-row items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-2 sm:gap-4">
             <Link href="/" className="flex items-center">
@@ -827,7 +827,7 @@ function ExploreContent() {
                 <button
                   onClick={logout}
                   id="btn-logout"
-                  className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30 hidden sm:block"
+                  className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[var(--line-2)] hover:border-[#ef7c2c]/30 hidden sm:block"
                 >
                   Sair
                 </button>
@@ -845,7 +845,7 @@ function ExploreContent() {
                 <button
                   onClick={() => setShowLogin(true)}
                   id="btn-login-modal-trigger"
-                  className="flex items-center gap-2 py-2 px-4 rounded-xl border border-[#2a2827] text-surface-300 text-xs font-semibold transition-all duration-200 hover:border-[#ef7c2c]/30 hover:text-white hover:bg-[#181615] active:scale-[0.97] cursor-pointer"
+                  className="flex items-center gap-2 py-2 px-4 rounded-xl border border-[var(--line-2)] text-surface-300 text-xs font-semibold transition-all duration-200 hover:border-[#ef7c2c]/30 hover:text-white hover:bg-[var(--panel-2)] active:scale-[0.97] cursor-pointer"
                 >
                   <User size={14} />
                   Entrar
@@ -869,7 +869,7 @@ function ExploreContent() {
             className={`flex items-center gap-1.5 py-2 px-3 sm:py-2.5 sm:px-5 text-[11px] sm:text-xs font-semibold rounded-xl transition-all duration-300 cursor-pointer flex-shrink-0 whitespace-nowrap ${
               activeTab === "produtos" 
                 ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white shadow-[0_4px_15px_rgba(239,124,44,0.25)] font-bold scale-[1.02]" 
-                : "bg-[#181615] text-surface-400 hover:text-white border border-[#252322] hover:bg-[#201e1d]"
+                : "bg-[var(--panel-2)] text-surface-400 hover:text-white border border-[var(--line)] hover:bg-[var(--line)]"
             }`}
           >
             <Tag size={14} weight={activeTab === "produtos" ? "fill" : "regular"} />
@@ -882,7 +882,7 @@ function ExploreContent() {
             className={`flex items-center gap-1.5 py-2 px-3 sm:py-2.5 sm:px-5 text-[11px] sm:text-xs font-semibold rounded-xl transition-all duration-300 cursor-pointer flex-shrink-0 whitespace-nowrap ${
               activeTab === "luthiers" 
                 ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white shadow-[0_4px_15px_rgba(239,124,44,0.25)] font-bold scale-[1.02]" 
-                : "bg-[#181615] text-surface-400 hover:text-white border border-[#252322] hover:bg-[#201e1d]"
+                : "bg-[var(--panel-2)] text-surface-400 hover:text-white border border-[var(--line)] hover:bg-[var(--line)]"
             }`}
           >
             <Wrench size={14} weight={activeTab === "luthiers" ? "fill" : "regular"} />
@@ -895,7 +895,7 @@ function ExploreContent() {
             className={`flex items-center gap-1.5 py-2 px-3 sm:py-2.5 sm:px-5 text-[11px] sm:text-xs font-semibold rounded-xl transition-all duration-300 cursor-pointer flex-shrink-0 whitespace-nowrap ${
               activeTab === "professores" 
                 ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white shadow-[0_4px_15px_rgba(239,124,44,0.25)] font-bold scale-[1.02]" 
-                : "bg-[#181615] text-surface-400 hover:text-white border border-[#252322] hover:bg-[#201e1d]"
+                : "bg-[var(--panel-2)] text-surface-400 hover:text-white border border-[var(--line)] hover:bg-[var(--line)]"
             }`}
           >
             <GraduationCap size={14} weight={activeTab === "professores" ? "fill" : "regular"} />
@@ -908,7 +908,7 @@ function ExploreContent() {
         <div className="lg:hidden flex items-center gap-2 mb-4">
           <button onClick={() => setShowMobileFilters(true)}
             id="mobile-filter-toggle"
-            className="flex items-center gap-2 py-2.5 px-4 rounded-xl bg-[#181615] border border-[#2a2827] text-xs font-semibold text-surface-300 hover:text-white transition-all cursor-pointer"
+            className="flex items-center gap-2 py-2.5 px-4 rounded-xl bg-[var(--panel-2)] border border-[var(--line-2)] text-xs font-semibold text-surface-300 hover:text-white transition-all cursor-pointer"
           >
             <Faders size={14} />
             Filtros
@@ -922,12 +922,12 @@ function ExploreContent() {
         {showMobileFilters && (
           <div className="fixed inset-0 z-[60] lg:hidden">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowMobileFilters(false)} />
-            <div className="absolute left-0 top-0 bottom-0 w-[85vw] max-w-[380px] bg-[#0b0908] border-r border-[#22201e] p-6 overflow-y-auto animate-slide-right">
+            <div className="absolute left-0 top-0 bottom-0 w-[85vw] max-w-[380px] bg-[var(--bg)] border-r border-[var(--line)] p-6 overflow-y-auto animate-slide-right">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-surface-400">Filtros</h3>
                 <button onClick={() => setShowMobileFilters(false)}
                   id="mobile-filter-close"
-                  className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[#181615] transition-all"
+                  className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[var(--panel-2)] transition-all"
                 >
                   <X size={16} />
                 </button>
@@ -938,7 +938,7 @@ function ExploreContent() {
         )}
 
         {/* Mobile View Toggle Bar */}
-        <div className="md:hidden flex bg-[#141211] border border-[#22201e]/80 rounded-xl p-1.5 mb-6 gap-2">
+        <div className="md:hidden flex bg-[var(--panel)] border border-[var(--line)]/80 rounded-xl p-1.5 mb-6 gap-2">
           <button
             onClick={() => setMobileView("list")}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
@@ -976,7 +976,7 @@ function ExploreContent() {
             
             {/* Listings Panel */}
             <div className={`md:col-span-5 flex flex-col gap-4 min-w-0 ${mobileView !== "list" ? "hidden md:flex" : "flex"}`}>
-              <div className="bg-[#141211] rounded-2xl p-3 sm:p-5 border border-[#22201e] flex flex-col gap-4 shadow-xl min-w-0">
+              <div className="bg-[var(--panel)] rounded-2xl p-3 sm:p-5 border border-[var(--line)] flex flex-col gap-4 shadow-xl min-w-0">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-surface-400 font-body">
                     Resultados ({filteredItems.length})
@@ -1001,11 +1001,11 @@ function ExploreContent() {
                           className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl border cursor-pointer transition-all duration-300 flex items-center gap-2 sm:gap-3 min-w-0 ${
                             isSelected
                               ? "bg-[#1d1b1a] border-[#ef7c2c] shadow-[0_0_12px_rgba(239,124,44,0.12)]"
-                              : "bg-[#110f0e] border-[#1c1a19] hover:border-[#2a2827]"
+                              : "bg-[var(--panel)] border-[var(--panel-2)] hover:border-[var(--line-2)]"
                           }`}
                         >
                           {/* Photo / Fallback Thumbnail */}
-                          <div className="h-12 w-12 rounded-lg bg-[#181615] border border-[#2a2827] flex-shrink-0 overflow-hidden flex items-center justify-center">
+                          <div className="h-12 w-12 rounded-lg bg-[var(--panel-2)] border border-[var(--line-2)] flex-shrink-0 overflow-hidden flex items-center justify-center">
                             {item.photo ? (
                               <img src={item.photo} alt={item.title} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                             ) : (
@@ -1075,7 +1075,7 @@ function ExploreContent() {
                             {item.type === "produto" && (
                               <button
                                 onClick={(e) => { e.stopPropagation(); router.push(`/anuncio/${item.id}`); }}
-                                className="text-[9px] px-2 py-0.5 rounded border border-[#2a2827] text-surface-400 hover:text-white hover:border-[#ef7c2c] transition-all cursor-pointer"
+                                className="text-[9px] px-2 py-0.5 rounded border border-[var(--line-2)] text-surface-400 hover:text-white hover:border-[#ef7c2c] transition-all cursor-pointer"
                               >
                                 Detalhes
                               </button>
@@ -1095,13 +1095,13 @@ function ExploreContent() {
             </div>
 
             <div className={`md:col-span-7 flex flex-col gap-4 min-w-0 ${mobileView !== "details" ? "hidden md:flex" : "flex"}`}>
-              <div className="bg-[#141211] rounded-2xl p-3 sm:p-5 border border-[#22201e] flex flex-col gap-4 shadow-xl min-w-0">
+              <div className="bg-[var(--panel)] rounded-2xl p-3 sm:p-5 border border-[var(--line)] flex flex-col gap-4 shadow-xl min-w-0">
                 <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
                   <div className="flex items-center gap-3">
                     {/* Mobile Back Button */}
                     <button
                       onClick={() => setMobileView("list")}
-                      className="md:hidden flex items-center justify-center p-2 rounded-lg bg-[#181615] border border-[#2a2827] text-white transition-all cursor-pointer"
+                      className="md:hidden flex items-center justify-center p-2 rounded-lg bg-[var(--panel-2)] border border-[var(--line-2)] text-white transition-all cursor-pointer"
                       title="Voltar para a lista"
                       aria-label="Voltar para a lista"
                     >
@@ -1134,7 +1134,7 @@ function ExploreContent() {
                       <button
                         onClick={() => setViewMode(viewMode === "photo" ? "map" : "photo")}
                         id="toggle-view-btn"
-                        className="flex items-center gap-1.5 py-1 px-3 rounded-lg bg-[#181615] border border-[#2a2827] hover:border-[#ef7c2c] text-xs font-semibold text-white transition-colors cursor-pointer"
+                        className="flex items-center gap-1.5 py-1 px-3 rounded-lg bg-[var(--panel-2)] border border-[var(--line-2)] hover:border-[#ef7c2c] text-xs font-semibold text-white transition-colors cursor-pointer"
                       >
                         {viewMode === "photo" ? (
                           <>
@@ -1156,7 +1156,7 @@ function ExploreContent() {
                   viewMode === "photo" ? (
                     <div className="flex flex-col gap-4">
                       {/* Photo Container */}
-                      <div className="relative h-[220px] sm:h-[300px] md:h-[360px] w-full rounded-xl overflow-hidden bg-[#0d0b0a] border border-[#22201e] flex items-center justify-center">
+                      <div className="relative h-[220px] sm:h-[300px] md:h-[360px] w-full rounded-xl overflow-hidden bg-[var(--bg)] border border-[var(--line)] flex items-center justify-center">
                         {selectedItem.photo ? (
                           <img
                             src={selectedItem.photo}
@@ -1194,7 +1194,7 @@ function ExploreContent() {
                       </div>
 
                       {/* Detail Text Info */}
-                      <div className="p-4 rounded-xl bg-[#110f0e] border border-[#1c1a19] flex flex-col gap-2">
+                      <div className="p-4 rounded-xl bg-[var(--panel)] border border-[var(--panel-2)] flex flex-col gap-2">
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] uppercase tracking-wider font-bold text-surface-400 bg-surface-800 px-2 py-0.5 rounded">
                             {selectedItem.type === "produto" ? "Produto / Instrumento" : selectedItem.type === "teacher" ? "Professor de Música" : "Luthier Especializado"}
@@ -1367,13 +1367,13 @@ function ExploreContent() {
       {/* Selection Modal for Anunciar */}
       {showAnunciarModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="w-full max-w-lg bg-[#0e0c0b] border border-[#2a2827] rounded-3xl shadow-2xl p-6 relative overflow-hidden">
+          <div className="w-full max-w-lg bg-[var(--bg)] border border-[var(--line-2)] rounded-3xl shadow-2xl p-6 relative overflow-hidden">
             {/* Ambient background glow inside modal */}
             <div className="absolute -top-12 -right-12 w-40 h-40 bg-[radial-gradient(circle,rgba(239,124,44,0.1),transparent_60%)] pointer-events-none" />
             
             <button
               onClick={() => setShowAnunciarModal(false)}
-              className="absolute top-4 right-4 h-8 w-8 flex items-center justify-center rounded-full text-surface-400 hover:text-white hover:bg-[#1c1a19] transition-all cursor-pointer"
+              className="absolute top-4 right-4 h-8 w-8 flex items-center justify-center rounded-full text-surface-400 hover:text-white hover:bg-[var(--panel-2)] transition-all cursor-pointer"
               aria-label="Fechar"
             >
               <X size={16} />
@@ -1391,7 +1391,7 @@ function ExploreContent() {
                   setShowAnunciarModal(false);
                   router.push("/meus-anuncios");
                 }}
-                className="group flex items-start gap-4 p-4 rounded-2xl bg-[#141211] border border-[#22201e] hover:border-[#ef7c2c]/40 hover:bg-[#1c1a19] cursor-pointer transition-all duration-300"
+                className="group flex items-start gap-4 p-4 rounded-2xl bg-[var(--panel)] border border-[var(--line)] hover:border-[#ef7c2c]/40 hover:bg-[var(--panel-2)] cursor-pointer transition-all duration-300"
               >
                 <div className="p-3 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 group-hover:scale-110 transition-transform">
                   <Tag size={20} weight="fill" />
@@ -1416,7 +1416,7 @@ function ExploreContent() {
                     }
                   }
                 }}
-                className="group flex items-start gap-4 p-4 rounded-2xl bg-[#141211] border border-[#22201e] hover:border-[#ef7c2c]/40 hover:bg-[#1c1a19] cursor-pointer transition-all duration-300"
+                className="group flex items-start gap-4 p-4 rounded-2xl bg-[var(--panel)] border border-[var(--line)] hover:border-[#ef7c2c]/40 hover:bg-[var(--panel-2)] cursor-pointer transition-all duration-300"
               >
                 <div className="p-3 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 group-hover:scale-110 transition-transform">
                   <Wrench size={20} weight="fill" />
@@ -1441,7 +1441,7 @@ function ExploreContent() {
                     }
                   }
                 }}
-                className="group flex items-start gap-4 p-4 rounded-2xl bg-[#141211] border border-[#22201e] hover:border-indigo-500/40 hover:bg-[#1c1a19] cursor-pointer transition-all duration-300"
+                className="group flex items-start gap-4 p-4 rounded-2xl bg-[var(--panel)] border border-[var(--line)] hover:border-indigo-500/40 hover:bg-[var(--panel-2)] cursor-pointer transition-all duration-300"
               >
                 <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 group-hover:scale-110 transition-transform">
                   <GraduationCap size={20} weight="fill" />
@@ -1457,7 +1457,7 @@ function ExploreContent() {
       )}
 
       {/* Footer */}
-      <footer className="border-t border-[#1c1a19]/60 mt-12 sm:mt-16 py-6 sm:py-8 text-center text-xs text-surface-500 font-body">
+      <footer className="border-t border-[var(--panel-2)]/60 mt-12 sm:mt-16 py-6 sm:py-8 text-center text-xs text-surface-500 font-body">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col items-center gap-4">
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
             <Link href="/termos" id="footer-link-termos" className="hover:text-surface-300 transition-colors">

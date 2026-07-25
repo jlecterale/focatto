@@ -171,12 +171,12 @@ export default function SocialFeedPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans relative overflow-x-hidden">
       {/* Premium Top Glow */}
       <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(ellipse_at_top_left,rgba(239,124,44,0.06),transparent_50%)] pointer-events-none z-0" />
 
       {/* Header */}
-      <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+      <header className="border-b border-[var(--panel-2)]/60 bg-[var(--bg)]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-row items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-2 sm:gap-4">
             <Link href="/" className="flex items-center">
@@ -235,7 +235,7 @@ export default function SocialFeedPage() {
                 <button
                   onClick={logout}
                   id="btn-logout"
-                  className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30 hidden sm:block"
+                  className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[var(--line-2)] hover:border-[#ef7c2c]/30 hidden sm:block"
                 >
                   Sair
                 </button>
@@ -251,7 +251,7 @@ export default function SocialFeedPage() {
                 </button>
                 <button
                   onClick={() => setShowLoginModal(true)}
-                  className="flex items-center gap-2 py-2 px-4 rounded-xl border border-[#2a2827] text-surface-300 text-xs font-semibold transition-all duration-200 hover:border-[#ef7c2c]/30 hover:text-white hover:bg-[#181615] active:scale-[0.97] cursor-pointer"
+                  className="flex items-center gap-2 py-2 px-4 rounded-xl border border-[var(--line-2)] text-surface-300 text-xs font-semibold transition-all duration-200 hover:border-[#ef7c2c]/30 hover:text-white hover:bg-[var(--panel-2)] active:scale-[0.97] cursor-pointer"
                 >
                   <User size={14} />
                   Entrar
@@ -293,7 +293,7 @@ export default function SocialFeedPage() {
                     ${
                       filter === item.id
                         ? "bg-[#ef7c2c] text-white shadow-md shadow-[#ef7c2c]/20"
-                        : "bg-[#181615] border border-white/5 text-surface-400 hover:text-white hover:border-[#ef7c2c]/30"
+                        : "bg-[var(--panel-2)] border border-white/5 text-surface-400 hover:text-white hover:border-[#ef7c2c]/30"
                     }
                   `}
                 >

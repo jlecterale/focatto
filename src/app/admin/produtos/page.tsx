@@ -53,12 +53,12 @@ export default function AdminProdutosPage() {
   }
 
   const inputBase =
-    "w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
+    "w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
 
   return (
     <AdminGuard>
-      <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
-        <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+      <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans">
+        <header className="border-b border-[var(--panel-2)]/60 bg-[var(--bg)]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <Link href="/admin" id="admin-products-back-btn" className="text-surface-400 hover:text-white transition-colors flex-shrink-0">
@@ -76,7 +76,7 @@ export default function AdminProdutosPage() {
             <NotificationBell />
             <button onClick={logout}
               id="admin-products-logout-btn"
-              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[var(--line-2)] hover:border-[#ef7c2c]/30"
             >
               <SignOut size={14} /> Sair
             </button>
@@ -90,7 +90,7 @@ export default function AdminProdutosPage() {
               className={`text-xs font-semibold py-2 px-4 rounded-xl transition-all ${
                 filter === "pending"
                   ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white"
-                  : "bg-[#181615] text-surface-400 border border-[#2a2827]"
+                  : "bg-[var(--panel-2)] text-surface-400 border border-[var(--line-2)]"
               }`}
             >
               Pendentes
@@ -100,7 +100,7 @@ export default function AdminProdutosPage() {
               className={`text-xs font-semibold py-2 px-4 rounded-xl transition-all ${
                 filter === "all"
                   ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white"
-                  : "bg-[#181615] text-surface-400 border border-[#2a2827]"
+                  : "bg-[var(--panel-2)] text-surface-400 border border-[var(--line-2)]"
               }`}
             >
               Todos
@@ -119,7 +119,7 @@ export default function AdminProdutosPage() {
           ) : (
             <div className="space-y-4">
               {products.map((product) => (
-                <div key={product.id} className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+                <div key={product.id} className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="min-w-0 flex-1">
                       <h3 className="text-sm font-bold text-white truncate">{product.title}</h3>
@@ -150,7 +150,7 @@ export default function AdminProdutosPage() {
                     <div className="flex gap-2 overflow-x-auto pb-1">
                       {product.photos.map((photo, idx) => (
                         <a key={idx} href={photo} target="_blank" rel="noopener noreferrer"
-                          className="h-24 w-24 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden flex-shrink-0 hover:border-[#ef7c2c]/30 transition-colors"
+                          className="h-24 w-24 rounded-xl bg-[var(--panel-2)] border border-[var(--line-2)] overflow-hidden flex-shrink-0 hover:border-[#ef7c2c]/30 transition-colors"
                         >
                           <img loading="lazy" decoding="async" src={photo} alt="" className="h-full w-full object-cover" />
                         </a>
@@ -159,7 +159,7 @@ export default function AdminProdutosPage() {
                   )}
 
                   {product.status === "pending" && (
-                    <div className="space-y-3 pt-2 border-t border-[#22201e]">
+                    <div className="space-y-3 pt-2 border-t border-[var(--line)]">
                       <textarea value={adminNotes} onChange={(e) => setAdminNotes(e.target.value)}
                         placeholder="Observações (opcional)..."
                         id={`admin-notes-prod-${product.id}`}
@@ -188,7 +188,7 @@ export default function AdminProdutosPage() {
                   )}
 
                   {product.status !== "pending" && product.adminNotes && (
-                    <div className="pt-2 border-t border-[#22201e]">
+                    <div className="pt-2 border-t border-[var(--line)]">
                       <p className="text-xs text-surface-400">
                         <span className="text-surface-500">Observações:</span> {product.adminNotes}
                       </p>

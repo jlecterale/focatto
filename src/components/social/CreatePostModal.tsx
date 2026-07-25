@@ -260,7 +260,7 @@ export default function CreatePostModal({
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg mx-4 sm:mx-auto bg-[#0e0c0b]/98 border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden animate-scale-in max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-lg mx-4 sm:mx-auto bg-[var(--bg)]/98 border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden animate-scale-in max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
           <h3 className="text-base font-bold text-surface-50 font-[family-name:var(--font-heading)]">
@@ -494,7 +494,7 @@ export default function CreatePostModal({
         </div>
 
         {/* Footer com botões */}
-        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-white/[0.06] bg-[#0c0a09]/50">
+        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-white/[0.06] bg-[var(--bg)]/50">
           <button
             onClick={onClose}
             disabled={submitting}

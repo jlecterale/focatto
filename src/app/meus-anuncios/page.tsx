@@ -242,7 +242,7 @@ export default function MeusAnunciosPage() {
 
   if (authLoading || (user && loading)) {
     return (
-      <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <Spinner size={24} className="animate-spin text-[#ef7c2c]" />
       </div>
     );
@@ -253,11 +253,11 @@ export default function MeusAnunciosPage() {
   }
 
   const inputBase =
-    "w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
+    "w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
 
   return (
-    <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
-      <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+    <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans">
+      <header className="border-b border-[var(--panel-2)]/60 bg-[var(--bg)]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <Link href="/profile" id="announcements-back-btn" className="text-surface-400 hover:text-white transition-colors flex-shrink-0">
@@ -283,7 +283,7 @@ export default function MeusAnunciosPage() {
             </button>
             <button onClick={logout}
               id="announcements-logout-btn"
-              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827]"
+              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[var(--line-2)]"
             >
               <SignOut size={14} />
               <span className="hidden sm:inline">Sair</span>
@@ -295,7 +295,7 @@ export default function MeusAnunciosPage() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
         {/* Product Creation Form */}
         {showForm && (
-          <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-5">
+          <div className="bg-[var(--panel)] rounded-2xl p-6 border border-[var(--line)] space-y-5">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold uppercase tracking-wider text-surface-400">Criar Anúncio</h2>
               <button onClick={() => setShowForm(false)}
@@ -369,7 +369,7 @@ export default function MeusAnunciosPage() {
                 <label htmlFor="announcement-photos-input" className="block text-xs text-surface-400 mb-1.5">Fotos (máx. 6)</label>
                 <div className="flex flex-wrap gap-2">
                   {photoPreviews.map((preview, idx) => (
-                    <div key={idx} className="relative h-20 w-20 rounded-xl border border-[#2a2827] overflow-hidden">
+                    <div key={idx} className="relative h-20 w-20 rounded-xl border border-[var(--line-2)] overflow-hidden">
                       <img src={preview} alt="" className="h-full w-full object-cover" />
                       <button onClick={() => removePhoto(idx)}
                         className="absolute top-0.5 right-0.5 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center"
@@ -382,7 +382,7 @@ export default function MeusAnunciosPage() {
                     <button onClick={() => photoInputRef.current?.click()}
                       id="announcement-photos-trigger-btn"
                       aria-label="Adicionar fotos"
-                      className="h-20 w-20 rounded-xl border-2 border-dashed border-[#2a2827] bg-[#181615] flex items-center justify-center text-surface-400 hover:border-[#ef7c2c]/50 transition-colors"
+                      className="h-20 w-20 rounded-xl border-2 border-dashed border-[var(--line-2)] bg-[var(--panel-2)] flex items-center justify-center text-surface-400 hover:border-[#ef7c2c]/50 transition-colors"
                     >
                       <FileImage size={20} />
                     </button>
@@ -403,7 +403,7 @@ export default function MeusAnunciosPage() {
         )}
 
         {/* My Products List */}
-        <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+        <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold uppercase tracking-wider text-surface-400">Meus Anúncios ({products.length})</h2>
             {loading && <Spinner size={14} className="animate-spin text-[#ef7c2c]" />}
@@ -424,7 +424,7 @@ export default function MeusAnunciosPage() {
             <div className="space-y-3">
               {products.map((product) => (
                 <div key={product.id}
-                  className="bg-[#110f0e] rounded-xl p-4 border border-[#1c1a19] space-y-2"
+                  className="bg-[var(--panel)] rounded-xl p-4 border border-[var(--panel-2)] space-y-2"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
@@ -447,7 +447,7 @@ export default function MeusAnunciosPage() {
                     <div className="flex gap-1.5 overflow-x-auto">
                       {product.photos.map((photo, idx) => (
                         <img loading="lazy" decoding="async" key={idx} src={photo} alt=""
-                          className="h-14 w-14 rounded-lg object-cover border border-[#2a2827] flex-shrink-0"
+                          className="h-14 w-14 rounded-lg object-cover border border-[var(--line-2)] flex-shrink-0"
                         />
                       ))}
                     </div>
@@ -458,7 +458,7 @@ export default function MeusAnunciosPage() {
                     const productFavs = allFavorites.filter((f) => f.productId === product.id);
                     if (productFavs.length === 0) return null;
                     return (
-                      <div className="mt-3 pt-3 border-t border-[#1c1a19]/80 space-y-2">
+                      <div className="mt-3 pt-3 border-t border-[var(--panel-2)]/80 space-y-2">
                         <p className="text-xs font-semibold text-[#ef7c2c] flex items-center gap-1">
                           <HeartStraight size={12} weight="fill" />
                           Interessados que favoritaram ({productFavs.length}):
@@ -471,7 +471,7 @@ export default function MeusAnunciosPage() {
                             return (
                               <div
                                 key={fav.id}
-                                className="flex flex-col sm:flex-row sm:items-center justify-between bg-[#141211] p-3 rounded-xl border border-[#22201e] gap-3"
+                                className="flex flex-col sm:flex-row sm:items-center justify-between bg-[var(--panel)] p-3 rounded-xl border border-[var(--line)] gap-3"
                               >
                                 <div className="min-w-0">
                                   <p className="text-xs font-bold text-white truncate">{fav.userName}</p>
@@ -520,7 +520,7 @@ export default function MeusAnunciosPage() {
       {/* Proposal Modal */}
       {showProposalModal && selectedProduct && selectedFav && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md bg-[#0c0a09] border border-[#2a2827] rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]">
+          <div className="w-full max-w-md bg-[var(--bg)] border border-[var(--line-2)] rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]">
             <div className="flex items-center justify-between px-6 pt-6 pb-2">
               <div className="flex items-center gap-2">
                 <span className="p-1.5 rounded-lg bg-[#ef7c2c]/10 text-[#ef7c2c]">
@@ -536,7 +536,7 @@ export default function MeusAnunciosPage() {
               </div>
               <button
                 onClick={() => setShowProposalModal(false)}
-                className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[#181615] transition-colors cursor-pointer"
+                className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[var(--panel-2)] transition-colors cursor-pointer"
               >
                 <XCircle size={18} />
               </button>
@@ -549,7 +549,7 @@ export default function MeusAnunciosPage() {
 
               <div>
                 <label className="block text-xs text-surface-400 mb-1.5">Produto</label>
-                <div className="bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-3 text-xs text-white">
+                <div className="bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-4 py-3 text-xs text-white">
                   {selectedProduct.title} (Preço atual: R$ {selectedProduct.price.toLocaleString("pt-BR")})
                 </div>
               </div>
@@ -564,7 +564,7 @@ export default function MeusAnunciosPage() {
                     className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       proposalType === "value"
                         ? "bg-[#ef7c2c]/20 text-[#ef7c2c] border border-[#ef7c2c]/40"
-                        : "bg-[#181615] text-surface-400 border border-[#2a2827] hover:border-[#ef7c2c]/20"
+                        : "bg-[var(--panel-2)] text-surface-400 border border-[var(--line-2)] hover:border-[#ef7c2c]/20"
                     }`}
                   >
                     <CurrencyDollar size={14} className="inline mr-1" weight="bold" />
@@ -576,7 +576,7 @@ export default function MeusAnunciosPage() {
                     className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       proposalType === "trade"
                         ? "bg-[#ef7c2c]/20 text-[#ef7c2c] border border-[#ef7c2c]/40"
-                        : "bg-[#181615] text-surface-400 border border-[#2a2827] hover:border-[#ef7c2c]/20"
+                        : "bg-[var(--panel-2)] text-surface-400 border border-[var(--line-2)] hover:border-[#ef7c2c]/20"
                     }`}
                   >
                     <ArrowsLeftRight size={14} className="inline mr-1" weight="bold" />
@@ -661,7 +661,7 @@ export default function MeusAnunciosPage() {
                           <img loading="lazy" decoding="async"
                             src={preview}
                             alt={`Trade photo ${index + 1}`}
-                            className="h-16 w-16 rounded-xl object-cover border border-[#2a2827]"
+                            className="h-16 w-16 rounded-xl object-cover border border-[var(--line-2)]"
                           />
                           <button
                             type="button"
@@ -676,7 +676,7 @@ export default function MeusAnunciosPage() {
                         </div>
                       ))}
                       {tradePhotoPreviews.length < 4 && (
-                        <label className="h-16 w-16 rounded-xl border-2 border-dashed border-[#2a2827] flex items-center justify-center cursor-pointer hover:border-[#ef7c2c]/40 transition-colors bg-[#181615]">
+                        <label className="h-16 w-16 rounded-xl border-2 border-dashed border-[var(--line-2)] flex items-center justify-center cursor-pointer hover:border-[#ef7c2c]/40 transition-colors bg-[var(--panel-2)]">
                           <FileImage size={18} className="text-surface-400" />
                           <input
                             type="file"
