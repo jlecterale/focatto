@@ -33,6 +33,9 @@ import {
 import ChatHeaderButton from "../../components/ChatHeaderButton";
 import NotificationBell from "../../components/NotificationBell";
 import { useAuth } from "../../contexts/AuthContext";
+import { useBandData } from "./useBandData";
+import type { Song, Member, ScaleEvent, Indisponibilidade } from "./agendaTypes";
+import type { BandType } from "@/lib/bandTypes";
 
 // Configurações de tipo de banda
 const groupTypeConfig: Record<string, { title: string; subtitle: string; hint: string; icon: string }> = {
@@ -78,39 +81,8 @@ const groupTypeConfig: Record<string, { title: string; subtitle: string; hint: s
 const chromaticScale = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const flatScale = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
 
-interface Song {
-  id: string;
-  title: string;
-  artist: string;
-  key: string;
-  bpm: number;
-  youtube?: string;
-  spotify?: string;
-  deezer?: string;
-  cifra: string; // Acordes em colchetes [C]
-}
-
-interface Member {
-  id: string;
-  name: string;
-  instrument: string;
-  email: string;
-}
-
-interface ScaleEvent {
-  id: string;
-  title: string;
-  type: string; // Ensaio, Apresentação, etc.
-  date: string;
-  location: string;
-  songs: string[]; // ids das músicas
-  members: Record<string, { memberId: string; role: string; status: "confirmado" | "pendente" | "recusado"; comment?: string }>;
-}
-
-interface Indisponibilidade {
-  date: string; // YYYY-MM-DD
-  reason: string;
-}
+// Song, Member, ScaleEvent and Indisponibilidade now live in ./agendaTypes
+// (shared with the useBandData hook that persists them to Firestore).
 
 function AgendaContent() {
   const router = useRouter();
@@ -120,19 +92,28 @@ function AgendaContent() {
   const typeParam = searchParams.get("type") || "outros";
   const config = groupTypeConfig[typeParam] || groupTypeConfig.outros;
 
-  // Estados principais persistidos no LocalStorage
-  const [bandCreated, setBandCreated] = useState(false);
-  const [bandName, setBandName] = useState("");
+  // Cloud-backed band data (replaces localStorage): shared across the owner's
+  // devices and, once membership is granted, across the band's members.
+  const {
+    bandName,
+    setBandName,
+    bandCreated,
+    loading: bandLoading,
+    songs,
+    members,
+    events,
+    indisponibilidades,
+    saveSongs,
+    saveMembers,
+    saveEvents,
+    saveIndisps,
+    createBand,
+  } = useBandData(user, typeParam as BandType);
+
   const [showCreateModal, setShowCreateModal] = useState(false);
-  
+
   // Abas
   const [activeTab, setActiveTab] = useState<"dashboard" | "escalas" | "repertorio" | "integrantes" | "indisponibilidade">("dashboard");
-  
-  // Dados da Banda
-  const [songs, setSongs] = useState<Song[]>([]);
-  const [members, setMembers] = useState<Member[]>([]);
-  const [events, setEvents] = useState<ScaleEvent[]>([]);
-  const [indisponibilidades, setIndisponibilidades] = useState<Indisponibilidade[]>([]);
 
   // Modais de Criação
   const [showAddSongModal, setShowAddSongModal] = useState(false);
@@ -192,110 +173,13 @@ function AgendaContent() {
 
   const cifraContainerRef = useRef<HTMLPreElement>(null);
 
-  // Carregar dados iniciais do LocalStorage
-  useEffect(() => {
-    const savedBand = localStorage.getItem(`vibrattoo_band_${typeParam}`);
-    if (savedBand) {
-      const data = JSON.parse(savedBand);
-      setBandName(data.name || "");
-      setBandCreated(true);
-    }
+  // Data loading and persistence are handled by useBandData (Firestore).
 
-    const savedSongs = localStorage.getItem(`vibrattoo_songs_${typeParam}`);
-    if (savedSongs) setSongs(JSON.parse(savedSongs));
-    else {
-      // Mock inicial de músicas
-      const initialSongs: Song[] = [
-        {
-          id: "s1",
-          title: "Oceanos",
-          artist: "Hillsong Em Português",
-          key: "D",
-          bpm: 64,
-          youtube: "https://www.youtube.com/watch?v=113s8qN6K60",
-          cifra: `[Bm]   Tua voz me chama sobre as [A/C#]águas\n[D]   Onde os meus pés podem fa[A]lhar\n[Bm]   E ali te encontro no mis[A/C#]tério\n[D]   Em meio ao mar confia[A]rei\n\nRefrão:\nAo Teu [G]nome chama[D]rei\nE a[A]lém das ondas olha[G]rei\nSe o mar cres[D]cer\nSomente em [A]Ti confia[G]rei\nPois eu sou [D]Teu e Tu és [A]meu`
-        },
-        {
-          id: "s2",
-          title: "Porque Ele Vive",
-          artist: "Harpa Cristã",
-          key: "A",
-          bpm: 72,
-          cifra: `[A]Deus enviou Seu [D]Filho amado\nPra perdo[A]ar, pra me sal[E]var\nNa cruz mor[A]reu por meus pe[D]cados\nMas o sep[A]ulcro va[E]zio está, porque Ele [A]vive\n\nRefrão:\nPorque Ele [D]vive, posso crer no ama[A]nhã\nPorque Ele [F#m]vive, temor não [B7]há\nMas eu bem [A]sei, eu sei, que a minha [D]vida\nEstá nas [A]mãos do meu Je[E]sus, que vivo es[A]tá`
-        }
-      ];
-      setSongs(initialSongs);
-      localStorage.setItem(`vibrattoo_songs_${typeParam}`, JSON.stringify(initialSongs));
-    }
-
-    const savedMembers = localStorage.getItem(`vibrattoo_members_${typeParam}`);
-    if (savedMembers) setMembers(JSON.parse(savedMembers));
-    else {
-      // Mock inicial de membros
-      const initialMembers: Member[] = [
-        { id: "m1", name: "Gabriel Silva", instrument: "Guitarra", email: "gabriel@vibrattoo.com" },
-        { id: "m2", name: "Jessica Souza", instrument: "Vocal Principal", email: "jessica@vibrattoo.com" },
-        { id: "m3", name: "Marcos Ribeiro", instrument: "Teclado", email: "marcos@vibrattoo.com" },
-        { id: "m4", name: "Daniel Costa", instrument: "Bateria", email: "daniel@vibrattoo.com" }
-      ];
-      setMembers(initialMembers);
-      localStorage.setItem(`vibrattoo_members_${typeParam}`, JSON.stringify(initialMembers));
-    }
-
-    const savedEvents = localStorage.getItem(`vibrattoo_events_${typeParam}`);
-    if (savedEvents) setEvents(JSON.parse(savedEvents));
-    else {
-      // Mock inicial de eventos
-      const initialEvents: ScaleEvent[] = [
-        {
-          id: "e1",
-          title: "Ensaio de Preparação",
-          type: "Ensaio",
-          date: "2026-07-10T19:30",
-          location: "Estúdio Principal Vibrattoo",
-          songs: ["s1"],
-          members: {
-            "m1": { memberId: "m1", role: "Guitarra", status: "confirmado" },
-            "m2": { memberId: "m2", role: "Vocal Principal", status: "pendente" },
-            "m3": { memberId: "m3", role: "Teclado", status: "confirmado" }
-          }
-        }
-      ];
-      setEvents(initialEvents);
-      localStorage.setItem(`vibrattoo_events_${typeParam}`, JSON.stringify(initialEvents));
-    }
-
-    const savedIndisp = localStorage.getItem(`vibrattoo_indisp_${typeParam}`);
-    if (savedIndisp) setIndisponibilidades(JSON.parse(savedIndisp));
-  }, [typeParam]);
-
-  // Persistir mudanças
-  const saveSongs = (newSongs: Song[]) => {
-    setSongs(newSongs);
-    localStorage.setItem(`vibrattoo_songs_${typeParam}`, JSON.stringify(newSongs));
-  };
-
-  const saveMembers = (newMembers: Member[]) => {
-    setMembers(newMembers);
-    localStorage.setItem(`vibrattoo_members_${typeParam}`, JSON.stringify(newMembers));
-  };
-
-  const saveEvents = (newEvents: ScaleEvent[]) => {
-    setEvents(newEvents);
-    localStorage.setItem(`vibrattoo_events_${typeParam}`, JSON.stringify(newEvents));
-  };
-
-  const saveIndisps = (newIndisps: Indisponibilidade[]) => {
-    setIndisponibilidades(newIndisps);
-    localStorage.setItem(`vibrattoo_indisp_${typeParam}`, JSON.stringify(newIndisps));
-  };
-
-  // Criar grupo
+  // Criar grupo (agora persiste na nuvem via useBandData)
   const handleCreateBandSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!bandName.trim()) return;
-    localStorage.setItem(`vibrattoo_band_${typeParam}`, JSON.stringify({ name: bandName, type: typeParam }));
-    setBandCreated(true);
+    void createBand(bandName.trim());
     setShowCreateModal(false);
   };
 
@@ -977,7 +861,32 @@ function AgendaContent() {
           </div>
         </div>
 
-        {!bandCreated ? (
+        {!user ? (
+          /* Requer login: a agenda agora é compartilhada na nuvem */
+          <div className="flex flex-col items-center justify-center py-20 px-4 rounded-3xl border border-dashed border-surface-800 bg-surface-900/10 text-center gap-5 animate-fadeIn">
+            <div className="w-16 h-16 rounded-full bg-surface-900 flex items-center justify-center text-surface-500 border border-surface-800">
+              <Calendar size={28} />
+            </div>
+            <div className="flex flex-col gap-1 max-w-md">
+              <h3 className="text-lg font-semibold text-white">Entre para usar a agenda</h3>
+              <p className="text-xs text-surface-400">
+                A agenda agora fica salva na nuvem e é compartilhada com a sua banda. Faça login para criar ou acessar os seus grupos.
+              </p>
+            </div>
+            <button
+              onClick={() => router.push("/")}
+              className="bg-[#ef7c2c] text-white font-semibold text-xs px-5 py-3 rounded-xl shadow-md transition-all hover:bg-[#ef7c2c]/90 hover:-translate-y-0.5"
+            >
+              Ir para o login
+            </button>
+          </div>
+        ) : bandLoading ? (
+          /* Carregando a banda do usuário */
+          <div className="flex flex-col items-center justify-center py-20 text-surface-400 gap-3 animate-fadeIn">
+            <div className="w-8 h-8 rounded-full border-2 border-surface-700 border-t-[#ef7c2c] animate-spin" />
+            <span className="text-xs">Carregando sua agenda…</span>
+          </div>
+        ) : !bandCreated ? (
           /* Estado Vazio: Nenhuma Banda Criada */
           <div className="flex flex-col items-center justify-center py-20 px-4 rounded-3xl border border-dashed border-surface-800 bg-surface-900/10 text-center gap-5 animate-fadeIn">
             <div className="w-16 h-16 rounded-full bg-surface-900 flex items-center justify-center text-surface-500 border border-surface-800">

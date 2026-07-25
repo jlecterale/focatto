@@ -34,6 +34,29 @@ function withId<T>(snap: { id: string; data: () => unknown }): T {
   return { id: snap.id, ...(snap.data() as object) } as T;
 }
 
+/**
+ * Write a subcollection document under a client-provided id (idempotent
+ * overwrite), so a UI item's own id becomes its Firestore doc id. This lets the
+ * useBandData hook diff a full array against the cloud without addDoc creating
+ * duplicate ids. `data` should NOT include the `id` field.
+ */
+export async function putBandDoc(
+  bandId: string,
+  coll: "songs" | "members" | "events" | "availability",
+  id: string,
+  data: Record<string, unknown>,
+): Promise<void> {
+  await setDoc(doc(db, "bands", bandId, coll, id), data);
+}
+
+export async function deleteBandDoc(
+  bandId: string,
+  coll: "songs" | "members" | "events" | "availability",
+  id: string,
+): Promise<void> {
+  await deleteDoc(doc(db, "bands", bandId, coll, id));
+}
+
 // ---------------------------------------------------------------------------
 // Bands
 // ---------------------------------------------------------------------------
