@@ -11,8 +11,8 @@ export async function generateMetadata({
 
   if (!product) {
     return {
-      title: "Anúncio - Focattolecter",
-      description: "Encontre instrumentos musicais e acessórios no Focattolecter.",
+      title: "Anúncio - Vibrattoo",
+      description: "Encontre instrumentos musicais e acessórios no Vibrattoo.",
     };
   }
 
@@ -20,10 +20,10 @@ export async function generateMetadata({
   const location = product.city && product.state ? ` em ${product.city}, ${product.state}` : "";
   const description =
     product.description?.slice(0, 160) ||
-    `${product.title}${priceLabel}${location}. Veja fotos e fale com o anunciante no Focattolecter.`;
+    `${product.title}${priceLabel}${location}. Veja fotos e fale com o anunciante no Vibrattoo.`;
 
   return {
-    title: `${product.title} - Focattolecter`,
+    title: `${product.title} - Vibrattoo`,
     description,
     openGraph: {
       title: product.title,

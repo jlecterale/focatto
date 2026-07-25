@@ -19,7 +19,7 @@ const FAQ_ITEMS = [
     a: "Após criar sua conta, você poderá cadastrar produtos na plataforma. Em breve disponibilizaremos a funcionalidade completa de anúncios.",
   },
   {
-    q: "O Focattolecter cobra taxas?",
+    q: "O Vibrattoo cobra taxas?",
     a: "Atualmente o cadastro e a navegação são gratuitos. Futuramente poderão ser implementadas taxas para funcionalidades premium.",
   },
   {
@@ -172,11 +172,11 @@ export default function SuportePage() {
           <p className="text-xs text-surface-400">
             Prefere enviar um email direto?{" "}
             <a
-              href="mailto:suporte@focattolecter.com.br"
+              href="mailto:suporte@vibrattoo.com.br"
               id="support-direct-email-link"
               className="text-[#ef7c2c] hover:underline"
             >
-              suporte@focattolecter.com.br
+              suporte@vibrattoo.com.br
             </a>
           </p>
         </section>

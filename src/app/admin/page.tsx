@@ -771,8 +771,8 @@ export default function AdminPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
             <Link href="/" className="flex flex-col items-start gap-0">
               <img 
-                src="/focattolecter.png" 
-                alt="Focattolecter Logo" 
+                src="/vibrattoo.png" 
+                alt="Vibrattoo Logo" 
                 className="h-10 sm:h-12 w-auto object-contain invert brightness-110 mix-blend-screen" 
               />
               <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#ef7c2c] pl-1.5 -mt-2 sm:-mt-2.5">
@@ -803,7 +803,7 @@ export default function AdminPage() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-white font-heading">Dashboard</h2>
-            <p className="text-sm text-surface-400 mt-1">Gerencie sua plataforma Focattolecter</p>
+            <p className="text-sm text-surface-400 mt-1">Gerencie sua plataforma Vibrattoo</p>
           </div>
 
           {/* Summary Notification Alert */}

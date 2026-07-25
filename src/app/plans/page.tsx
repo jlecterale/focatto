@@ -60,7 +60,7 @@ export default function PlansPage() {
             Escolha o Plano Perfeito para Você
           </h1>
           <p className="text-sm sm:text-base text-surface-400 max-w-2xl mx-auto leading-relaxed">
-            Maximize sua presença na Focatto. Anuncie instrumentos, divulgue serviços de luthieria ou agende mais aulas de música com facilidade.
+            Maximize sua presença na Vibrattoo. Anuncie instrumentos, divulgue serviços de luthieria ou agende mais aulas de música com facilidade.
           </p>
         </div>
 

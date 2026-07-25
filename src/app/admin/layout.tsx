@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Painel Admin - Focattolecter",
-  description: "Painel de administração da plataforma Focattolecter para gerenciar anúncios, usuários e verificações de identidade.",
+  title: "Painel Admin - Vibrattoo",
+  description: "Painel de administração da plataforma Vibrattoo para gerenciar anúncios, usuários e verificações de identidade.",
 };
 
 export default function AdminLayout({

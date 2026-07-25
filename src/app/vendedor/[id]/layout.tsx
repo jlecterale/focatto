@@ -11,17 +11,17 @@ export async function generateMetadata({
 
   if (!seller) {
     return {
-      title: "Vendedor - Focattolecter",
-      description: "Conheça vendedores, luthiers e professores no Focattolecter.",
+      title: "Vendedor - Vibrattoo",
+      description: "Conheça vendedores, luthiers e professores no Vibrattoo.",
     };
   }
 
   const description =
     seller.bio?.slice(0, 160) ||
-    `Veja os anúncios e avaliações de ${seller.displayName} no Focattolecter.`;
+    `Veja os anúncios e avaliações de ${seller.displayName} no Vibrattoo.`;
 
   return {
-    title: `${seller.displayName} - Focattolecter`,
+    title: `${seller.displayName} - Vibrattoo`,
     description,
     openGraph: {
       title: seller.displayName,

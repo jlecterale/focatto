@@ -47,11 +47,11 @@ service cloud.firestore {
 
     // Products collection
     match /products/{productId} {
-      // Anyone can read approved, active or pending products. Owners can read their own products.
-      allow read: if resource.data.status == 'approved' 
-                  || resource.data.status == 'active' 
-                  || resource.data.status == 'pending' 
-                  || (isAuth() && resource.data.userId == request.auth.uid) 
+      // Public can read only moderated (approved/active) products. Unmoderated
+      // products (pending/rejected) are visible only to the owner and admins.
+      allow read: if resource.data.status == 'approved'
+                  || resource.data.status == 'active'
+                  || (isAuth() && resource.data.userId == request.auth.uid)
                   || isAdmin();
 
       // Authenticated users can create products
@@ -171,7 +171,12 @@ service cloud.firestore {
 
     // Favorites collection
     match /favorites/{favoriteId} {
-      allow read: if isAuth();
+      // Readable only by the user who favorited (userId) or the product's
+      // seller (sellerId, for "who favorited my ad") — not by any auth user.
+      allow read: if isAuth() && (
+        request.auth.uid == resource.data.userId ||
+        request.auth.uid == resource.data.sellerId
+      );
       allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
       allow delete: if isAuth() && request.auth.uid == resource.data.userId;
     }

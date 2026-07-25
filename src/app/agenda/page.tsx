@@ -194,14 +194,14 @@ function AgendaContent() {
 
   // Carregar dados iniciais do LocalStorage
   useEffect(() => {
-    const savedBand = localStorage.getItem(`focatto_band_${typeParam}`);
+    const savedBand = localStorage.getItem(`vibrattoo_band_${typeParam}`);
     if (savedBand) {
       const data = JSON.parse(savedBand);
       setBandName(data.name || "");
       setBandCreated(true);
     }
 
-    const savedSongs = localStorage.getItem(`focatto_songs_${typeParam}`);
+    const savedSongs = localStorage.getItem(`vibrattoo_songs_${typeParam}`);
     if (savedSongs) setSongs(JSON.parse(savedSongs));
     else {
       // Mock inicial de músicas
@@ -225,24 +225,24 @@ function AgendaContent() {
         }
       ];
       setSongs(initialSongs);
-      localStorage.setItem(`focatto_songs_${typeParam}`, JSON.stringify(initialSongs));
+      localStorage.setItem(`vibrattoo_songs_${typeParam}`, JSON.stringify(initialSongs));
     }
 
-    const savedMembers = localStorage.getItem(`focatto_members_${typeParam}`);
+    const savedMembers = localStorage.getItem(`vibrattoo_members_${typeParam}`);
     if (savedMembers) setMembers(JSON.parse(savedMembers));
     else {
       // Mock inicial de membros
       const initialMembers: Member[] = [
-        { id: "m1", name: "Gabriel Silva", instrument: "Guitarra", email: "gabriel@focatto.com" },
-        { id: "m2", name: "Jessica Souza", instrument: "Vocal Principal", email: "jessica@focatto.com" },
-        { id: "m3", name: "Marcos Ribeiro", instrument: "Teclado", email: "marcos@focatto.com" },
-        { id: "m4", name: "Daniel Costa", instrument: "Bateria", email: "daniel@focatto.com" }
+        { id: "m1", name: "Gabriel Silva", instrument: "Guitarra", email: "gabriel@vibrattoo.com" },
+        { id: "m2", name: "Jessica Souza", instrument: "Vocal Principal", email: "jessica@vibrattoo.com" },
+        { id: "m3", name: "Marcos Ribeiro", instrument: "Teclado", email: "marcos@vibrattoo.com" },
+        { id: "m4", name: "Daniel Costa", instrument: "Bateria", email: "daniel@vibrattoo.com" }
       ];
       setMembers(initialMembers);
-      localStorage.setItem(`focatto_members_${typeParam}`, JSON.stringify(initialMembers));
+      localStorage.setItem(`vibrattoo_members_${typeParam}`, JSON.stringify(initialMembers));
     }
 
-    const savedEvents = localStorage.getItem(`focatto_events_${typeParam}`);
+    const savedEvents = localStorage.getItem(`vibrattoo_events_${typeParam}`);
     if (savedEvents) setEvents(JSON.parse(savedEvents));
     else {
       // Mock inicial de eventos
@@ -252,7 +252,7 @@ function AgendaContent() {
           title: "Ensaio de Preparação",
           type: "Ensaio",
           date: "2026-07-10T19:30",
-          location: "Estúdio Principal Focatto",
+          location: "Estúdio Principal Vibrattoo",
           songs: ["s1"],
           members: {
             "m1": { memberId: "m1", role: "Guitarra", status: "confirmado" },
@@ -262,39 +262,39 @@ function AgendaContent() {
         }
       ];
       setEvents(initialEvents);
-      localStorage.setItem(`focatto_events_${typeParam}`, JSON.stringify(initialEvents));
+      localStorage.setItem(`vibrattoo_events_${typeParam}`, JSON.stringify(initialEvents));
     }
 
-    const savedIndisp = localStorage.getItem(`focatto_indisp_${typeParam}`);
+    const savedIndisp = localStorage.getItem(`vibrattoo_indisp_${typeParam}`);
     if (savedIndisp) setIndisponibilidades(JSON.parse(savedIndisp));
   }, [typeParam]);
 
   // Persistir mudanças
   const saveSongs = (newSongs: Song[]) => {
     setSongs(newSongs);
-    localStorage.setItem(`focatto_songs_${typeParam}`, JSON.stringify(newSongs));
+    localStorage.setItem(`vibrattoo_songs_${typeParam}`, JSON.stringify(newSongs));
   };
 
   const saveMembers = (newMembers: Member[]) => {
     setMembers(newMembers);
-    localStorage.setItem(`focatto_members_${typeParam}`, JSON.stringify(newMembers));
+    localStorage.setItem(`vibrattoo_members_${typeParam}`, JSON.stringify(newMembers));
   };
 
   const saveEvents = (newEvents: ScaleEvent[]) => {
     setEvents(newEvents);
-    localStorage.setItem(`focatto_events_${typeParam}`, JSON.stringify(newEvents));
+    localStorage.setItem(`vibrattoo_events_${typeParam}`, JSON.stringify(newEvents));
   };
 
   const saveIndisps = (newIndisps: Indisponibilidade[]) => {
     setIndisponibilidades(newIndisps);
-    localStorage.setItem(`focatto_indisp_${typeParam}`, JSON.stringify(newIndisps));
+    localStorage.setItem(`vibrattoo_indisp_${typeParam}`, JSON.stringify(newIndisps));
   };
 
   // Criar grupo
   const handleCreateBandSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!bandName.trim()) return;
-    localStorage.setItem(`focatto_band_${typeParam}`, JSON.stringify({ name: bandName, type: typeParam }));
+    localStorage.setItem(`vibrattoo_band_${typeParam}`, JSON.stringify({ name: bandName, type: typeParam }));
     setBandCreated(true);
     setShowCreateModal(false);
   };
@@ -551,7 +551,7 @@ function AgendaContent() {
       id: "m_" + Date.now().toString(),
       name: newMemberName,
       instrument: newMemberInstrument,
-      email: newMemberEmail || "membro@focatto.com"
+      email: newMemberEmail || "membro@vibrattoo.com"
     };
 
     saveMembers([...members, newMem]);
@@ -796,6 +796,16 @@ function AgendaContent() {
     return processedLines.join("\n");
   };
 
+  // Escapes HTML metacharacters so user-provided lyrics/cifra text can never
+  // inject markup when rendered via dangerouslySetInnerHTML (stored XSS guard).
+  const escapeHtml = (s: string): string =>
+    s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
   const renderCifraText = (text: string, offset: number): string => {
     if (offset === 0) return text;
     return text.replace(/\[([^\]]+)\]/g, (match, chord) => {
@@ -813,7 +823,7 @@ function AgendaContent() {
 
     for (let line of lines) {
       if (!line.includes("[")) {
-        formattedLines.push(line);
+        formattedLines.push(escapeHtml(line));
         continue;
       }
 
@@ -850,8 +860,8 @@ function AgendaContent() {
           chordLineVisualLength += spacesNeeded;
         }
         
-        // Renderiza o acorde no estilo Cifra Club (laranja do Focatto, bold, sem boxes que quebrem palavras)
-        chordLine += `<span class="text-[#ef7c2c] font-bold select-none cursor-pointer hover:text-[#f99247] transition-colors">${chordText}</span>`;
+        // Renderiza o acorde no estilo Cifra Club (laranja do Vibrattoo, bold, sem boxes que quebrem palavras)
+        chordLine += `<span class="text-[#ef7c2c] font-bold select-none cursor-pointer hover:text-[#f99247] transition-colors">${escapeHtml(chordText)}</span>`;
         chordLineVisualLength += chordText.length;
         
         lastIndex = regex.lastIndex;
@@ -865,7 +875,7 @@ function AgendaContent() {
         formattedLines.push(chordLine);
       } else {
         formattedLines.push(chordLine);
-        formattedLines.push(lyricLine);
+        formattedLines.push(escapeHtml(lyricLine));
       }
     }
 
@@ -876,8 +886,8 @@ function AgendaContent() {
   const formatCifraToHtml = (text: string) => {
     const transposed = renderCifraText(text, transposeOffset);
     if (!showChords) {
-      // Remove acordes e deixa apenas a letra
-      return transposed.replace(/\[([^\]]+)\]/g, "");
+      // Remove acordes e deixa apenas a letra (escapada contra injeção de HTML)
+      return escapeHtml(transposed.replace(/\[([^\]]+)\]/g, ""));
     }
     
     return renderBracketsToCifraClubHtml(transposed);
@@ -899,7 +909,7 @@ function AgendaContent() {
   return (
     <div className="min-h-screen bg-surface-950 text-surface-100 flex flex-col font-body">
       
-      {/* Header Focatto */}
+      {/* Header Vibrattoo */}
       <header className="sticky top-0 z-40 w-full border-b border-surface-850/60 bg-surface-950/80 backdrop-blur-md px-4 sm:px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2 text-surface-450 hover:text-white transition-colors">
@@ -908,7 +918,7 @@ function AgendaContent() {
           </Link>
           <span className="text-surface-700">|</span>
           <span className="font-display font-bold text-lg text-white">
-            Focatto<span className="text-[#ef7c2c]">.</span>Agenda
+            Vibrattoo<span className="text-[#ef7c2c]">.</span>Agenda
           </span>
         </div>
 

@@ -20,7 +20,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Focattolecter - Marketplace de Instrumentos Musicais",
+  title: "Vibrattoo - Marketplace de Instrumentos Musicais",
   description: "Encontre instrumentos musicais e luthiers especializados perto de você.",
 };
 

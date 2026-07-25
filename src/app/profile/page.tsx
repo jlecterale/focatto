@@ -705,7 +705,7 @@ export default function ProfilePage() {
       await updateUserProfile(user.uid, updatedData);
 
       setProfile((prev) => (prev ? { ...prev, ...updatedData } : prev));
-      toast.success(`Plano Focatto ${premiumTier === 1 ? "Pro" : "Plus"} (${isYearly ? "Anual" : "Mensal"}) ativado!`);
+      toast.success(`Plano Vibrattoo ${premiumTier === 1 ? "Pro" : "Plus"} (${isYearly ? "Anual" : "Mensal"}) ativado!`);
       setShowPremiumModal(false);
     } catch {
       toast.error("Erro ao ativar plano premium.");
@@ -837,7 +837,7 @@ export default function ProfilePage() {
             </div>
             <div>
               <h1 className="text-sm sm:text-lg font-bold text-white">Meu Perfil</h1>
-              <p className="text-[10px] text-surface-400 hidden sm:block">Focattolecter</p>
+              <p className="text-[10px] text-surface-400 hidden sm:block">Vibrattoo</p>
             </div>
           </Link>
           <div className="flex items-center gap-1.5 sm:gap-3">
@@ -1011,7 +1011,7 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Meus Anúncios</h3>
-                      <p className="text-[10px] text-surface-500 mt-0.5">Gerencie os itens que você anunciou no Focatto</p>
+                      <p className="text-[10px] text-surface-500 mt-0.5">Gerencie os itens que você anunciou no Vibrattoo</p>
                     </div>
                     <Link
                       href="/meus-anuncios"
@@ -1179,7 +1179,7 @@ export default function ProfilePage() {
                 <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
                   <div>
                     <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Minhas Atividades Profissionais</h3>
-                    <p className="text-[10px] text-surface-500 mt-0.5">Seus perfis de serviços cadastrados no Focatto</p>
+                    <p className="text-[10px] text-surface-500 mt-0.5">Seus perfis de serviços cadastrados no Vibrattoo</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1206,7 +1206,7 @@ export default function ProfilePage() {
                             ? "Seu perfil de luthier profissional está ativo e visível na busca e no mapa."
                             : profile?.luthierStatus === "pending"
                             ? "Seu cadastro de luthier está sob análise da nossa equipe administrativa."
-                            : "Ofereça serviços de regulagem, reparo e customização de instrumentos no Focatto."}
+                            : "Ofereça serviços de regulagem, reparo e customização de instrumentos no Vibrattoo."}
                         </p>
                         {profile?.isProfessional && luthierSpecialties.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-3">
@@ -1436,7 +1436,7 @@ export default function ProfilePage() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Rede Social</h3>
-                      <p className="text-[10px] text-surface-500 mt-0.5">Gerencie sua presença social e equipamentos no Focatto</p>
+                      <p className="text-[10px] text-surface-500 mt-0.5">Gerencie sua presença social e equipamentos no Vibrattoo</p>
                     </div>
                     <Link
                       href={`/social/${user.uid}`}
@@ -1654,11 +1654,11 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Atividades no Focatto */}
+            {/* Atividades no Vibrattoo */}
             <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-4">
               <div className="flex items-center gap-2">
                 <Compass size={18} className="text-[#ef7c2c]" />
-                <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Atividades no Focatto</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Atividades no Vibrattoo</h3>
               </div>
               <p className="text-xs text-surface-400">
                 Habilite as opções abaixo se você deseja oferecer serviços de luthieria ou dar aulas de música na plataforma.
@@ -2075,7 +2075,7 @@ export default function ProfilePage() {
                 
                 {profile?.isPremium ? (
                   <span className="flex items-center gap-1.5 text-xs text-[#ef7c2c] font-semibold bg-[#ef7c2c]/10 px-2.5 py-1 rounded-full border border-[#ef7c2c]/20">
-                    ★ Focatto {profile.premiumTier === "tier1" ? "Pro" : "Plus"}
+                    ★ Vibrattoo {profile.premiumTier === "tier1" ? "Pro" : "Plus"}
                   </span>
                 ) : (
                   <span className="flex items-center gap-1.5 text-xs text-surface-400 font-semibold bg-surface-800 px-2.5 py-1 rounded-full border border-surface-700">
@@ -2087,7 +2087,7 @@ export default function ProfilePage() {
               {profile?.isPremium ? (
                 <div className="space-y-3">
                   <p className="text-xs text-surface-300 leading-relaxed">
-                    Você é um membro <strong>{profile.premiumTier === "tier1" ? "Focatto Pro (Completo)" : "Focatto Plus"}</strong>!
+                    Você é um membro <strong>{profile.premiumTier === "tier1" ? "Vibrattoo Pro (Completo)" : "Vibrattoo Plus"}</strong>!
                     Sua assinatura está ativa via faturamento <strong>{profile.premiumBilling === "yearly" ? "Anual" : "Mensal"}</strong>.
                   </p>
                   <div className="flex flex-wrap gap-3 pt-2">
@@ -2178,7 +2178,7 @@ export default function ProfilePage() {
 
             <div className="px-6 pb-6 pt-4 space-y-5">
               <p className="text-xs text-surface-400">
-                Suas fotos serão analisadas e armazenadas com segurança. Apenas a equipe Focattolecter terá acesso.
+                Suas fotos serão analisadas e armazenadas com segurança. Apenas a equipe Vibrattoo terá acesso.
               </p>
 
               {/* Document Upload */}
@@ -2374,7 +2374,7 @@ export default function ProfilePage() {
                 <div className="bg-[#ef7c2c]/5 border border-[#ef7c2c]/10 p-4 rounded-2xl text-[11px] text-surface-300 leading-relaxed flex items-start gap-2.5">
                   <span className="text-[#ef7c2c] font-bold text-base select-none mt-[-2px]">🏆</span>
                   <div>
-                    <strong>Recomendação Focatto:</strong> O plano <strong>Pro (Pacote Completo)</strong> é a melhor compra! Ele oferece anúncios ilimitados e o triplo de exposição, ideal para expandir seus contatos e impulsionar suas vendas. O faturamento anual economiza <strong>R$ 60,00 por ano</strong> (desconto de R$ 5,00/mês).
+                    <strong>Recomendação Vibrattoo:</strong> O plano <strong>Pro (Pacote Completo)</strong> é a melhor compra! Ele oferece anúncios ilimitados e o triplo de exposição, ideal para expandir seus contatos e impulsionar suas vendas. O faturamento anual economiza <strong>R$ 60,00 por ano</strong> (desconto de R$ 5,00/mês).
                   </div>
                 </div>
               ) : (
