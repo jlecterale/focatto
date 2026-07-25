@@ -13,6 +13,17 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
+    // Helpers for band (agenda) access control.
+    function bandData(bandId) {
+      return get(/databases/$(database)/documents/bands/$(bandId)).data;
+    }
+    function isBandMember(bandId) {
+      return isAuth() && request.auth.uid in bandData(bandId).memberUids;
+    }
+    function isBandOwner(bandId) {
+      return isAuth() && request.auth.uid == bandData(bandId).ownerId;
+    }
+
 
     // Users collection
     match /users/{userId} {
@@ -301,6 +312,53 @@ service cloud.firestore {
         && request.resource.data.read == false;
       // Users can update (read/unread) and delete their own notifications
       allow update, delete: if isAuth() && resource.data.userId == request.auth.uid;
+    }
+
+    // ==========================================
+    // Agenda: Bands and their scheduling data
+    // ==========================================
+    match /bands/{bandId} {
+      // Only the owner and listed members can see the band.
+      allow read: if isBandOwner(bandId) || isBandMember(bandId);
+
+      // Creator must be the owner and must include themselves as a member.
+      allow create: if isAuth()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.auth.uid in request.resource.data.memberUids;
+
+      // Only the owner manages the band (name, type, membership list).
+      allow update: if isBandOwner(bandId);
+      allow delete: if isBandOwner(bandId);
+
+      // Repertoire: any member can manage songs.
+      match /songs/{songId} {
+        allow read: if isBandMember(bandId);
+        allow write: if isBandMember(bandId);
+      }
+
+      // Roster: only the owner adds/edits/removes members.
+      match /members/{memberId} {
+        allow read: if isBandMember(bandId);
+        allow write: if isBandOwner(bandId);
+      }
+
+      // Schedule: owner creates/removes escalas; members may update (e.g. to
+      // confirm/decline their own assignment). Restricting updates to a
+      // member's own status is a planned follow-up.
+      match /events/{eventId} {
+        allow read: if isBandMember(bandId);
+        allow create, delete: if isBandOwner(bandId);
+        allow update: if isBandMember(bandId);
+      }
+
+      // Availability blocks: a member manages their own blocks.
+      match /availability/{availabilityId} {
+        allow read: if isBandMember(bandId);
+        allow create: if isBandMember(bandId)
+          && request.resource.data.uid == request.auth.uid;
+        allow update, delete: if isBandMember(bandId)
+          && resource.data.uid == request.auth.uid;
+      }
     }
 
     // Deny all other access
