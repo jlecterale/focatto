@@ -1,6 +1,6 @@
 # 🤖 Registro de Atividades e Diretrizes dos Agentes (agents.md)
 
-Este documento registra o histórico de intervenções dos agentes de Inteligência Artificial no projeto **Focatto**, mantendo uma trilha clara de modificações, decisões de design e tarefas pendentes.
+Este documento registra o histórico de intervenções dos agentes de Inteligência Artificial no projeto **Vibrattoo**, mantendo uma trilha clara de modificações, decisões de design e tarefas pendentes.
 
 > [!IMPORTANT]
 > **DIRETRIZ OBRIGATÓRIA PARA TODOS OS AGENTES:**
@@ -11,7 +11,7 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 ## 📅 Histórico de Intervenções
 
 ### 19/07/2026 — Correção de Falhas de Segurança, Bugs de Runtime, Dependências e Relatório Atualizado
-*   **Objetivo**: Mitigar e corrigir todas as 8 ocorrências apontadas no relatório de auditoria do Focatto. Implementar as correções ordenadas por importância, rodar testes redundantes de compilação (build) e lint, e atualizar o relatório interativo do Desktop.
+*   **Objetivo**: Mitigar e corrigir todas as 8 ocorrências apontadas no relatório de auditoria do Vibrattoo. Implementar as correções ordenadas por importância, rodar testes redundantes de compilação (build) e lint, e atualizar o relatório interativo do Desktop.
 *   **Arquivos Criados/Modificados**:
     *   [`src/app/api/cifraclub/route.ts`](file:///c:/Users/USER%201/Desktop/focatto/src/app/api/cifraclub/route.ts) — Modificado. Adicionada validação de hostname contra domínio do Cifra Club contra ataques SSRF.
     *   [`firestore.rules`](file:///c:/Users/USER%201/Desktop/focatto/firestore.rules) — Modificado. Reforçada regra de criação de usuários para prevenir escalação de privilégios admin.
@@ -23,7 +23,7 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
     *   [`C:\Users\USER 1\Desktop\focatto auditoria 19-07.html`](file:///C:/Users/USER%201/Desktop/focatto%20auditoria%2019-07.html) — Modificado. Atualizado com status 100% resolvido.
 *   **Estado**: Concluído com sucesso. Todos os testes (lint de zero erros e build de produção) validados com sucesso.
 
-### 14/07/2026 — Ajuste de Impressão do Pitch Centelha Focatto e Inclusão de Jonatas Freire (CEO)
+### 14/07/2026 — Ajuste de Impressão do Pitch Centelha Vibrattoo e Inclusão de Jonatas Freire (CEO)
 *   **Objetivo**: Reestruturar o arquivo do pitch HTML para corrigir a quebra de elementos e páginas na geração do PDF, exibir todas as tecnologias na versão impressa (ocultando abas dinâmicas) e incluir Jonatas Freire (CEO & Fundador) na equipe com sua respectiva foto circular e atribuições, além de atualizar as menções no Hero e rodapé. Remover também marcas rasuradas de membros antigos.
 *   **Arquivos Criados/Modificados**:
     *   [`c:\Users\USER 1\Desktop\apresentacao focatto centelha\pitch_focatto_centelha.html`](file:///c:/Users/USER%201/Desktop/apresentacao%20focatto%20centelha/pitch_focatto_centelha.html) — Modificado. Remoção do texto de membro removido, modificação das regras CSS (adição de `@media print` específica com redimensionamentos, ocultamento de headers, quebras de páginas, exibição linear de abas de tecnologias, etc.) e adição de Jonatas Freire e Flávio Lima como co-autores da equipe.
@@ -45,7 +45,7 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 *   **Estado**: Concluído e verificado via build de produção com sucesso.
 
 ### 08/07/2026 — Splash Landing Page de Seleção e Módulo de Agenda Musical (Louve App)
-*   **Objetivo**: Criar uma Landing Page premium como tela inicial do Focatto (`/`), direcionando o usuário para as verticais do app: Marketplace, Aulas de Música, Luthiers e Agenda Musical. O botão de Agenda Musical abre um modal de seleção rápida do tipo de grupo/banda (Ministério, GIG/Freelancer, Baile, Agência, Coral, Outros). Ao escolher, redireciona o usuário para o esqueleto funcional e personalizado da nova Agenda Musical (`/agenda?type=...`).
+*   **Objetivo**: Criar uma Landing Page premium como tela inicial do Vibrattoo (`/`), direcionando o usuário para as verticais do app: Marketplace, Aulas de Música, Luthiers e Agenda Musical. O botão de Agenda Musical abre um modal de seleção rápida do tipo de grupo/banda (Ministério, GIG/Freelancer, Baile, Agência, Coral, Outros). Ao escolher, redireciona o usuário para o esqueleto funcional e personalizado da nova Agenda Musical (`/agenda?type=...`).
 *   **Arquivos Criados/Modificados**:
     *   [`src/app/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/page.tsx) — Nova Landing Page premium com cards de glassmorphism, gradientes interativos e modal de tipos de bandas.
     *   [`src/app/explore/page.tsx`](file:///c:/Users/USER%201/Desktop/focatto/src/app/explore/page.tsx) — Antiga página inicial movida para cá, adaptada para ler query strings (`?tab=...`) para ativar dinamicamente a aba correspondente do marketplace/luthiers/professores, e envolta em `Suspense` para conformidade de build.
@@ -53,10 +53,10 @@ Este documento registra o histórico de intervenções dos agentes de Inteligên
 *   **Estado**: Concluído e verificado com sucesso via build de produção do Next.js.
 
 ### 24/06/2026 — Criação da Apresentação RecarGarage no Desktop
-*   **Objetivo**: Criar uma pasta no Desktop com arquivos de texto (.txt) e apresentação interativa (.html) detalhando o ecossistema RecarGarage/Focatto, a stack tecnológica, a arquitetura de segurança (Security Rules) e os planos de evolução futura, destacando o impacto social (fomento à luthieria e rede social de músicos).
+*   **Objetivo**: Criar uma pasta no Desktop com arquivos de texto (.txt) e apresentação interativa (.html) detalhando o ecossistema RecarGarage/Vibrattoo, a stack tecnológica, a arquitetura de segurança (Security Rules) e os planos de evolução futura, destacando o impacto social (fomento à luthieria e rede social de músicos).
 *   **Arquivos Criados**:
-    *   [`C:\Users\USER 1\Desktop\Apresentacao Focatto\apresentacao.txt`](file:///C:/Users/USER%201/Desktop/Apresentacao%20Focatto/apresentacao.txt) — Explicação textual e aprofundada de toda a lógica do projeto.
-    *   [`C:\Users\USER 1\Desktop\Apresentacao Focatto\apresentacao.html`](file:///C:/Users/USER%201/Desktop/Apresentacao%20Focatto/apresentacao.html) — Apresentação interativa de altíssima qualidade visual, incluindo simulador de ROI e explicação visual dinâmica do Ciclo Artístico Completo.
+    *   [`C:\Users\USER 1\Desktop\Apresentacao Vibrattoo\apresentacao.txt`](file:///C:/Users/USER%201/Desktop/Apresentacao%20Vibrattoo/apresentacao.txt) — Explicação textual e aprofundada de toda a lógica do projeto.
+    *   [`C:\Users\USER 1\Desktop\Apresentacao Vibrattoo\apresentacao.html`](file:///C:/Users/USER%201/Desktop/Apresentacao%20Vibrattoo/apresentacao.html) — Apresentação interativa de altíssima qualidade visual, incluindo simulador de ROI e explicação visual dinâmica do Ciclo Artístico Completo.
 *   **Estado**: Concluído e disponibilizado diretamente na área de trabalho do usuário.
 
 ### 15/06/2026 — Restrição de Avaliação de Vendedor a Vendas Concluídas

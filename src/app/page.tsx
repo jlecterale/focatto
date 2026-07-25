@@ -91,11 +91,11 @@ export default function LandingPage() {
         <div className="text-center flex flex-col items-center gap-3 md:gap-4 max-w-xl animate-fadeSlideUp">
           <div className="flex items-center gap-2 bg-surface-900/60 border border-surface-850 px-4 py-1.5 rounded-full text-xs text-surface-400 font-medium shadow-lg backdrop-blur-md">
             <Sparkle size={14} className="text-[#ef7c2c]" />
-            <span>Bem-vindo à nova experiência Focatto</span>
+            <span>Bem-vindo à nova experiência Vibrattoo</span>
           </div>
           
           <h1 className="text-5xl md:text-7xl font-display font-semibold tracking-tight text-white mt-1">
-            Focatto<span className="text-[#ef7c2c]">.</span>
+            Vibrattoo<span className="text-[#ef7c2c]">.</span>
           </h1>
           
           <p className="text-sm md:text-base text-surface-400 font-body leading-relaxed">
@@ -201,7 +201,7 @@ export default function LandingPage() {
 
         {/* Subtle Footer branding */}
         <div className="text-center text-xs text-surface-500 font-body animate-fadeSlideUp" style={{ animationDelay: "300ms" }}>
-          &copy; {new Date().getFullYear()} Focattolecter. Todos os direitos reservados.
+          &copy; {new Date().getFullYear()} Vibrattoo. Todos os direitos reservados.
         </div>
 
       </div>

@@ -158,7 +158,7 @@ export default function VendedorPage() {
               Voltar
             </button>
             <div className="h-5 w-px bg-[#2a2827]" />
-            <img src="/focattolecter.png" alt="Logo" className="h-7 w-auto object-contain invert brightness-110 mix-blend-screen" />
+            <img src="/vibrattoo.png" alt="Logo" className="h-7 w-auto object-contain invert brightness-110 mix-blend-screen" />
           </div>
           <ChatHeaderButton />
           <NotificationBell />

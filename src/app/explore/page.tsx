@@ -767,8 +767,8 @@ function ExploreContent() {
           <div className="flex items-center gap-2 sm:gap-4">
             <Link href="/" className="flex items-center">
               <img 
-                src="/focattolecter.png" 
-                alt="Focattolecter Logo" 
+                src="/vibrattoo.png" 
+                alt="Vibrattoo Logo" 
                 className="h-10 sm:h-14 md:h-20 w-auto object-contain invert brightness-110 mix-blend-screen" 
               />
             </Link>
@@ -1473,7 +1473,7 @@ function ExploreContent() {
               Contato de Suporte
             </Link>
           </div>
-          <p>&copy; {new Date().getFullYear()} Focattolecter. Todos os direitos reservados.</p>
+          <p>&copy; {new Date().getFullYear()} Vibrattoo. Todos os direitos reservados.</p>
         </div>
       </footer>
     </div>

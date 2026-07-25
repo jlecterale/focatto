@@ -1,7 +1,7 @@
 [
   {
-    "id": "focatto-plus",
-    "name": "Focatto Plus",
+    "id": "vibrattoo-plus",
+    "name": "Vibrattoo Plus",
     "tier": "tier2",
     "priceMonthly": 29.90,
     "priceYearlyMonthly": 24.90,
@@ -18,8 +18,8 @@
     "description": "Ideal para profissionais autônomos e professores de música que buscam visibilidade intermediária e contato rápido com clientes."
   },
   {
-    "id": "focatto-pro",
-    "name": "Focatto Pro",
+    "id": "vibrattoo-pro",
+    "name": "Vibrattoo Pro",
     "tier": "tier1",
     "priceMonthly": 79.90,
     "priceYearlyMonthly": 74.90,
@@ -28,7 +28,7 @@
       "Anúncios ILIMITADOS na plataforma",
       "WhatsApp direto nos cards de todos os anúncios",
       "Selo 'Pro' de destaque automático no perfil",
-      "Suporte prioritário da equipe Focatto",
+      "Suporte prioritário da equipe Vibrattoo",
       "Prioridade nos resultados de busca do mapa"
     ],
     "highlight": true,
@@ -44,7 +44,7 @@
     "priceMonthly": 149.00,
     "priceYearlyMonthly": 129.00,
     "features": [
-      "Destaque absoluto no topo da Home Page da Focatto",
+      "Destaque absoluto no topo da Home Page da Vibrattoo",
       "Rotação automática no carrossel de patrocinados",
       "Mini-vitrine interna com até 4 produtos em destaque no banner",
       "Link direto ('CTA') para a página do seu perfil profissional",

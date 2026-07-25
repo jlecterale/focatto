@@ -222,7 +222,7 @@ function ChatPageContent() {
             </Link>
             <div className="h-5 w-px bg-[#2a2827]" />
             <img
-              src="/focattolecter.png"
+              src="/vibrattoo.png"
               alt="Logo"
               className="h-7 sm:h-8 w-auto object-contain invert brightness-110 mix-blend-screen"
             />
@@ -378,7 +378,7 @@ function ChatPageContent() {
                         )}
                       </h3>
                       <p className="text-[10px] text-surface-400">
-                        {otherUser?.isVerified ? "Vendedor Verificado" : "Membro do Focatto"}
+                        {otherUser?.isVerified ? "Vendedor Verificado" : "Membro do Vibrattoo"}
                       </p>
                     </div>
                   </div>
@@ -501,7 +501,7 @@ function ChatPageContent() {
                 </div>
                 <div className="max-w-xs">
                   <h3 className="text-sm font-bold text-white font-heading">
-                    Focatto Chat Interno
+                    Vibrattoo Chat Interno
                   </h3>
                   <p className="text-[11px] text-surface-400 mt-2 leading-relaxed font-body">
                     Selecione uma conversa ao lado para negociar instrumentos, tirar dúvidas sobre aulas ou acertar reparos com luthiers.

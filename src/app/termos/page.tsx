@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Termos de Uso - Focattolecter",
-  description: "Termos e condições de uso da plataforma Focattolecter.",
+  title: "Termos de Uso - Vibrattoo",
+  description: "Termos e condições de uso da plataforma Vibrattoo.",
 };
 
 export default function TermosPage() {
@@ -20,7 +20,7 @@ export default function TermosPage() {
           <section>
             <h2 className="text-lg font-bold text-white mb-2">1. Aceitação dos Termos</h2>
             <p>
-              Ao acessar ou utilizar a plataforma Focattolecter, você concorda com os termos e condições aqui descritos.
+              Ao acessar ou utilizar a plataforma Vibrattoo, você concorda com os termos e condições aqui descritos.
               Caso não concorde com algum dos termos, recomendamos que não utilize nossos serviços.
             </p>
           </section>
@@ -28,7 +28,7 @@ export default function TermosPage() {
           <section>
             <h2 className="text-lg font-bold text-white mb-2">2. Definições</h2>
             <p>
-              &quot;Plataforma&quot; refere-se ao site e aplicativo Focattolecter. &quot;Usuário&quot; refere-se a qualquer pessoa
+              &quot;Plataforma&quot; refere-se ao site e aplicativo Vibrattoo. &quot;Usuário&quot; refere-se a qualquer pessoa
               que acesse ou utilize a plataforma. &quot;Anunciante&quot; é o usuário que cadastra produtos ou serviços.
             </p>
           </section>
@@ -44,7 +44,7 @@ export default function TermosPage() {
           <section>
             <h2 className="text-lg font-bold text-white mb-2">4. Anúncios e Transações</h2>
             <p>
-              O Focattolecter é uma plataforma de marketplace que conecta compradores e vendedores. Não nos
+              O Vibrattoo é uma plataforma de marketplace que conecta compradores e vendedores. Não nos
               responsabilizamos por negociações realizadas entre usuários. Recomendamos verificar a
               procedência dos produtos e a reputação dos anunciantes antes de concluir qualquer transação.
             </p>
@@ -53,7 +53,7 @@ export default function TermosPage() {
           <section>
             <h2 className="text-lg font-bold text-white mb-2">5. Verificação de Conta</h2>
             <p>
-              Usuários podem solicitar verificação de identidade enviando documentação. O Focattolecter se reserva
+              Usuários podem solicitar verificação de identidade enviando documentação. O Vibrattoo se reserva
               o direito de aprovar ou rejeitar solicitações a seu critério. Dados enviados são tratados com
               sigilo conforme nossa Política de Privacidade.
             </p>
@@ -63,14 +63,14 @@ export default function TermosPage() {
             <h2 className="text-lg font-bold text-white mb-2">6. Conduta do Usuário</h2>
             <p>
               É proibido publicar conteúdo falso, ofensivo, ilegal ou que viole direitos de terceiros.
-              O Focattolecter pode remover anúncios e suspender contas que descumprirem estas regras.
+              O Vibrattoo pode remover anúncios e suspender contas que descumprirem estas regras.
             </p>
           </section>
 
           <section>
             <h2 className="text-lg font-bold text-white mb-2">7. Limitação de Responsabilidade</h2>
             <p>
-              O Focattolecter não se responsabiliza por danos diretos ou indiretos decorrentes do uso da
+              O Vibrattoo não se responsabiliza por danos diretos ou indiretos decorrentes do uso da
               plataforma, incluindo mas não se limitando a negociações entre usuários.
             </p>
           </section>

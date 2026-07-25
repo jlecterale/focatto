@@ -19,20 +19,39 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "A URL informada é inválida." }, { status: 400 });
   }
 
+  // Guards against a slow or oversized upstream response hanging/pressuring the server.
+  const FETCH_TIMEOUT_MS = 8000;
+  const MAX_HTML_BYTES = 5 * 1024 * 1024; // 5 MB — cifra pages are far smaller
+
   try {
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"
-      }
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+          "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"
+        }
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!res.ok) {
       return NextResponse.json({ error: `Erro ao buscar página: Status ${res.status}` }, { status: res.status });
     }
 
-    const html = await res.text();
+    // Reject oversized payloads early when the upstream declares its size.
+    const declaredLength = Number(res.headers.get("content-length") || 0);
+    if (declaredLength > MAX_HTML_BYTES) {
+      return NextResponse.json({ error: "A página é grande demais para processar." }, { status: 413 });
+    }
+
+    const html = (await res.text()).slice(0, MAX_HTML_BYTES);
 
     if (mode === "list") {
       // Extrair lista de músicas de uma página de artista ou playlist
