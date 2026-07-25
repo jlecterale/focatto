@@ -10,10 +10,12 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   getDoc,
   getDocs,
   query,
   where,
+  arrayRemove,
   onSnapshot,
   type Unsubscribe,
 } from "firebase/firestore";
@@ -73,6 +75,9 @@ export async function createBand(
     type,
     ownerId: ownerUid,
     memberUids: [ownerUid],
+    leaderUids: [ownerUid],
+    invitedEmails: [],
+    memberIdByUid: {},
     createdAt: now,
     updatedAt: now,
   };
@@ -106,9 +111,26 @@ export function subscribeBand(
 
 export async function updateBand(
   bandId: string,
-  patch: Partial<Pick<Band, "name" | "type" | "memberUids">>,
+  patch: Partial<Pick<Band, "name" | "type" | "memberUids" | "leaderUids" | "invitedEmails">>,
 ): Promise<void> {
   await updateDoc(doc(db, "bands", bandId), { ...patch, updatedAt: Date.now() });
+}
+
+/**
+ * Remove a member from a band (leader action). Deletes the roster doc and, when
+ * the member had an account linked, revokes their access by pulling the uid from
+ * `memberUids`/`leaderUids` and dropping its `memberIdByUid` entry.
+ */
+export async function removeMember(bandId: string, memberId: string, uid?: string): Promise<void> {
+  await deleteDoc(doc(db, "bands", bandId, "members", memberId));
+  if (uid) {
+    await updateDoc(doc(db, "bands", bandId), {
+      memberUids: arrayRemove(uid),
+      leaderUids: arrayRemove(uid),
+      [`memberIdByUid.${uid}`]: deleteField(),
+      updatedAt: Date.now(),
+    });
+  }
 }
 
 export async function deleteBand(bandId: string): Promise<void> {

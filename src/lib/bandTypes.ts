@@ -9,20 +9,66 @@ export type EventMemberStatus = "confirmado" | "pendente" | "recusado";
 /** Group flavour shown in the agenda (ministério, gig, baile, coral, …). */
 export type BandType = "ministerio" | "gig" | "baile" | "agencia" | "coral" | "outros";
 
+/** Lifecycle of an e-mail invite while it waits to be accepted. */
+export type InviteStatus = "pending" | "accepted" | "declined";
+
+/** Roster membership state: still invited (no account linked) vs active. */
+export type MemberStatus = "invited" | "active";
+
 /**
  * Top-level band document: `bands/{bandId}`.
- * `ownerId` is the leader; `memberUids` holds every auth uid allowed to read the
- * band and its subcollections. Security rules key access off these two fields.
+ * `ownerId` is the founding leader; `leaderUids` lists every leader (owner +
+ * co-leaders) allowed to manage the band; `memberUids` holds every auth uid
+ * allowed to read the band and its subcollections. Security rules key access
+ * off these fields.
  */
 export interface Band {
   id?: string;
   name: string;
   type: BandType;
   ownerId: string;
-  /** Auth uids with access (owner included). Owner maintains this list. */
+  /** Auth uids with access (owner included). Leaders maintain this list. */
   memberUids: string[];
+  /**
+   * Auth uids with leader privileges (invite, manage roster, build escalas).
+   * Always contains `ownerId`; the owner promotes/demotes co-leaders. Optional
+   * for bands created before Fase 5 — treat a missing value as `[ownerId]`.
+   */
+  leaderUids?: string[];
+  /**
+   * Lowercased e-mails invited but not yet accepted. A user whose token e-mail
+   * is listed here may add their own uid to `memberUids` (self-join rule).
+   */
+  invitedEmails?: string[];
+  /**
+   * Reverse index `uid -> memberId` for linked members, so security rules can
+   * confirm a member only edits their OWN assignment status on an event.
+   */
+  memberIdByUid?: Record<string, string>;
   createdAt: number;
   updatedAt: number;
+}
+
+/**
+ * Top-level discovery index for pending invites: `bandInvites/{inviteId}`.
+ * Lives outside the band so an invitee (not yet a member, so unable to read the
+ * band) can query their own invites by e-mail.
+ */
+export interface BandInvite {
+  id?: string;
+  bandId: string;
+  bandName: string;
+  bandType: BandType;
+  /** Roster member id created for this invite; linked to the uid on accept. */
+  memberId: string;
+  /** Lowercased invitee e-mail. */
+  email: string;
+  /** Instrument/role the invitee is being asked to cover. */
+  instrument: string;
+  invitedByUid: string;
+  invitedByName: string;
+  status: InviteStatus;
+  createdAt: number;
 }
 
 /** `bands/{bandId}/songs/{songId}` — repertoire item. */
@@ -52,6 +98,11 @@ export interface BandMember {
   /** Linked auth uid once the invite is accepted; absent while pending. */
   uid?: string;
   role?: string;
+  /**
+   * `invited` while waiting for the e-mail invite to be accepted, `active` once
+   * linked to an account. Missing on pre-Fase 5 rosters — treat as `active`.
+   */
+  status?: MemberStatus;
   createdAt: number;
 }
 

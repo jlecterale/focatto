@@ -34,8 +34,18 @@ import ChatHeaderButton from "../../components/ChatHeaderButton";
 import NotificationBell from "../../components/NotificationBell";
 import { useAuth } from "../../contexts/AuthContext";
 import { useBandData } from "./useBandData";
+import { useUserInvites } from "./useUserInvites";
 import type { Song, Member, ScaleEvent, Indisponibilidade } from "./agendaTypes";
-import type { BandType } from "@/lib/bandTypes";
+import type { BandInvite, BandType } from "@/lib/bandTypes";
+import { isBandLeader, isBandOwner, toggleLeader } from "@/lib/bandRoles";
+import {
+  inviteMember,
+  cancelInvite,
+  acceptInvite,
+  declineInvite,
+  inviteBlockedReason,
+} from "@/lib/bandInvites";
+import { removeMember, updateBand, setEventMemberStatus } from "@/lib/bandService";
 
 // Configurações de tipo de banda
 const groupTypeConfig: Record<string, { title: string; subtitle: string; hint: string; icon: string }> = {
@@ -95,6 +105,8 @@ function AgendaContent() {
   // Cloud-backed band data (replaces localStorage): shared across the owner's
   // devices and, once membership is granted, across the band's members.
   const {
+    bandId,
+    band,
     bandName,
     setBandName,
     bandCreated,
@@ -104,11 +116,19 @@ function AgendaContent() {
     events,
     indisponibilidades,
     saveSongs,
-    saveMembers,
     saveEvents,
     saveIndisps,
     createBand,
   } = useBandData(user, typeParam as BandType);
+
+  // Pending invites addressed to the logged user (any group type).
+  const { invites: pendingInvites, refresh: refreshInvites } = useUserInvites(user);
+
+  // Role of the logged user in the currently loaded band.
+  const isLeader = isBandLeader(band ?? { ownerId: "", leaderUids: [] }, user?.uid);
+  const isOwner = isBandOwner(band ?? { ownerId: "" }, user?.uid);
+  // The logged user's own roster entry (drives the confirm/decline escala flow).
+  const myMember = user ? members.find((m) => m.uid === user.uid) : undefined;
 
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -426,23 +446,92 @@ function AgendaContent() {
     alert("Alterações salvas com sucesso!");
   };
 
-  // Adicionar Membro
-  const handleAddMemberSubmit = (e: React.FormEvent) => {
+  // Convidar Integrante por e-mail (líder). Cria um membro pendente, registra o
+  // e-mail na banda (habilita o self-join) e grava um convite descobrível.
+  const [inviting, setInviting] = useState(false);
+  const handleInviteMemberSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMemberName.trim() || !newMemberInstrument.trim()) return;
+    if (!band?.id || !user) return;
+    if (!newMemberInstrument.trim() || !newMemberEmail.trim()) return;
 
-    const newMem: Member = {
-      id: "m_" + Date.now().toString(),
-      name: newMemberName,
-      instrument: newMemberInstrument,
-      email: newMemberEmail || "membro@vibrattoo.com"
-    };
+    const blocked = inviteBlockedReason(band, members, newMemberEmail);
+    if (blocked) {
+      alert(blocked);
+      return;
+    }
 
-    saveMembers([...members, newMem]);
-    setNewMemberName("");
-    setNewMemberInstrument("");
-    setNewMemberEmail("");
-    setShowAddMemberModal(false);
+    setInviting(true);
+    try {
+      await inviteMember(
+        band,
+        { uid: user.uid, name: user.displayName || user.email || "Líder" },
+        { email: newMemberEmail, instrument: newMemberInstrument, name: newMemberName || undefined },
+      );
+      setNewMemberName("");
+      setNewMemberInstrument("");
+      setNewMemberEmail("");
+      setShowAddMemberModal(false);
+    } catch (err) {
+      console.error("Erro ao convidar integrante:", err);
+      alert("Não foi possível enviar o convite. Tente novamente.");
+    } finally {
+      setInviting(false);
+    }
+  };
+
+  // Remover integrante (líder). Convite pendente → cancela (libera e-mail +
+  // apaga convite); membro ativo → remove e revoga o acesso vinculado.
+  const handleRemoveMember = async (m: Member) => {
+    if (!band?.id) return;
+    const isPending = m.status === "invited" && !m.uid;
+    const msg = isPending
+      ? `Cancelar o convite de ${m.name}?`
+      : `Deseja remover ${m.name} da banda?`;
+    if (!confirm(msg)) return;
+    try {
+      if (isPending) await cancelInvite(band.id, { id: m.id, email: m.email });
+      else await removeMember(band.id, m.id, m.uid);
+    } catch (err) {
+      console.error("Erro ao remover integrante:", err);
+      alert("Não foi possível remover o integrante.");
+    }
+  };
+
+  // Promover/rebaixar co-líder (apenas o dono).
+  const handleToggleLeader = async (m: Member) => {
+    if (!band?.id || !m.uid) return;
+    const makeLeader = !isBandLeader(band, m.uid);
+    try {
+      await updateBand(band.id, { leaderUids: toggleLeader(band, m.uid, makeLeader) });
+    } catch (err) {
+      console.error("Erro ao atualizar papel:", err);
+      alert("Não foi possível atualizar o papel do integrante.");
+    }
+  };
+
+  // Aceitar/recusar um convite recebido (convidado).
+  const handleAcceptInvite = async (invite: BandInvite) => {
+    if (!user?.email) return;
+    try {
+      await acceptInvite(invite, { uid: user.uid, email: user.email });
+      await refreshInvites();
+      // Recarrega a página para o tipo do convite carregar a banda recém-aceita.
+      if (invite.bandType === typeParam) router.refresh();
+    } catch (err) {
+      console.error("Erro ao aceitar convite:", err);
+      alert("Não foi possível aceitar o convite.");
+    }
+  };
+  const handleDeclineInvite = async (invite: BandInvite) => {
+    if (!user?.email) return;
+    if (!confirm(`Recusar o convite para "${invite.bandName}"?`)) return;
+    try {
+      await declineInvite(invite, { email: user.email });
+      await refreshInvites();
+    } catch (err) {
+      console.error("Erro ao recusar convite:", err);
+      alert("Não foi possível recusar o convite.");
+    }
   };
 
   // Adicionar Evento
@@ -498,28 +587,27 @@ function AgendaContent() {
     }
   };
 
-  // Confirmar/recusar escala pelo integrante logado (simulado)
-  const handleConfirmScale = (evtId: string, memberId: string, isConfirm: boolean, reason?: string) => {
-    const updated = events.map((evt) => {
-      if (evt.id === evtId) {
-        const m = evt.members[memberId];
-        if (m) {
-          return {
-            ...evt,
-            members: {
-              ...evt.members,
-              [memberId]: {
-                ...m,
-                status: isConfirm ? ("confirmado" as const) : ("recusado" as const),
-                comment: reason || undefined
-              }
-            }
-          };
-        }
-      }
-      return evt;
-    });
-    saveEvents(updated);
+  // Confirmar/recusar a PRÓPRIA escala (integrante logado). Escreve apenas o
+  // status do próprio membro (setEventMemberStatus), respeitando a regra estrita.
+  const handleConfirmScale = async (
+    evtId: string,
+    memberId: string,
+    isConfirm: boolean,
+    reason?: string,
+  ) => {
+    if (!bandId) return;
+    try {
+      await setEventMemberStatus(
+        bandId,
+        evtId,
+        memberId,
+        isConfirm ? "confirmado" : "recusado",
+        reason,
+      );
+    } catch (err) {
+      console.error("Erro ao atualizar presença na escala:", err);
+      alert("Não foi possível atualizar sua resposta.");
+    }
   };
 
   // Adicionar Indisponibilidade
@@ -861,6 +949,47 @@ function AgendaContent() {
           </div>
         </div>
 
+        {/* Convites recebidos (qualquer tipo de grupo) */}
+        {user && pendingInvites.length > 0 && (
+          <div className="mb-8 flex flex-col gap-3 rounded-2xl border border-[#ef7c2c]/25 bg-[#ef7c2c]/[0.06] p-5 animate-fadeIn">
+            <div className="flex items-center gap-2">
+              <UserPlus size={16} className="text-[#ef7c2c]" weight="bold" />
+              <h3 className="text-sm font-display font-semibold text-white">
+                Convites recebidos ({pendingInvites.length})
+              </h3>
+            </div>
+            <div className="flex flex-col gap-2.5">
+              {pendingInvites.map((invite) => (
+                <div
+                  key={invite.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-surface-850 bg-surface-900/50 p-4"
+                >
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-sm font-semibold text-white">{invite.bandName}</span>
+                    <span className="text-[11px] text-surface-400">
+                      Convite de {invite.invitedByName} • {invite.instrument}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleAcceptInvite(invite)}
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold px-4 py-2 rounded-lg transition-colors"
+                    >
+                      Aceitar
+                    </button>
+                    <button
+                      onClick={() => handleDeclineInvite(invite)}
+                      className="bg-surface-800 hover:bg-surface-700 text-surface-200 text-[11px] font-semibold px-4 py-2 rounded-lg transition-colors"
+                    >
+                      Recusar
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {!user ? (
           /* Requer login: a agenda agora é compartilhada na nuvem */
           <div className="flex flex-col items-center justify-center py-20 px-4 rounded-3xl border border-dashed border-surface-800 bg-surface-900/10 text-center gap-5 animate-fadeIn">
@@ -953,9 +1082,9 @@ function AgendaContent() {
                   ) : (
                     <div className="flex flex-col gap-4">
                       {events.map((evt) => {
-                        // Verifica se "você" (simulado por Jessica) está escalado para confirmar
-                        const isJessicaEscalada = Object.values(evt.members).find(m => m.memberId === "m2");
-                        
+                        // Escala do próprio usuário logado (se ele estiver escalado).
+                        const myScale = myMember ? evt.members[myMember.id] : undefined;
+
                         return (
                           <div key={evt.id} className="bg-surface-900/40 border border-surface-850 p-6 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-md">
                             <div className="flex flex-col gap-2">
@@ -1006,23 +1135,23 @@ function AgendaContent() {
                               )}
                             </div>
 
-                            {/* Ações Rápidas de Integrante (Jessica Souza - simulada) */}
-                            {isJessicaEscalada && (
+                            {/* Ações Rápidas do integrante logado sobre a própria escala */}
+                            {myScale && myMember && (
                               <div className="flex flex-col gap-2 bg-surface-950/45 p-4 rounded-xl border border-surface-800 sm:min-w-[200px]">
                                 <span className="text-[10px] font-semibold text-surface-450 uppercase tracking-wider block text-center border-b border-surface-850 pb-1.5">Sua Escala</span>
                                 <div className="flex flex-col gap-1 text-center mt-1">
-                                  <span className="text-xs text-white font-medium">{isJessicaEscalada.role}</span>
+                                  <span className="text-xs text-white font-medium">{myScale.role}</span>
                                   <span className={`text-[10px] font-bold ${
-                                    isJessicaEscalada.status === "confirmado" ? "text-emerald-400" :
-                                    isJessicaEscalada.status === "recusado" ? "text-red-400" : "text-amber-400"
+                                    myScale.status === "confirmado" ? "text-emerald-400" :
+                                    myScale.status === "recusado" ? "text-red-400" : "text-amber-400"
                                   }`}>
-                                    Status: {isJessicaEscalada.status.toUpperCase()}
+                                    Status: {myScale.status.toUpperCase()}
                                   </span>
                                 </div>
-                                {isJessicaEscalada.status === "pendente" ? (
+                                {myScale.status === "pendente" ? (
                                   <div className="flex gap-2 mt-2">
                                     <button
-                                      onClick={() => handleConfirmScale(evt.id, "m2", true)}
+                                      onClick={() => handleConfirmScale(evt.id, myMember.id, true)}
                                       className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold py-1.5 rounded transition-colors"
                                     >
                                       Confirmar
@@ -1031,7 +1160,7 @@ function AgendaContent() {
                                       onClick={() => {
                                         const comment = prompt("Digite a justificativa da recusa:");
                                         if (comment !== null) {
-                                          handleConfirmScale(evt.id, "m2", false, comment || "Indisponível");
+                                          handleConfirmScale(evt.id, myMember.id, false, comment || "Indisponível");
                                         }
                                       }}
                                       className="flex-1 bg-red-600 hover:bg-red-500 text-white text-[11px] font-semibold py-1.5 rounded transition-colors"
@@ -1041,7 +1170,7 @@ function AgendaContent() {
                                   </div>
                                 ) : (
                                   <button
-                                    onClick={() => handleConfirmScale(evt.id, "m2", false)} // toggle/reset
+                                    onClick={() => handleConfirmScale(evt.id, myMember.id, false)}
                                     className="text-[10px] text-surface-500 hover:text-white underline mt-1 text-center"
                                   >
                                     Alterar resposta
@@ -1196,13 +1325,15 @@ function AgendaContent() {
                     <h3 className="text-lg font-display font-semibold text-white">Escalas e Eventos</h3>
                     <p className="text-xs text-surface-400">Crie escalas de cultos/shows, setlists de repertórios e escalação de músicos.</p>
                   </div>
-                  <button
-                    onClick={() => setShowAddEventModal(true)}
-                    className="flex items-center gap-1.5 bg-[#ef7c2c] hover:bg-[#ef7c2c]/90 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow transition-all hover:-translate-y-0.5"
-                  >
-                    <Plus size={14} weight="bold" />
-                    <span>Criar Escala / Evento</span>
-                  </button>
+                  {isLeader && (
+                    <button
+                      onClick={() => setShowAddEventModal(true)}
+                      className="flex items-center gap-1.5 bg-[#ef7c2c] hover:bg-[#ef7c2c]/90 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow transition-all hover:-translate-y-0.5"
+                    >
+                      <Plus size={14} weight="bold" />
+                      <span>Criar Escala / Evento</span>
+                    </button>
+                  )}
                 </div>
 
                 {events.length === 0 ? (
@@ -1215,14 +1346,16 @@ function AgendaContent() {
                     {events.map((evt) => (
                       <div key={evt.id} className="bg-surface-900/40 border border-surface-850 p-6 rounded-2xl flex flex-col gap-4 relative shadow-md">
                         
-                        {/* Excluir Evento */}
-                        <button
-                          onClick={() => handleDeleteEvent(evt.id)}
-                          className="absolute top-4 right-4 text-surface-500 hover:text-red-400 transition-colors p-1.5 rounded-full hover:bg-surface-850"
-                          title="Remover Evento"
-                        >
-                          <Trash size={16} />
-                        </button>
+                        {/* Excluir Evento (apenas líderes) */}
+                        {isLeader && (
+                          <button
+                            onClick={() => handleDeleteEvent(evt.id)}
+                            className="absolute top-4 right-4 text-surface-500 hover:text-red-400 transition-colors p-1.5 rounded-full hover:bg-surface-850"
+                            title="Remover Evento"
+                          >
+                            <Trash size={16} />
+                          </button>
+                        )}
 
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2 flex-wrap">
@@ -1333,13 +1466,15 @@ function AgendaContent() {
                     <h3 className="text-lg font-display font-semibold text-white">Integrantes do Grupo</h3>
                     <p className="text-xs text-surface-400">Gerencie quem faz parte do grupo e as funções/instrumentos correspondentes.</p>
                   </div>
-                  <button
-                    onClick={() => setShowAddMemberModal(true)}
-                    className="flex items-center gap-1.5 bg-[#ef7c2c] hover:bg-[#ef7c2c]/90 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow transition-all hover:-translate-y-0.5"
-                  >
-                    <UserPlus size={14} weight="bold" />
-                    <span>Convidar Integrante</span>
-                  </button>
+                  {isLeader && (
+                    <button
+                      onClick={() => setShowAddMemberModal(true)}
+                      className="flex items-center gap-1.5 bg-[#ef7c2c] hover:bg-[#ef7c2c]/90 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow transition-all hover:-translate-y-0.5"
+                    >
+                      <UserPlus size={14} weight="bold" />
+                      <span>Convidar por E-mail</span>
+                    </button>
+                  )}
                 </div>
 
                 <div className="bg-surface-900/30 border border-surface-850 rounded-2xl overflow-hidden shadow-md">
@@ -1349,35 +1484,69 @@ function AgendaContent() {
                         <th className="p-4">Nome</th>
                         <th className="p-4">Instrumento Principal</th>
                         <th className="p-4">Email</th>
-                        <th className="p-4 text-right">Ação</th>
+                        <th className="p-4">Papel</th>
+                        <th className="p-4">Situação</th>
+                        {isLeader && <th className="p-4 text-right">Ação</th>}
                       </tr>
                     </thead>
                     <tbody>
-                      {members.map((m) => (
-                        <tr key={m.id} className="border-b border-surface-850/45 hover:bg-surface-900/20 transition-colors">
-                          <td className="p-4 font-semibold text-white flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-surface-800 border border-surface-700 flex items-center justify-center font-display text-white text-xs font-bold shadow-sm uppercase">
-                              {m.name.charAt(0)}
-                            </div>
-                            <span>{m.name}</span>
-                          </td>
-                          <td className="p-4 text-surface-300 font-medium">{m.instrument}</td>
-                          <td className="p-4 text-surface-400 font-mono">{m.email}</td>
-                          <td className="p-4 text-right">
-                            <button
-                              onClick={() => {
-                                if (confirm(`Deseja remover ${m.name} da banda?`)) {
-                                  saveMembers(members.filter(mem => mem.id !== m.id));
-                                }
-                              }}
-                              className="text-surface-650 hover:text-red-400 p-1.5 rounded transition-colors"
-                              title="Remover integrante"
-                            >
-                              <Trash size={14} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                      {members.map((m) => {
+                        const memberIsLeader = m.uid ? isBandLeader(band ?? { ownerId: "", leaderUids: [] }, m.uid) : false;
+                        const memberIsOwner = m.uid ? isBandOwner(band ?? { ownerId: "" }, m.uid) : false;
+                        const pending = m.status === "invited" && !m.uid;
+                        return (
+                          <tr key={m.id} className="border-b border-surface-850/45 hover:bg-surface-900/20 transition-colors">
+                            <td className="p-4 font-semibold text-white flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg-surface-800 border border-surface-700 flex items-center justify-center font-display text-white text-xs font-bold shadow-sm uppercase">
+                                {m.name.charAt(0)}
+                              </div>
+                              <span>{m.name}</span>
+                            </td>
+                            <td className="p-4 text-surface-300 font-medium">{m.instrument}</td>
+                            <td className="p-4 text-surface-400 font-mono">{m.email}</td>
+                            <td className="p-4">
+                              <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${
+                                memberIsLeader
+                                  ? "bg-[#ef7c2c]/10 text-[#ef7c2c] border-[#ef7c2c]/25"
+                                  : "bg-surface-800/50 text-surface-300 border-surface-700"
+                              }`}>
+                                {memberIsOwner ? "Líder" : memberIsLeader ? "Co-líder" : "Músico"}
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${
+                                pending
+                                  ? "bg-amber-500/10 text-amber-400 border-amber-500/25"
+                                  : "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
+                              }`}>
+                                {pending ? "Convite pendente" : "Ativo"}
+                              </span>
+                            </td>
+                            {isLeader && (
+                              <td className="p-4 text-right whitespace-nowrap">
+                                {isOwner && m.uid && !memberIsOwner && (
+                                  <button
+                                    onClick={() => handleToggleLeader(m)}
+                                    className="text-surface-650 hover:text-[#ef7c2c] p-1.5 rounded transition-colors"
+                                    title={memberIsLeader ? "Rebaixar para músico" : "Promover a co-líder"}
+                                  >
+                                    <Sparkle size={14} weight={memberIsLeader ? "fill" : "regular"} />
+                                  </button>
+                                )}
+                                {!memberIsOwner && (
+                                  <button
+                                    onClick={() => handleRemoveMember(m)}
+                                    className="text-surface-650 hover:text-red-400 p-1.5 rounded transition-colors"
+                                    title={pending ? "Cancelar convite" : "Remover integrante"}
+                                  >
+                                    <Trash size={14} />
+                                  </button>
+                                )}
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -2180,12 +2349,12 @@ function AgendaContent() {
       {/* MODAL: ADICIONAR INTEGRANTE */}
       {showAddMemberModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-950/80 backdrop-blur-sm animate-fadeIn">
-          <form 
-            onSubmit={handleAddMemberSubmit}
+          <form
+            onSubmit={handleInviteMemberSubmit}
             className="relative w-full max-w-md bg-surface-900 border border-surface-850 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 animate-scaleUp"
           >
-            
-            <button 
+
+            <button
               type="button"
               onClick={() => setShowAddMemberModal(false)}
               className="absolute top-4 right-4 text-surface-400 hover:text-white bg-surface-850 hover:bg-surface-800 p-1 rounded-full transition-all"
@@ -2194,19 +2363,19 @@ function AgendaContent() {
             </button>
 
             <div className="flex flex-col gap-1">
-              <h3 className="text-lg font-display font-semibold text-white">Convidar Integrante</h3>
-              <p className="text-xs text-surface-450">Adicione um novo músico à equipe do seu grupo.</p>
+              <h3 className="text-lg font-display font-semibold text-white">Convidar por E-mail</h3>
+              <p className="text-xs text-surface-450">O músico recebe o convite ao entrar na agenda com esse e-mail e passa a integrar a banda ao aceitar.</p>
             </div>
 
             <div className="flex flex-col gap-3 mt-2">
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="member-name" className="text-xs font-semibold text-surface-300">Nome do Músico</label>
+                <label htmlFor="member-email" className="text-xs font-semibold text-surface-300">E-mail do Músico</label>
                 <input
-                  type="text"
-                  id="member-name"
-                  value={newMemberName}
-                  onChange={(e) => setNewMemberName(e.target.value)}
-                  placeholder="Ex: João Silva, Aline Mendes..."
+                  type="email"
+                  id="member-email"
+                  value={newMemberEmail}
+                  onChange={(e) => setNewMemberEmail(e.target.value)}
+                  placeholder="musico@exemplo.com"
                   required
                   className="w-full bg-surface-950 border border-surface-850 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#ef7c2c]/65 placeholder:text-surface-700 transition-colors"
                 />
@@ -2226,13 +2395,13 @@ function AgendaContent() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="member-email" className="text-xs font-semibold text-surface-300">E-mail (Opcional)</label>
+                <label htmlFor="member-name" className="text-xs font-semibold text-surface-300">Nome do Músico (Opcional)</label>
                 <input
-                  type="email"
-                  id="member-email"
-                  value={newMemberEmail}
-                  onChange={(e) => setNewMemberEmail(e.target.value)}
-                  placeholder="membro@exemplo.com"
+                  type="text"
+                  id="member-name"
+                  value={newMemberName}
+                  onChange={(e) => setNewMemberName(e.target.value)}
+                  placeholder="Ex: João Silva, Aline Mendes..."
                   className="w-full bg-surface-950 border border-surface-850 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#ef7c2c]/65 placeholder:text-surface-700 transition-colors"
                 />
               </div>
@@ -2248,9 +2417,10 @@ function AgendaContent() {
               </button>
               <button
                 type="submit"
-                className="text-xs font-semibold text-white bg-[#ef7c2c] hover:bg-[#ef7c2c]/90 px-4 py-2.5 rounded-lg shadow-md transition-colors"
+                disabled={inviting}
+                className="text-xs font-semibold text-white bg-[#ef7c2c] hover:bg-[#ef7c2c]/90 px-4 py-2.5 rounded-lg shadow-md transition-colors disabled:opacity-60"
               >
-                Adicionar Integrante
+                {inviting ? "Enviando..." : "Enviar Convite"}
               </button>
             </div>
 

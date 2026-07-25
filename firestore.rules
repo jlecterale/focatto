@@ -23,6 +23,48 @@ service cloud.firestore {
     function isBandOwner(bandId) {
       return isAuth() && request.auth.uid == bandData(bandId).ownerId;
     }
+    // Leaders = owner plus anyone promoted into leaderUids (optional field).
+    function isBandLeader(bandId) {
+      return isAuth() && (
+        request.auth.uid == bandData(bandId).ownerId ||
+        ('leaderUids' in bandData(bandId) && request.auth.uid in bandData(bandId).leaderUids)
+      );
+    }
+    // Invitee self-join: an invited e-mail may add ONLY its own uid to the band,
+    // removing its own e-mail from invitedEmails and linking memberIdByUid.
+    function isBandSelfJoin(bandId) {
+      return isAuth()
+        && request.auth.token.email != null
+        && request.auth.token.email in bandData(bandId).invitedEmails
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['memberUids', 'invitedEmails', 'memberIdByUid', 'updatedAt'])
+        && request.resource.data.memberUids.hasAll(resource.data.memberUids)
+        && request.resource.data.memberUids.size() == resource.data.memberUids.size() + 1
+        && request.auth.uid in request.resource.data.memberUids
+        && !(request.auth.token.email in request.resource.data.invitedEmails);
+    }
+    // Invitee decline: an invited e-mail may only pull itself from invitedEmails.
+    function isBandSelfDecline(bandId) {
+      return isAuth()
+        && request.auth.token.email != null
+        && request.auth.token.email in bandData(bandId).invitedEmails
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['invitedEmails', 'updatedAt'])
+        && request.resource.data.memberUids == resource.data.memberUids
+        && !(request.auth.token.email in request.resource.data.invitedEmails);
+    }
+    // A member may only flip the status/comment of THEIR OWN assignment on an
+    // event, identified via the band's memberIdByUid reverse index.
+    function editsOwnEventStatus(bandId) {
+      let mid = bandData(bandId).memberIdByUid[request.auth.uid];
+      return 'memberIdByUid' in bandData(bandId)
+        && request.auth.uid in bandData(bandId).memberIdByUid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'updatedAt'])
+        && mid in resource.data.members
+        && request.resource.data.members.diff(resource.data.members).affectedKeys().hasOnly([mid])
+        && request.resource.data.members[mid].memberId == resource.data.members[mid].memberId
+        && request.resource.data.members[mid].role == resource.data.members[mid].role;
+    }
 
 
     // Users collection
@@ -326,8 +368,13 @@ service cloud.firestore {
         && request.resource.data.ownerId == request.auth.uid
         && request.auth.uid in request.resource.data.memberUids;
 
-      // Only the owner manages the band (name, type, membership list).
-      allow update: if isBandOwner(bandId);
+      // Owner has full control. Co-leaders manage everything except ownership
+      // and the leadership roster. Invitees may self-join or self-decline.
+      allow update: if isBandOwner(bandId)
+        || (isBandLeader(bandId)
+            && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['ownerId', 'leaderUids']))
+        || isBandSelfJoin(bandId)
+        || isBandSelfDecline(bandId);
       allow delete: if isBandOwner(bandId);
 
       // Repertoire: any member can manage songs.
@@ -336,19 +383,25 @@ service cloud.firestore {
         allow write: if isBandMember(bandId);
       }
 
-      // Roster: only the owner adds/edits/removes members.
+      // Roster: leaders add/edit/remove members. An invitee may link their own
+      // uid onto the member entry matching their e-mail (accept flow).
       match /members/{memberId} {
         allow read: if isBandMember(bandId);
-        allow write: if isBandOwner(bandId);
+        allow write: if isBandLeader(bandId);
+        allow update: if isAuth()
+          && request.auth.token.email != null
+          && resource.data.email == request.auth.token.email
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uid', 'status'])
+          && request.resource.data.uid == request.auth.uid;
       }
 
-      // Schedule: owner creates/removes escalas; members may update (e.g. to
-      // confirm/decline their own assignment). Restricting updates to a
-      // member's own status is a planned follow-up.
+      // Schedule: leaders create/remove/edit escalas; a member may only flip the
+      // status/comment of their own assignment.
       match /events/{eventId} {
         allow read: if isBandMember(bandId);
-        allow create, delete: if isBandOwner(bandId);
-        allow update: if isBandMember(bandId);
+        allow create, delete: if isBandLeader(bandId);
+        allow update: if isBandLeader(bandId)
+          || (isBandMember(bandId) && editsOwnEventStatus(bandId));
       }
 
       // Availability blocks: a member manages their own blocks.
@@ -359,6 +412,29 @@ service cloud.firestore {
         allow update, delete: if isBandMember(bandId)
           && resource.data.uid == request.auth.uid;
       }
+    }
+
+    // ==========================================
+    // Agenda: band invites (discovery index)
+    // ==========================================
+    // Lives outside the band so an invitee (not yet a member) can find their own
+    // invites by e-mail. A leader creates/cancels invites; the invitee reads
+    // their own and may only flip status to accepted/declined.
+    match /bandInvites/{inviteId} {
+      allow read: if isAuth() && (
+        request.auth.token.email == resource.data.email ||
+        isBandLeader(resource.data.bandId)
+      );
+      allow create: if isBandLeader(request.resource.data.bandId)
+        && request.resource.data.status == 'pending'
+        && request.resource.data.email is string
+        && request.resource.data.bandId is string
+        && request.resource.data.memberId is string;
+      allow update: if isAuth()
+        && request.auth.token.email == resource.data.email
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['accepted', 'declined'];
+      allow delete: if isBandLeader(resource.data.bandId);
     }
 
     // Deny all other access
