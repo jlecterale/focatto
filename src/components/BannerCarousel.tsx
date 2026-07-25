@@ -186,7 +186,7 @@ export default function BannerCarousel() {
 
   return (
     <div 
-      className="relative w-full h-[260px] sm:h-[220px] rounded-2xl overflow-hidden border border-[#22201e] shadow-2xl mb-8 group"
+      className="relative w-full h-[260px] sm:h-[220px] rounded-2xl overflow-hidden border border-[var(--line)] shadow-2xl mb-8 group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -207,7 +207,7 @@ export default function BannerCarousel() {
             }}
           >
             {/* Ambient Dark Overlay for text legibility */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0b0908]/95 via-[#0b0908]/85 to-transparent z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg)]/95 via-[var(--bg)]/85 to-transparent z-10" />
 
             {/* Slide Content */}
             <div className="relative z-20 flex flex-col md:flex-row md:items-center justify-between w-full gap-4">
@@ -240,7 +240,7 @@ export default function BannerCarousel() {
 
                 <a 
                   href={banner.ctaLink}
-                  className="inline-flex items-center justify-center self-start mt-3 px-4 py-2 bg-white text-[#0b0908] text-xs font-bold rounded-lg border border-transparent hover:bg-transparent hover:text-white hover:border-white transition-all duration-300 cursor-pointer"
+                  className="inline-flex items-center justify-center self-start mt-3 px-4 py-2 bg-white text-[var(--bg)] text-xs font-bold rounded-lg border border-transparent hover:bg-transparent hover:text-white hover:border-white transition-all duration-300 cursor-pointer"
                 >
                   Conhecer Parceiro
                 </a>
@@ -252,9 +252,9 @@ export default function BannerCarousel() {
                   {banner.products.map((prod) => (
                     <div 
                       key={prod.id}
-                      className="bg-[#141211]/80 hover:bg-[#1c1a19]/90 border border-white/5 hover:border-[#ef7c2c]/30 p-3 rounded-xl flex flex-col gap-2 w-[120px] backdrop-blur-md transition-all duration-300 transform hover:translate-y-[-4px]"
+                      className="bg-[var(--panel)]/80 hover:bg-[var(--panel-2)]/90 border border-white/5 hover:border-[#ef7c2c]/30 p-3 rounded-xl flex flex-col gap-2 w-[120px] backdrop-blur-md transition-all duration-300 transform hover:translate-y-[-4px]"
                     >
-                      <div className="h-10 w-full rounded-lg bg-[#22201e] flex items-center justify-center text-xl select-none">
+                      <div className="h-10 w-full rounded-lg bg-[var(--line)] flex items-center justify-center text-xl select-none">
                         {prod.icon}
                       </div>
                       <div className="flex flex-col gap-0.5">
@@ -279,7 +279,7 @@ export default function BannerCarousel() {
         <>
           <button 
             onClick={handlePrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-[#0b0908]/60 hover:bg-[#ef7c2c] text-white border border-white/10 hover:border-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-30 cursor-pointer"
+            className="absolute left-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-[var(--bg)]/60 hover:bg-[#ef7c2c] text-white border border-white/10 hover:border-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-30 cursor-pointer"
             aria-label="Slide anterior"
           >
             <CaretLeft size={16} weight="bold" />
@@ -287,7 +287,7 @@ export default function BannerCarousel() {
           
           <button 
             onClick={handleNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-[#0b0908]/60 hover:bg-[#ef7c2c] text-white border border-white/10 hover:border-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-30 cursor-pointer"
+            className="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-[var(--bg)]/60 hover:bg-[#ef7c2c] text-white border border-white/10 hover:border-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-30 cursor-pointer"
             aria-label="Próximo slide"
           >
             <CaretRight size={16} weight="bold" />

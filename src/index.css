@@ -149,6 +149,14 @@
   --btn-secondary-bg: rgba(28, 25, 23, 0.05);
   --btn-secondary-bg-hover: rgba(28, 25, 23, 0.09);
   --veil-hover: rgba(28, 25, 23, 0.05);
+
+  /* Named surfaces that replace the inlined dark palette so panels/borders
+     flip per theme. Light values here; dark values in [data-theme="dark"]. */
+  --bg: #ffffff;
+  --panel: #f6f2ec;
+  --panel-2: #ece5da;
+  --line: #e4dbcd;
+  --line-2: #d8cfc0;
 }
 
 :root[data-theme="dark"] {
@@ -178,6 +186,13 @@
   --btn-secondary-bg: rgba(255, 255, 255, 0.06);
   --btn-secondary-bg-hover: rgba(255, 255, 255, 0.10);
   --veil-hover: rgba(255, 255, 255, 0.05);
+
+  /* Dark values for the named surfaces (original inlined palette). */
+  --bg: #0a0a0b;
+  --panel: #141211;
+  --panel-2: #181615;
+  --line: #22201e;
+  --line-2: #2a2827;
 }
 
 @layer base {

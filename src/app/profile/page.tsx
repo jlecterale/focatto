@@ -780,7 +780,7 @@ export default function ProfilePage() {
 
   if (authLoading || (user && loading)) {
     return (
-      <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <Spinner size={24} className="animate-spin text-[#ef7c2c]" />
       </div>
     );
@@ -791,7 +791,7 @@ export default function ProfilePage() {
   }
 
   const inputBase =
-    "w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
+    "w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
 
   const verificationBadge = () => {
     switch (profile?.verificationStatus) {
@@ -827,9 +827,9 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
+    <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans">
       {/* Header */}
-      <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+      <header className="border-b border-[var(--panel-2)]/60 bg-[var(--bg)]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
           <Link href="/" className="flex items-center gap-2 sm:gap-3">
             <div className="h-8 sm:h-9 w-8 sm:w-9 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center flex-shrink-0">
@@ -846,7 +846,7 @@ export default function ProfilePage() {
             <Link
               href="/"
               id="profile-back-btn"
-              className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827]"
+              className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[var(--line-2)]"
             >
               Voltar
             </Link>
@@ -862,7 +862,7 @@ export default function ProfilePage() {
             <button
               onClick={logout}
               id="profile-logout-btn"
-              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[var(--line-2)] hover:border-[#ef7c2c]/30"
             >
               <SignOut size={14} />
               <span className="hidden sm:inline">Sair</span>
@@ -873,7 +873,7 @@ export default function ProfilePage() {
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
         {/* Photo + Name Section */}
-        <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] flex items-center gap-5">
+        <div className="bg-[var(--panel)] rounded-2xl p-6 border border-[var(--line)] flex items-center gap-5">
           <div className="relative group">
             <div className="h-20 w-20 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center overflow-hidden">
               {profile?.photoURL ? (
@@ -933,7 +933,7 @@ export default function ProfilePage() {
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                   id="profile-toggle-back-btn"
-                  className="flex items-center gap-1.5 py-2 px-3 sm:py-2.5 sm:px-4 rounded-xl bg-[#181615] border border-[#2a2827] text-surface-400 hover:text-white transition-all text-xs font-semibold cursor-pointer"
+                  className="flex items-center gap-1.5 py-2 px-3 sm:py-2.5 sm:px-4 rounded-xl bg-[var(--panel-2)] border border-[var(--line-2)] text-surface-400 hover:text-white transition-all text-xs font-semibold cursor-pointer"
                 >
                   <ArrowLeft size={14} />
                   Voltar
@@ -946,7 +946,7 @@ export default function ProfilePage() {
         {!isEditing ? (
           <div className="space-y-6 animate-fade-in">
             {/* Tab Navigation */}
-            <div className="flex border-b border-[#22201e] gap-1 sm:gap-2 overflow-x-auto scrollbar-none pb-px">
+            <div className="flex border-b border-[var(--line)] gap-1 sm:gap-2 overflow-x-auto scrollbar-none pb-px">
               <button
                 onClick={() => setActiveTab("anuncios")}
                 className={`flex items-center gap-2 py-3 px-4 text-xs font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
@@ -1007,7 +1007,7 @@ export default function ProfilePage() {
             {/* Tab Contents */}
             <div className="space-y-6">
               {activeTab === "anuncios" && (
-                <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+                <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Meus Anúncios</h3>
@@ -1028,7 +1028,7 @@ export default function ProfilePage() {
                       <span className="text-xs">Carregando seus anúncios...</span>
                     </div>
                   ) : userProducts.length === 0 ? (
-                    <div className="text-center py-12 bg-[#110f0e] rounded-xl border border-[#1c1a19] space-y-3">
+                    <div className="text-center py-12 bg-[var(--panel)] rounded-xl border border-[var(--panel-2)] space-y-3">
                       <Package size={40} className="mx-auto text-surface-500" />
                       <p className="text-xs text-surface-400">Você ainda não tem anúncios criados.</p>
                       <Link
@@ -1041,10 +1041,10 @@ export default function ProfilePage() {
                   ) : (
                     <div className="space-y-3">
                       {userProducts.map((product) => (
-                        <div key={product.id} className="bg-[#110f0e] rounded-xl p-4 border border-[#1c1a19] space-y-3">
+                        <div key={product.id} className="bg-[var(--panel)] rounded-xl p-4 border border-[var(--panel-2)] space-y-3">
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0 flex-1 flex gap-3">
-                              <div className="h-12 w-12 rounded-lg bg-[#181615] border border-[#2a2827] flex-shrink-0 overflow-hidden flex items-center justify-center">
+                              <div className="h-12 w-12 rounded-lg bg-[var(--panel-2)] border border-[var(--line-2)] flex-shrink-0 overflow-hidden flex items-center justify-center">
                                 {product.photos && product.photos[0] ? (
                                   <img loading="lazy" decoding="async" src={product.photos[0]} alt="" className="h-full w-full object-cover" />
                                 ) : (
@@ -1078,7 +1078,7 @@ export default function ProfilePage() {
                             </p>
                           )}
 
-                          <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#1c1a19]/50">
+                          <div className="flex items-center justify-end gap-2 pt-2 border-t border-[var(--panel-2)]/50">
                             <button
                               onClick={() => handleDeleteProduct(product.id!)}
                               className="flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all text-[11px] font-semibold cursor-pointer"
@@ -1088,7 +1088,7 @@ export default function ProfilePage() {
                             </button>
                             <Link
                               href="/meus-anuncios"
-                              className="flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-[#181615] border border-[#2a2827] hover:border-[#ef7c2c]/30 text-surface-300 hover:text-white transition-all text-[11px] font-semibold"
+                              className="flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-[var(--panel-2)] border border-[var(--line-2)] hover:border-[#ef7c2c]/30 text-surface-300 hover:text-white transition-all text-[11px] font-semibold"
                             >
                               Gerenciar
                             </Link>
@@ -1101,7 +1101,7 @@ export default function ProfilePage() {
               )}
 
               {activeTab === "favoritos" && (
-                <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+                <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] space-y-4">
                   <div>
                     <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Favoritos</h3>
                     <p className="text-[10px] text-surface-500 mt-0.5">Anúncios que você marcou como favoritos</p>
@@ -1113,12 +1113,12 @@ export default function ProfilePage() {
                       <span className="text-xs">Carregando favoritos...</span>
                     </div>
                   ) : favoritedProducts.length === 0 ? (
-                    <div className="text-center py-12 bg-[#110f0e] rounded-xl border border-[#1c1a19] space-y-2">
+                    <div className="text-center py-12 bg-[var(--panel)] rounded-xl border border-[var(--panel-2)] space-y-2">
                       <HeartStraight size={40} className="mx-auto text-surface-500" />
                       <p className="text-xs text-surface-400">Nenhum anúncio favoritado por enquanto.</p>
                       <Link
                         href="/"
-                        className="inline-flex items-center gap-1 py-1.5 px-4 rounded-xl bg-[#181615] border border-[#2a2827] text-surface-300 hover:text-white text-xs font-semibold"
+                        className="inline-flex items-center gap-1 py-1.5 px-4 rounded-xl bg-[var(--panel-2)] border border-[var(--line-2)] text-surface-300 hover:text-white text-xs font-semibold"
                       >
                         Explorar Anúncios
                       </Link>
@@ -1128,9 +1128,9 @@ export default function ProfilePage() {
                       {favoritedProducts.map((product) => {
                         const favMeta = favorites.find((f) => f.productId === product.id);
                         return (
-                          <div key={product.id} className="bg-[#110f0e] rounded-xl p-4 border border-[#1c1a19] flex items-center justify-between gap-4">
+                          <div key={product.id} className="bg-[var(--panel)] rounded-xl p-4 border border-[var(--panel-2)] flex items-center justify-between gap-4">
                             <div className="min-w-0 flex-1 flex gap-3">
-                              <div className="h-12 w-12 rounded-lg bg-[#181615] border border-[#2a2827] flex-shrink-0 overflow-hidden flex items-center justify-center">
+                              <div className="h-12 w-12 rounded-lg bg-[var(--panel-2)] border border-[var(--line-2)] flex-shrink-0 overflow-hidden flex items-center justify-center">
                                 {product.photos && product.photos[0] ? (
                                   <img loading="lazy" decoding="async" src={product.photos[0]} alt="" className="h-full w-full object-cover" />
                                 ) : (
@@ -1162,7 +1162,7 @@ export default function ProfilePage() {
                               </button>
                               <Link
                                 href={`/anuncio/${product.id}`}
-                                className="py-1.5 px-3 rounded-lg bg-[#181615] border border-[#2a2827] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30 transition-all text-xs font-semibold"
+                                className="py-1.5 px-3 rounded-lg bg-[var(--panel-2)] border border-[var(--line-2)] text-surface-300 hover:text-white hover:border-[#ef7c2c]/30 transition-all text-xs font-semibold"
                               >
                                 Ver Anúncio
                               </Link>
@@ -1176,7 +1176,7 @@ export default function ProfilePage() {
               )}
 
               {activeTab === "atividades" && (
-                <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+                <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] space-y-4">
                   <div>
                     <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Minhas Atividades Profissionais</h3>
                     <p className="text-[10px] text-surface-500 mt-0.5">Seus perfis de serviços cadastrados no Vibrattoo</p>
@@ -1184,7 +1184,7 @@ export default function ProfilePage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Luthier Card */}
-                    <div className="bg-[#110f0e] rounded-xl p-4 border border-[#1c1a19] flex flex-col justify-between gap-4">
+                    <div className="bg-[var(--panel)] rounded-xl p-4 border border-[var(--panel-2)] flex flex-col justify-between gap-4">
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <span className="flex items-center gap-1.5 text-xs text-[#ef7c2c] font-bold">
@@ -1225,7 +1225,7 @@ export default function ProfilePage() {
                       {profile?.isProfessional ? (
                         <Link
                           href={`/vendedor/${user.uid}`}
-                          className="w-full py-1.5 px-3 rounded-lg bg-[#181615] border border-[#2a2827] text-surface-300 hover:text-white text-xs font-semibold text-center mt-2"
+                          className="w-full py-1.5 px-3 rounded-lg bg-[var(--panel-2)] border border-[var(--line-2)] text-surface-300 hover:text-white text-xs font-semibold text-center mt-2"
                         >
                           Ver Perfil Público
                         </Link>
@@ -1244,7 +1244,7 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Teacher Card */}
-                    <div className="bg-[#110f0e] rounded-xl p-4 border border-[#1c1a19] flex flex-col justify-between gap-4">
+                    <div className="bg-[var(--panel)] rounded-xl p-4 border border-[var(--panel-2)] flex flex-col justify-between gap-4">
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <span className="flex items-center gap-1.5 text-xs text-indigo-400 font-bold">
@@ -1285,7 +1285,7 @@ export default function ProfilePage() {
                       {profile?.isTeacher ? (
                         <Link
                           href={`/vendedor/${user.uid}`}
-                          className="w-full py-1.5 px-3 rounded-lg bg-[#181615] border border-[#2a2827] text-surface-300 hover:text-white text-xs font-semibold text-center mt-2"
+                          className="w-full py-1.5 px-3 rounded-lg bg-[var(--panel-2)] border border-[var(--line-2)] text-surface-300 hover:text-white text-xs font-semibold text-center mt-2"
                         >
                           Ver Perfil Público
                         </Link>
@@ -1307,7 +1307,7 @@ export default function ProfilePage() {
               )}
 
               {activeTab === "propostas" && (
-                <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-4">
+                <div className="bg-[var(--panel)] rounded-2xl p-6 border border-[var(--line)] space-y-4">
                   <div className="flex items-center gap-2">
                     <Handshake size={18} className="text-[#ef7c2c]" />
                     <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Propostas Recebidas</h3>
@@ -1322,14 +1322,14 @@ export default function ProfilePage() {
                       <span className="text-xs">Carregando propostas...</span>
                     </div>
                   ) : proposals.length === 0 ? (
-                    <div className="text-center py-8 bg-[#110f0e] rounded-xl border border-[#1c1a19]">
+                    <div className="text-center py-8 bg-[var(--panel)] rounded-xl border border-[var(--panel-2)]">
                       <CurrencyDollar size={32} className="mx-auto text-surface-500 mb-2" />
                       <p className="text-xs text-surface-400">Nenhuma proposta recebida até o momento.</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {proposals.map((prop) => (
-                        <div key={prop.id} className="bg-[#110f0e] rounded-xl p-4 border border-[#1c1a19] space-y-3">
+                        <div key={prop.id} className="bg-[var(--panel)] rounded-xl p-4 border border-[var(--panel-2)] space-y-3">
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2 mb-1">
@@ -1360,7 +1360,7 @@ export default function ProfilePage() {
                           </div>
 
                           {prop.type === "trade" && prop.tradeDescription && (
-                            <div className="bg-[#141211] p-3 rounded-xl border border-[#22201e] space-y-2">
+                            <div className="bg-[var(--panel)] p-3 rounded-xl border border-[var(--line)] space-y-2">
                               <p className="text-[10px] text-surface-500 uppercase tracking-wider font-semibold">Item Oferecido para Troca</p>
                               <p className="text-[11px] text-surface-200">{prop.tradeDescription}</p>
                               {prop.tradeCategory && (
@@ -1378,7 +1378,7 @@ export default function ProfilePage() {
                                       <img loading="lazy" decoding="async"
                                         src={photo}
                                         alt={`Item de troca ${idx + 1}`}
-                                        className="h-14 w-14 rounded-lg object-cover border border-[#2a2827] hover:opacity-80 transition-opacity"
+                                        className="h-14 w-14 rounded-lg object-cover border border-[var(--line-2)] hover:opacity-80 transition-opacity"
                                       />
                                     </a>
                                   ))}
@@ -1388,12 +1388,12 @@ export default function ProfilePage() {
                           )}
 
                           {prop.message && (
-                            <p className="text-[11px] text-surface-300 bg-[#141211] p-2 rounded-lg border border-[#22201e] italic">
+                            <p className="text-[11px] text-surface-300 bg-[var(--panel)] p-2 rounded-lg border border-[var(--line)] italic">
                               "{prop.message}"
                             </p>
                           )}
 
-                          <div className="flex items-center justify-between gap-3 pt-1 border-t border-[#1c1a19]/50">
+                          <div className="flex items-center justify-between gap-3 pt-1 border-t border-[var(--panel-2)]/50">
                             <div>
                               <span className="text-[10px] text-surface-500 block uppercase tracking-wider font-semibold">
                                 {prop.type === "trade" ? "Valor de Referência" : "Valor Proposto"}
@@ -1432,7 +1432,7 @@ export default function ProfilePage() {
               )}
 
               {activeTab === "social" && (
-                <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+                <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Rede Social</h3>
@@ -1446,7 +1446,7 @@ export default function ProfilePage() {
                     </Link>
                   </div>
 
-                  <hr className="border-[#22201e]" />
+                  <hr className="border-[var(--line)]" />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Painel de Contacto */}
@@ -1479,7 +1479,7 @@ export default function ProfilePage() {
         ) : (
           <div className="space-y-6 animate-fade-in">
             {/* Profile Form */}
-            <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-5">
+            <div className="bg-[var(--panel)] rounded-2xl p-6 border border-[var(--line)] space-y-5">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Dados Pessoais</h3>
                 <PencilSimple size={16} className="text-surface-400" />
@@ -1553,7 +1553,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Address */}
-            <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-5">
+            <div className="bg-[var(--panel)] rounded-2xl p-6 border border-[var(--line)] space-y-5">
               <div className="flex items-center gap-2">
                 <MapPin size={16} className="text-[#ef7c2c]" />
                 <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Endereço</h3>
@@ -1655,7 +1655,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Atividades no Vibrattoo */}
-            <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-4">
+            <div className="bg-[var(--panel)] rounded-2xl p-6 border border-[var(--line)] space-y-4">
               <div className="flex items-center gap-2">
                 <Compass size={18} className="text-[#ef7c2c]" />
                 <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Atividades no Vibrattoo</h3>
@@ -1667,7 +1667,7 @@ export default function ProfilePage() {
                 <label className={`flex-1 flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${
                   isProfessional 
                     ? "bg-[#ef7c2c]/5 border-[#ef7c2c]/30 text-white" 
-                    : "bg-[#181615] border-[#2a2827] text-surface-400 hover:text-white"
+                    : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-400 hover:text-white"
                 }`}>
                   <div className="flex items-center gap-3">
                     <Wrench size={20} className={isProfessional ? "text-[#ef7c2c]" : "text-surface-500"} />
@@ -1680,14 +1680,14 @@ export default function ProfilePage() {
                     type="checkbox"
                     checked={isProfessional}
                     onChange={(e) => setIsProfessional(e.target.checked)}
-                    className="rounded border-[#2a2827] bg-[#181615] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
+                    className="rounded border-[var(--line-2)] bg-[var(--panel-2)] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
                   />
                 </label>
 
                 <label className={`flex-1 flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${
                   isTeacher 
                     ? "bg-indigo-500/5 border-indigo-500/30 text-white" 
-                    : "bg-[#181615] border-[#2a2827] text-surface-400 hover:text-white"
+                    : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-400 hover:text-white"
                 }`}>
                   <div className="flex items-center gap-3">
                     <GraduationCap size={20} className={isTeacher ? "text-indigo-400" : "text-surface-500"} />
@@ -1700,7 +1700,7 @@ export default function ProfilePage() {
                     type="checkbox"
                     checked={isTeacher}
                     onChange={(e) => setIsTeacher(e.target.checked)}
-                    className="rounded border-[#2a2827] bg-[#181615] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
+                    className="rounded border-[var(--line-2)] bg-[var(--panel-2)] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
                   />
                 </label>
               </div>
@@ -1708,7 +1708,7 @@ export default function ProfilePage() {
 
             {/* Luthier Profile Section */}
             {isProfessional && (
-              <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-5">
+              <div className="bg-[var(--panel)] rounded-2xl p-6 border border-[var(--line)] space-y-5">
                 <div className="flex items-center gap-2">
                   <Wrench size={18} className="text-[#ef7c2c]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Perfil de Luthier Especializado</h3>
@@ -1758,7 +1758,7 @@ export default function ProfilePage() {
                           <label key={spec} className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs cursor-pointer select-none transition-all ${
                             isSelected 
                               ? "bg-[#ef7c2c]/10 border-[#ef7c2c]/30 text-[#ef7c2c]" 
-                              : "bg-[#181615] border-[#2a2827] text-surface-400 hover:text-white"
+                              : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-400 hover:text-white"
                           }`}>
                             <input
                               type="checkbox"
@@ -1770,7 +1770,7 @@ export default function ProfilePage() {
                                   setLuthierSpecialties(luthierSpecialties.filter((s) => s !== spec));
                                 }
                               }}
-                              className="rounded border-[#2a2827] bg-[#181615] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
+                              className="rounded border-[var(--line-2)] bg-[var(--panel-2)] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
                             />
                             {spec}
                           </label>
@@ -1784,7 +1784,7 @@ export default function ProfilePage() {
 
             {/* Teacher Profile Section */}
             {isTeacher && (
-              <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-5">
+              <div className="bg-[var(--panel)] rounded-2xl p-6 border border-[var(--line)] space-y-5">
                 <div className="flex items-center gap-2">
                   <GraduationCap size={18} className="text-[#ef7c2c]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Perfil de Professor de Música</h3>
@@ -1859,7 +1859,7 @@ export default function ProfilePage() {
                           <label key={spec} className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs cursor-pointer select-none transition-all ${
                             isSelected 
                               ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-300" 
-                              : "bg-[#181615] border-[#2a2827] text-surface-400 hover:text-white"
+                              : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-400 hover:text-white"
                           }`}>
                             <input
                               type="checkbox"
@@ -1871,7 +1871,7 @@ export default function ProfilePage() {
                                   setTeacherSpecialties(teacherSpecialties.filter((s) => s !== spec));
                                 }
                               }}
-                              className="rounded border-[#2a2827] bg-[#181615] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
+                              className="rounded border-[var(--line-2)] bg-[var(--panel-2)] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
                             />
                             {spec}
                           </label>
@@ -1890,7 +1890,7 @@ export default function ProfilePage() {
                             <label key={level} className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs cursor-pointer select-none transition-all ${
                               isSelected 
                                 ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-300" 
-                                : "bg-[#181615] border-[#2a2827] text-surface-400 hover:text-white"
+                                : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-400 hover:text-white"
                             }`}>
                               <input
                                 type="checkbox"
@@ -1902,7 +1902,7 @@ export default function ProfilePage() {
                                     setTeacherLevels(teacherLevels.filter((l) => l !== level));
                                   }
                                 }}
-                                className="rounded border-[#2a2827] bg-[#181615] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
+                                className="rounded border-[var(--line-2)] bg-[var(--panel-2)] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
                               />
                               {level}
                             </label>
@@ -1920,7 +1920,7 @@ export default function ProfilePage() {
                             <label key={mod} className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs cursor-pointer select-none transition-all ${
                               isSelected 
                                 ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-300" 
-                                : "bg-[#181615] border-[#2a2827] text-surface-400 hover:text-white"
+                                : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-400 hover:text-white"
                             }`}>
                               <input
                                 type="checkbox"
@@ -1932,7 +1932,7 @@ export default function ProfilePage() {
                                     setTeacherModalities(teacherModalities.filter((m) => m !== mod));
                                   }
                                 }}
-                                className="rounded border-[#2a2827] bg-[#181615] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
+                                className="rounded border-[var(--line-2)] bg-[var(--panel-2)] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
                               />
                               {mod}
                             </label>
@@ -1951,7 +1951,7 @@ export default function ProfilePage() {
                           <label key={audience} className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs cursor-pointer select-none transition-all ${
                             isSelected 
                               ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-300" 
-                              : "bg-[#181615] border-[#2a2827] text-surface-400 hover:text-white"
+                              : "bg-[var(--panel-2)] border-[var(--line-2)] text-surface-400 hover:text-white"
                           }`}>
                             <input
                               type="checkbox"
@@ -1963,7 +1963,7 @@ export default function ProfilePage() {
                                   setTeacherTargetAudience(teacherTargetAudience.filter((a) => a !== audience));
                                 }
                               }}
-                              className="rounded border-[#2a2827] bg-[#181615] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
+                              className="rounded border-[var(--line-2)] bg-[var(--panel-2)] text-[#ef7c2c] focus:ring-[#ef7c2c]/30"
                             />
                             {audience}
                           </label>
@@ -1976,7 +1976,7 @@ export default function ProfilePage() {
             )}
 
             {/* Seller Profile Section */}
-            <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-5">
+            <div className="bg-[var(--panel)] rounded-2xl p-6 border border-[var(--line)] space-y-5">
               <div className="flex items-center gap-2">
                 <Smiley size={18} className="text-[#ef7c2c]" />
                 <h3 className="text-sm font-bold uppercase tracking-wider text-surface-400">Perfil do Vendedor</h3>
@@ -2060,7 +2060,7 @@ export default function ProfilePage() {
             </button>
 
             {/* Assinatura Premium Section */}
-            <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-4 relative overflow-hidden">
+            <div className="bg-[var(--panel)] rounded-2xl p-6 border border-[var(--line)] space-y-4 relative overflow-hidden">
               {profile?.isPremium && (
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(239,124,44,0.06),transparent_50%)] pointer-events-none" />
               )}
@@ -2129,7 +2129,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Verification Section */}
-            <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e] space-y-4">
+            <div className="bg-[var(--panel)] rounded-2xl p-6 border border-[var(--line)] space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <ShieldCheck size={18} className="text-[#ef7c2c]" />
@@ -2160,7 +2160,7 @@ export default function ProfilePage() {
       {/* Verification Modal */}
       {showVerificationModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-4">
-          <div className="w-full max-w-[90vw] sm:max-w-lg bg-[#0c0a09] border border-[#2a2827] rounded-2xl shadow-2xl overflow-hidden">
+          <div className="w-full max-w-[90vw] sm:max-w-lg bg-[var(--bg)] border border-[var(--line-2)] rounded-2xl shadow-2xl overflow-hidden">
             <div className="flex items-center justify-between px-6 pt-6 pb-2">
               <h2 className="text-lg font-bold text-white">Enviar Documentos</h2>
               <button
@@ -2170,7 +2170,7 @@ export default function ProfilePage() {
                 }}
                 id="profile-close-verif-modal-btn"
                 aria-label="Fechar modal de verificação"
-                className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[#181615]"
+                className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[var(--panel-2)]"
               >
                 <XCircle size={18} />
               </button>
@@ -2186,7 +2186,7 @@ export default function ProfilePage() {
                 <label htmlFor="document-photo-file-input" className="block text-xs text-surface-400 mb-2 font-medium">
                   Foto do Documento (RG, CNH ou CPF)
                 </label>
-                <label htmlFor="document-photo-file-input" className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[#2a2827] bg-[#181615] cursor-pointer hover:border-[#ef7c2c]/50 transition-colors">
+                <label htmlFor="document-photo-file-input" className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[var(--line-2)] bg-[var(--panel-2)] cursor-pointer hover:border-[#ef7c2c]/50 transition-colors">
                   {documentPreview ? (
                     <img src={documentPreview} alt="Documento" className="h-full object-contain rounded-lg" />
                   ) : (
@@ -2204,7 +2204,7 @@ export default function ProfilePage() {
                 <label htmlFor="face-photo-file-input" className="block text-xs text-surface-400 mb-2 font-medium">
                   Selfie com o Documento (rosto visível)
                 </label>
-                <label htmlFor="face-photo-file-input" className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[#2a2827] bg-[#181615] cursor-pointer hover:border-[#ef7c2c]/50 transition-colors">
+                <label htmlFor="face-photo-file-input" className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[var(--line-2)] bg-[var(--panel-2)] cursor-pointer hover:border-[#ef7c2c]/50 transition-colors">
                   {facePreview ? (
                     <img src={facePreview} alt="Selfie" className="h-full object-contain rounded-lg" />
                   ) : (
@@ -2234,7 +2234,7 @@ export default function ProfilePage() {
       {/* Premium Checkout Modal */}
       {showPremiumModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-4">
-          <div className="w-full max-w-[90vw] sm:max-w-lg bg-[#0c0a09] border border-[#2a2827] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="w-full max-w-[90vw] sm:max-w-lg bg-[var(--bg)] border border-[var(--line-2)] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-2">
               <div className="flex items-center gap-2">
@@ -2247,7 +2247,7 @@ export default function ProfilePage() {
               </div>
               <button
                 onClick={() => setShowPremiumModal(false)}
-                className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[#181615] transition-colors"
+                className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[var(--panel-2)] transition-colors"
               >
                 <XCircle size={18} />
               </button>
@@ -2257,13 +2257,13 @@ export default function ProfilePage() {
             <div className="px-6 pb-6 pt-2 overflow-y-auto space-y-5 flex-1 scrollbar-thin">
               
               {/* Billing Toggle (Mensal / Anual) */}
-              <div className="bg-[#141211] p-1.5 rounded-xl border border-[#22201e] flex gap-2">
+              <div className="bg-[var(--panel)] p-1.5 rounded-xl border border-[var(--line)] flex gap-2">
                 <button
                   type="button"
                   onClick={() => setPremiumBilling("monthly")}
                   className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${
                     premiumBilling === "monthly"
-                      ? "bg-[#181615] text-[#ef7c2c] border border-[#ef7c2c]/30 shadow-md"
+                      ? "bg-[var(--panel-2)] text-[#ef7c2c] border border-[#ef7c2c]/30 shadow-md"
                       : "text-surface-400 hover:text-white"
                   }`}
                 >
@@ -2274,7 +2274,7 @@ export default function ProfilePage() {
                   onClick={() => setPremiumBilling("yearly")}
                   className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 relative ${
                     premiumBilling === "yearly"
-                      ? "bg-[#181615] text-[#ef7c2c] border border-[#ef7c2c]/30 shadow-md"
+                      ? "bg-[var(--panel-2)] text-[#ef7c2c] border border-[#ef7c2c]/30 shadow-md"
                       : "text-surface-400 hover:text-white"
                   }`}
                 >
@@ -2295,7 +2295,7 @@ export default function ProfilePage() {
                   className={`p-5 rounded-2xl border cursor-pointer transition-all duration-300 relative overflow-hidden ${
                     premiumTier === 1
                       ? "bg-[#1d1712] border-[#ef7c2c] shadow-[0_0_15px_rgba(239,124,44,0.15)]"
-                      : "bg-[#141211] border-[#22201e] hover:border-[#2a2827]"
+                      : "bg-[var(--panel)] border-[var(--line)] hover:border-[var(--line-2)]"
                   }`}
                 >
                   {/* Recommended Ribbon */}
@@ -2338,7 +2338,7 @@ export default function ProfilePage() {
                   className={`p-5 rounded-2xl border cursor-pointer transition-all duration-300 ${
                     premiumTier === 2
                       ? "bg-[#17121d] border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.15)]"
-                      : "bg-[#141211] border-[#22201e] hover:border-[#2a2827]"
+                      : "bg-[var(--panel)] border-[var(--line)] hover:border-[var(--line-2)]"
                   }`}
                 >
                   <div className="flex items-start gap-3">

@@ -52,10 +52,10 @@ export default function SuportePage() {
   }
 
   const inputBase =
-    "w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
+    "w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
 
   return (
-    <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
+    <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <Link href="/" id="back-to-home-link" className="text-sm text-[#ef7c2c] hover:underline mb-6 inline-block">
           &larr; Voltar ao início
@@ -75,7 +75,7 @@ export default function SuportePage() {
             {FAQ_ITEMS.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-[#141211] rounded-xl border border-[#22201e] overflow-hidden"
+                className="bg-[var(--panel)] rounded-xl border border-[var(--line)] overflow-hidden"
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
@@ -113,7 +113,7 @@ export default function SuportePage() {
             <h2 className="text-lg font-bold text-white">Fale Conosco</h2>
           </div>
 
-          <div className="bg-[#141211] rounded-2xl p-6 border border-[#22201e]">
+          <div className="bg-[var(--panel)] rounded-2xl p-6 border border-[var(--line)]">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="support-name-input" className="block text-xs text-surface-400 mb-1.5">Nome</label>

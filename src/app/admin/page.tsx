@@ -22,7 +22,7 @@ type Tab = "pendentes" | "luthier" | "acessorios" | "instrumentos" | "usuarios" 
 const INSTRUMENT_CATEGORIES = ["Guitarra", "Violão", "Baixo", "Bateria", "Teclado", "Saxofone", "Violino"];
 
 const inputBase =
-  "w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
+  "w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
 
 function ProductCard({
   product,
@@ -36,7 +36,7 @@ function ProductCard({
   // Notas locais por card: evita que o texto digitado em um item vaze para os demais.
   const [adminNotes, setAdminNotes] = useState("");
   return (
-    <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+    <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] space-y-4">
       <div className="flex items-center justify-between">
         <div className="min-w-0 flex-1">
           <h4 className="text-sm font-bold text-white truncate">{product.title}</h4>
@@ -67,7 +67,7 @@ function ProductCard({
         <div className="flex gap-2 overflow-x-auto pb-1">
           {product.photos.map((photo, idx) => (
             <a key={idx} href={photo} target="_blank" rel="noopener noreferrer"
-              className="h-20 sm:h-24 w-20 sm:w-24 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden flex-shrink-0 hover:border-[#ef7c2c]/30 transition-colors"
+              className="h-20 sm:h-24 w-20 sm:w-24 rounded-xl bg-[var(--panel-2)] border border-[var(--line-2)] overflow-hidden flex-shrink-0 hover:border-[#ef7c2c]/30 transition-colors"
             >
               <img src={photo} alt="" className="h-full w-full object-cover" />
             </a>
@@ -76,7 +76,7 @@ function ProductCard({
       )}
 
       {product.status === "pending" && (
-        <div className="space-y-3 pt-2 border-t border-[#22201e]">
+        <div className="space-y-3 pt-2 border-t border-[var(--line)]">
           <textarea value={adminNotes} onChange={(e) => setAdminNotes(e.target.value)}
             placeholder="Observações (opcional)..."
             id={`admin-notes-prod-${product.id}`}
@@ -105,7 +105,7 @@ function ProductCard({
       )}
 
       {product.status !== "pending" && product.adminNotes && (
-        <div className="pt-2 border-t border-[#22201e]">
+        <div className="pt-2 border-t border-[var(--line)]">
           <p className="text-xs text-surface-400">
             <span className="text-surface-500">Observações:</span> {product.adminNotes}
           </p>
@@ -126,7 +126,7 @@ function VerificationCard({
 }) {
   const [adminNotes, setAdminNotes] = useState("");
   return (
-    <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+    <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h4 className="text-sm font-bold text-white">{ver.userName}</h4>
@@ -145,19 +145,19 @@ function VerificationCard({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <a href={ver.documentPhoto} target="_blank" rel="noopener noreferrer"
-          className="h-28 sm:h-32 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
+          className="h-28 sm:h-32 rounded-xl bg-[var(--panel-2)] border border-[var(--line-2)] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
         >
           <img src={ver.documentPhoto} alt="Documento" className="h-full w-full object-cover" />
         </a>
         <a href={ver.facePhoto} target="_blank" rel="noopener noreferrer"
-          className="h-28 sm:h-32 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
+          className="h-28 sm:h-32 rounded-xl bg-[var(--panel-2)] border border-[var(--line-2)] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
         >
           <img src={ver.facePhoto} alt="Selfie" className="h-full w-full object-cover" />
         </a>
       </div>
 
       {ver.status === "pending" && (
-        <div className="space-y-3 pt-2 border-t border-[#22201e]">
+        <div className="space-y-3 pt-2 border-t border-[var(--line)]">
           <textarea value={adminNotes} onChange={(e) => setAdminNotes(e.target.value)}
             placeholder="Observações (opcional)..."
             id={`admin-notes-ver-${ver.id}`}
@@ -186,7 +186,7 @@ function VerificationCard({
       )}
 
       {ver.status !== "pending" && ver.adminNotes && (
-        <div className="pt-2 border-t border-[#22201e]">
+        <div className="pt-2 border-t border-[var(--line)]">
           <p className="text-xs text-surface-400">
             <span className="text-surface-500">Observações:</span> {ver.adminNotes}
           </p>
@@ -207,7 +207,7 @@ function PendingLuthierCard({
 }) {
   const [adminNotes, setAdminNotes] = useState("");
   return (
-    <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+    <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] space-y-4">
       <div className="flex items-center justify-between">
         <div className="min-w-0 flex-1">
           <h4 className="text-sm font-bold text-white truncate">{luthier.name}</h4>
@@ -235,7 +235,7 @@ function PendingLuthierCard({
         </div>
       )}
 
-      <div className="space-y-3 pt-2 border-t border-[#22201e]">
+      <div className="space-y-3 pt-2 border-t border-[var(--line)]">
         <textarea
           value={adminNotes}
           onChange={(e) => setAdminNotes(e.target.value)}
@@ -277,7 +277,7 @@ function PendingTeacherCard({
 }) {
   const [adminNotes, setAdminNotes] = useState("");
   return (
-    <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+    <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] space-y-4">
       <div className="flex items-center justify-between">
         <div className="min-w-0 flex-1">
           <h4 className="text-sm font-bold text-white truncate">{teacher.userName}</h4>
@@ -321,7 +321,7 @@ function PendingTeacherCard({
         </div>
       )}
 
-      <div className="space-y-3 pt-2 border-t border-[#22201e]">
+      <div className="space-y-3 pt-2 border-t border-[var(--line)]">
         <textarea
           value={adminNotes}
           onChange={(e) => setAdminNotes(e.target.value)}
@@ -363,7 +363,7 @@ function PendingRatingCard({
 }) {
   const [adminNotes, setAdminNotes] = useState("");
   return (
-    <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4">
+    <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] space-y-4">
       <div className="flex items-center justify-between">
         <div className="min-w-0 flex-1">
           <h4 className="text-sm font-bold text-white">Avaliação de Perfil</h4>
@@ -391,12 +391,12 @@ function PendingRatingCard({
       </div>
 
       {rating.comment && (
-        <p className="text-xs text-surface-300 leading-relaxed bg-[#181615] border border-[#2a2827] rounded-xl p-3">
+        <p className="text-xs text-surface-300 leading-relaxed bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl p-3">
           "{rating.comment}"
         </p>
       )}
 
-      <div className="space-y-3 pt-2 border-t border-[#22201e]">
+      <div className="space-y-3 pt-2 border-t border-[var(--line)]">
         <textarea
           value={adminNotes}
           onChange={(e) => setAdminNotes(e.target.value)}
@@ -443,8 +443,8 @@ function UserCard({
   toggling: string | null;
 }) {
   return (
-    <div className="bg-[#141211] rounded-2xl p-4 sm:p-5 border border-[#22201e] flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-      <div className="h-10 sm:h-12 w-10 sm:w-12 rounded-full bg-[#181615] border border-[#2a2827] overflow-hidden flex-shrink-0">
+    <div className="bg-[var(--panel)] rounded-2xl p-4 sm:p-5 border border-[var(--line)] flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+      <div className="h-10 sm:h-12 w-10 sm:w-12 rounded-full bg-[var(--panel-2)] border border-[var(--line-2)] overflow-hidden flex-shrink-0">
         {u.photoURL ? (
           <img src={u.photoURL} alt="" className="h-full w-full object-cover" />
         ) : (
@@ -478,7 +478,7 @@ function UserCard({
           className={`text-[10px] font-semibold py-2 px-3 rounded-lg border transition-all disabled:opacity-60 ${
             u.role === "admin"
               ? "bg-[#ef7c2c]/10 text-[#ef7c2c] border-[#ef7c2c]/20 hover:bg-[#ef7c2c]/20"
-              : "bg-[#181615] text-surface-400 border-[#2a2827] hover:border-[#ef7c2c]/30"
+              : "bg-[var(--panel-2)] text-surface-400 border-[var(--line-2)] hover:border-[#ef7c2c]/30"
           }`}
         >
           Admin
@@ -489,7 +489,7 @@ function UserCard({
           className={`text-[10px] font-semibold py-2 px-3 rounded-lg border transition-all disabled:opacity-60 ${
             u.isVerified
               ? "bg-emerald-400/10 text-emerald-400 border-emerald-400/20 hover:bg-emerald-400/20"
-              : "bg-[#181615] text-surface-400 border-[#2a2827] hover:border-emerald-400/30"
+              : "bg-[var(--panel-2)] text-surface-400 border-[var(--line-2)] hover:border-emerald-400/30"
           }`}
         >
           Verif.
@@ -500,7 +500,7 @@ function UserCard({
           className={`text-[10px] font-semibold py-2 px-3 rounded-lg border transition-all disabled:opacity-60 ${
             u.isProfessional
               ? "bg-[#d4ae12]/10 text-[#d4ae12] border-[#d4ae12]/20 hover:bg-[#d4ae12]/20"
-              : "bg-[#181615] text-surface-400 border-[#2a2827] hover:border-[#d4ae12]/30"
+              : "bg-[var(--panel-2)] text-surface-400 border-[var(--line-2)] hover:border-[#d4ae12]/30"
           }`}
         >
           Prof.
@@ -511,7 +511,7 @@ function UserCard({
           className={`text-[10px] font-semibold py-2 px-3 rounded-lg border transition-all disabled:opacity-60 ${
             u.isTeacher
               ? "bg-indigo-400/10 text-indigo-400 border-indigo-400/20 hover:bg-indigo-400/20"
-              : "bg-[#181615] text-surface-400 border-[#2a2827] hover:border-indigo-400/30"
+              : "bg-[var(--panel-2)] text-surface-400 border-[var(--line-2)] hover:border-indigo-400/30"
           }`}
         >
           Prof.Mús.
@@ -766,8 +766,8 @@ export default function AdminPage() {
 
   return (
     <AdminGuard>
-      <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
-        <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+      <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans">
+        <header className="border-b border-[var(--panel-2)]/60 bg-[var(--bg)]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
             <Link href="/" className="flex flex-col items-start gap-0">
               <img 
@@ -785,13 +785,13 @@ export default function AdminPage() {
               <NotificationBell />
               <Link
                 href="/profile"
-                className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827]"
+                className="text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[var(--line-2)]"
               >
                 Perfil
               </Link>
               <button
                 onClick={logout}
-                className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+                className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[var(--line-2)] hover:border-[#ef7c2c]/30"
               >
                 <SignOut size={14} />
                 Sair
@@ -862,7 +862,7 @@ export default function AdminPage() {
                   className={`flex items-center gap-2 text-xs font-semibold py-2.5 px-4 rounded-xl transition-all flex-shrink-0 whitespace-nowrap ${
                     activeTab === tab.key
                       ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white shadow-lg shadow-[#ef7c2c]/20"
-                      : "bg-[#181615] text-surface-400 border border-[#2a2827] hover:border-[#ef7c2c]/30 hover:text-white"
+                      : "bg-[var(--panel-2)] text-surface-400 border border-[var(--line-2)] hover:border-[#ef7c2c]/30 hover:text-white"
                   }`}
                 >
                   {tab.icon}
@@ -893,7 +893,7 @@ export default function AdminPage() {
                       Anúncios Pendentes
                     </h3>
                     {pendingProducts.length === 0 ? (
-                      <div className="text-center py-8 bg-[#141211] rounded-2xl border border-[#22201e]">
+                      <div className="text-center py-8 bg-[var(--panel)] rounded-2xl border border-[var(--line)]">
                         <Package size={40} className="mx-auto text-surface-500 mb-2" />
                         <p className="text-surface-400 text-sm">Nenhum anúncio pendente.</p>
                       </div>
@@ -917,7 +917,7 @@ export default function AdminPage() {
                       Avaliações Pendentes
                     </h3>
                     {pendingVerifications.length === 0 ? (
-                      <div className="text-center py-8 bg-[#141211] rounded-2xl border border-[#22201e]">
+                      <div className="text-center py-8 bg-[var(--panel)] rounded-2xl border border-[var(--line)]">
                         <ShieldCheckIcon />
                         <p className="text-surface-400 text-sm mt-2">Nenhuma verificação pendente.</p>
                       </div>
@@ -941,7 +941,7 @@ export default function AdminPage() {
                       Luthiers Pendentes
                     </h3>
                     {pendingLuthiers.length === 0 ? (
-                      <div className="text-center py-8 bg-[#141211] rounded-2xl border border-[#22201e]">
+                      <div className="text-center py-8 bg-[var(--panel)] rounded-2xl border border-[var(--line)]">
                         <Wrench size={40} className="mx-auto text-surface-500 mb-2" />
                         <p className="text-surface-400 text-sm">Nenhum luthier pendente.</p>
                       </div>
@@ -965,7 +965,7 @@ export default function AdminPage() {
                       Professores Pendentes
                     </h3>
                     {pendingTeachers.length === 0 ? (
-                      <div className="text-center py-8 bg-[#141211] rounded-2xl border border-[#22201e]">
+                      <div className="text-center py-8 bg-[var(--panel)] rounded-2xl border border-[var(--line)]">
                         <GraduationCap size={40} className="mx-auto text-surface-500 mb-2" />
                         <p className="text-surface-400 text-sm">Nenhum professor pendente.</p>
                       </div>
@@ -989,7 +989,7 @@ export default function AdminPage() {
                       Avaliações de Perfil Pendentes
                     </h3>
                     {pendingRatings.length === 0 ? (
-                      <div className="text-center py-8 bg-[#141211] rounded-2xl border border-[#22201e]">
+                      <div className="text-center py-8 bg-[var(--panel)] rounded-2xl border border-[var(--line)]">
                         <Star size={40} className="mx-auto text-surface-500 mb-2" />
                         <p className="text-surface-400 text-sm">Nenhuma avaliação de perfil pendente.</p>
                       </div>
@@ -1017,7 +1017,7 @@ export default function AdminPage() {
                     Luthiers / Profissionais
                   </h3>
                   {professionalUsers.length === 0 ? (
-                    <div className="text-center py-12 bg-[#141211] rounded-2xl border border-[#22201e]">
+                    <div className="text-center py-12 bg-[var(--panel)] rounded-2xl border border-[var(--line)]">
                       <Wrench size={40} className="mx-auto text-surface-500 mb-2" />
                       <p className="text-surface-400 text-sm">Nenhum profissional cadastrado.</p>
                     </div>
@@ -1047,7 +1047,7 @@ export default function AdminPage() {
                     Professores de Música
                   </h3>
                   {teacherUsers.length === 0 ? (
-                    <div className="text-center py-12 bg-[#141211] rounded-2xl border border-[#22201e]">
+                    <div className="text-center py-12 bg-[var(--panel)] rounded-2xl border border-[var(--line)]">
                       <GraduationCap size={40} className="mx-auto text-surface-500 mb-2" />
                       <p className="text-surface-400 text-sm">Nenhum professor cadastrado.</p>
                     </div>
@@ -1077,7 +1077,7 @@ export default function AdminPage() {
                     Acessórios
                   </h3>
                   {acessorioProducts.length === 0 ? (
-                    <div className="text-center py-12 bg-[#141211] rounded-2xl border border-[#22201e]">
+                    <div className="text-center py-12 bg-[var(--panel)] rounded-2xl border border-[var(--line)]">
                       <Package size={40} className="mx-auto text-surface-500 mb-2" />
                       <p className="text-surface-400 text-sm">Nenhum acessório cadastrado.</p>
                     </div>
@@ -1104,7 +1104,7 @@ export default function AdminPage() {
                     Instrumentos
                   </h3>
                   {instrumentoProducts.length === 0 ? (
-                    <div className="text-center py-12 bg-[#141211] rounded-2xl border border-[#22201e]">
+                    <div className="text-center py-12 bg-[var(--panel)] rounded-2xl border border-[var(--line)]">
                       <MusicNote size={40} className="mx-auto text-surface-500 mb-2" />
                       <p className="text-surface-400 text-sm">Nenhum instrumento cadastrado.</p>
                     </div>
@@ -1142,7 +1142,7 @@ export default function AdminPage() {
                   />
 
                   {filteredUsers.length === 0 ? (
-                    <div className="text-center py-12 bg-[#141211] rounded-2xl border border-[#22201e]">
+                    <div className="text-center py-12 bg-[var(--panel)] rounded-2xl border border-[var(--line)]">
                       <Users size={40} className="mx-auto text-surface-500 mb-2" />
                       <p className="text-surface-400 text-sm">Nenhum usuário encontrado.</p>
                     </div>

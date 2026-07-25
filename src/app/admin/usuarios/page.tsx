@@ -118,12 +118,12 @@ export default function AdminUsuariosPage() {
     : users;
 
   const inputBase =
-    "w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
+    "w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
 
   return (
     <AdminGuard>
-      <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
-        <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+      <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans">
+        <header className="border-b border-[var(--panel-2)]/60 bg-[var(--bg)]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <Link href="/admin" id="admin-users-back-btn" className="text-surface-400 hover:text-white transition-colors flex-shrink-0">
@@ -143,7 +143,7 @@ export default function AdminUsuariosPage() {
             <NotificationBell />
             <button onClick={logout}
               id="admin-users-logout-btn"
-              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[var(--line-2)] hover:border-[#ef7c2c]/30"
             >
               <SignOut size={14} /> Sair
             </button>
@@ -170,7 +170,7 @@ export default function AdminUsuariosPage() {
           ) : (
             <div className="space-y-4">
               {filtered.map((u) => (
-                <div key={u.uid} className="bg-[#141211] rounded-2xl p-4 sm:p-5 border border-[#22201e] space-y-4">
+                <div key={u.uid} className="bg-[var(--panel)] rounded-2xl p-4 sm:p-5 border border-[var(--line)] space-y-4">
                   <div className="flex items-start sm:items-center gap-3 sm:gap-4">
                     <div className="h-10 sm:h-12 w-10 sm:w-12 rounded-full bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
                       {u.displayName?.charAt(0).toUpperCase() || u.email?.charAt(0).toUpperCase() || "U"}
@@ -201,7 +201,7 @@ export default function AdminUsuariosPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 pt-2 border-t border-[#22201e]">
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-[var(--line)]">
                     {/* Toggle Admin */}
                     <button onClick={() => handleToggleRole(u.uid, u.role)}
                       disabled={processingUid === u.uid}
@@ -209,7 +209,7 @@ export default function AdminUsuariosPage() {
                       className={`flex items-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
                         u.role === "admin"
                           ? "bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 hover:bg-[#ef7c2c]/20"
-                          : "bg-[#181615] text-surface-400 border border-[#2a2827] hover:text-white"
+                          : "bg-[var(--panel-2)] text-surface-400 border border-[var(--line-2)] hover:text-white"
                       }`}
                     >
                       {processingUid === u.uid ? <Spinner size={12} className="animate-spin" /> : <ShieldCheck size={14} />}
@@ -223,7 +223,7 @@ export default function AdminUsuariosPage() {
                       className={`flex items-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
                         u.isVerified
                           ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
-                          : "bg-[#181615] text-surface-400 border border-[#2a2827] hover:text-white"
+                          : "bg-[var(--panel-2)] text-surface-400 border border-[var(--line-2)] hover:text-white"
                       }`}
                     >
                       {processingUid === u.uid ? <Spinner size={12} className="animate-spin" /> : <CheckCircle size={14} />}
@@ -237,7 +237,7 @@ export default function AdminUsuariosPage() {
                       className={`flex items-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
                         u.isProfessional
                           ? "bg-amber-400/10 text-amber-400 border border-amber-400/20 hover:bg-amber-400/20"
-                          : "bg-[#181615] text-surface-400 border border-[#2a2827] hover:text-white"
+                          : "bg-[var(--panel-2)] text-surface-400 border border-[var(--line-2)] hover:text-white"
                       }`}
                     >
                       {processingUid === u.uid ? <Spinner size={12} className="animate-spin" /> : <Star size={14} />}
@@ -251,7 +251,7 @@ export default function AdminUsuariosPage() {
                       className={`flex items-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-60 ${
                         u.isTeacher
                           ? "bg-indigo-400/10 text-indigo-400 border border-indigo-400/20 hover:bg-indigo-400/20"
-                          : "bg-[#181615] text-surface-400 border border-[#2a2827] hover:text-white"
+                          : "bg-[var(--panel-2)] text-surface-400 border border-[var(--line-2)] hover:text-white"
                       }`}
                     >
                       {processingUid === u.uid ? <Spinner size={12} className="animate-spin" /> : <GraduationCap size={14} />}
@@ -260,7 +260,7 @@ export default function AdminUsuariosPage() {
 
                     {/* Alterar Assinatura (Apenas para jfreire.comercial@gmail.com) */}
                     {superAdmin && (
-                      <div className="flex items-center gap-2 bg-[#181615] border border-[#2a2827] rounded-xl px-3 py-2.5 text-xs font-semibold">
+                      <div className="flex items-center gap-2 bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-3 py-2.5 text-xs font-semibold">
                         <span className="text-surface-400">Plano:</span>
                         <select
                           value={u.premiumTier || "tier3"}
@@ -268,9 +268,9 @@ export default function AdminUsuariosPage() {
                           disabled={processingUid === u.uid}
                           className="bg-transparent border-none text-[#ef7c2c] font-bold outline-none cursor-pointer"
                         >
-                          <option value="tier3" className="bg-[#0b0908] text-white">Tier 3 (Grátis)</option>
-                          <option value="tier2" className="bg-[#0b0908] text-white">Tier 2 (Plus)</option>
-                          <option value="tier1" className="bg-[#0b0908] text-white">Tier 1 (Pro)</option>
+                          <option value="tier3" className="bg-[var(--bg)] text-white">Tier 3 (Grátis)</option>
+                          <option value="tier2" className="bg-[var(--bg)] text-white">Tier 2 (Plus)</option>
+                          <option value="tier1" className="bg-[var(--bg)] text-white">Tier 1 (Pro)</option>
                         </select>
                       </div>
                     )}

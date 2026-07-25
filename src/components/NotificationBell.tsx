@@ -167,11 +167,11 @@ export default function NotificationBell() {
         onClick={() => setIsOpen(!isOpen)}
         id="btn-notifications-toggle"
         aria-label="Abrir notificações"
-        className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-[#181615] border border-[#2a2827] flex items-center justify-center text-surface-300 hover:text-white hover:border-[#ef7c2c]/30 hover:bg-[#201e1d] active:scale-[0.97] transition-all duration-200 cursor-pointer"
+        className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-[var(--panel-2)] border border-[var(--line-2)] flex items-center justify-center text-surface-300 hover:text-white hover:border-[#ef7c2c]/30 hover:bg-[var(--line)] active:scale-[0.97] transition-all duration-200 cursor-pointer"
       >
         <Bell size={20} className={unreadCount > 0 ? "animate-swing" : ""} />
         {unreadCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-[#ef7c2c] text-[10px] font-bold text-white shadow-[0_0_10px_rgba(239,124,44,0.4)] animate-pulse border border-[#0c0a09]">
+          <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-[#ef7c2c] text-[10px] font-bold text-white shadow-[0_0_10px_rgba(239,124,44,0.4)] animate-pulse border border-[var(--bg)]">
             {unreadCount}
           </span>
         )}
@@ -179,9 +179,9 @@ export default function NotificationBell() {
 
       {/* Notifications Popover Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2.5 w-[310px] sm:w-[360px] bg-[#0e0c0b]/95 border border-[#2a2827] rounded-2xl shadow-2xl backdrop-blur-md z-[100] animate-slide-down overflow-hidden">
+        <div className="absolute right-0 mt-2.5 w-[310px] sm:w-[360px] bg-[var(--bg)]/95 border border-[var(--line-2)] rounded-2xl shadow-2xl backdrop-blur-md z-[100] animate-slide-down overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#22201e] bg-[#141211]/50">
+          <div className="flex items-center justify-between px-4 py-3.5 border-b border-[var(--line)] bg-[var(--panel)]/50">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold uppercase tracking-wider text-surface-200">Notificações</span>
               {unreadCount > 0 && (
@@ -202,10 +202,10 @@ export default function NotificationBell() {
           </div>
 
           {/* List Content */}
-          <div className="max-h-[360px] overflow-y-auto divide-y divide-[#1c1a19]/40 scrollbar-thin">
+          <div className="max-h-[360px] overflow-y-auto divide-y divide-[var(--panel-2)]/40 scrollbar-thin">
             {notifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-[#181615] border border-[#22201e]/60 flex items-center justify-center text-surface-500">
+                <div className="h-12 w-12 rounded-full bg-[var(--panel-2)] border border-[var(--line)]/60 flex items-center justify-center text-surface-500">
                   <Bell size={22} className="opacity-40" />
                 </div>
                 <div>
@@ -218,12 +218,12 @@ export default function NotificationBell() {
                 <div
                   key={item.id}
                   onClick={() => handleNotificationClick(item)}
-                  className={`flex items-start gap-3 p-4 hover:bg-[#181615]/80 cursor-pointer transition-all ${
+                  className={`flex items-start gap-3 p-4 hover:bg-[var(--panel-2)]/80 cursor-pointer transition-all ${
                     !item.read ? "bg-[#ef7c2c]/5 border-l-2 border-l-[#ef7c2c]" : ""
                   }`}
                 >
                   {/* Icon Badge */}
-                  <div className="h-8 w-8 rounded-xl bg-[#1c1a19] border border-[#2c2a29] flex-shrink-0 flex items-center justify-center shadow-inner">
+                  <div className="h-8 w-8 rounded-xl bg-[var(--panel-2)] border border-[#2c2a29] flex-shrink-0 flex items-center justify-center shadow-inner">
                     {getIcon(item.type)}
                   </div>
 
@@ -272,7 +272,7 @@ export default function NotificationBell() {
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-2 border-t border-[#22201e] bg-[#141211]/30 text-center">
+          <div className="px-4 py-2 border-t border-[var(--line)] bg-[var(--panel)]/30 text-center">
             <button
               onClick={() => {
                 setIsOpen(false);
