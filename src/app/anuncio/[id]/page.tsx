@@ -22,6 +22,12 @@ import { toast } from "sonner";
 import NotificationBell from "../../../components/NotificationBell";
 import ChatHeaderButton from "../../../components/ChatHeaderButton";
 import { createOrGetChat } from "../../../lib/chatService";
+import dynamic from "next/dynamic";
+
+const Map = dynamic(() => import("../../../Map"), {
+  ssr: false,
+  loading: () => <div className="h-[150px] w-full rounded-xl bg-surface-900 animate-pulse border border-surface-850" />
+});
 
 export default function AnuncioDetalhePage() {
   const params = useParams();
@@ -127,7 +133,7 @@ export default function AnuncioDetalhePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3 text-surface-400">
           <Clock size={28} className="animate-spin" />
           <p className="text-xs">Carregando anúncio...</p>
@@ -138,7 +144,7 @@ export default function AnuncioDetalhePage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-[#0b0908] flex flex-col items-center justify-center gap-4">
+      <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center gap-4">
         <p className="text-surface-400 text-sm">Anúncio não encontrado.</p>
         <button onClick={() => router.push("/")} className="text-xs text-[#ef7c2c] hover:underline cursor-pointer">
           Voltar para o marketplace
@@ -148,17 +154,17 @@ export default function AnuncioDetalhePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
+    <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans">
       {/* Header */}
-      <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50">
+      <header className="border-b border-[var(--panel-2)]/60 bg-[var(--bg)]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <button onClick={() => router.back()} className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors cursor-pointer">
               <ArrowLeft size={16} />
               Voltar
             </button>
-            <div className="h-5 w-px bg-[#2a2827]" />
-            <img src="/focattolecter.png" alt="Logo" className="h-7 w-auto object-contain invert brightness-110 mix-blend-screen" />
+            <div className="h-5 w-px bg-[var(--line-2)]" />
+            <img src="/vibrattoo.png" alt="Logo" className="h-7 w-auto object-contain invert brightness-110 mix-blend-screen" />
           </div>
           <ChatHeaderButton />
           <NotificationBell />
@@ -171,8 +177,8 @@ export default function AnuncioDetalhePage() {
           {/* Left: Product Details */}
           <div className="md:col-span-7 flex flex-col gap-5">
             {/* Photos */}
-            <div className="bg-[#141211] rounded-2xl border border-[#22201e] overflow-hidden shadow-xl">
-              <div className="h-[300px] sm:h-[400px] w-full bg-[#0d0b0a] flex items-center justify-center">
+            <div className="bg-[var(--panel)] rounded-2xl border border-[var(--line)] overflow-hidden shadow-xl">
+              <div className="h-[300px] sm:h-[400px] w-full bg-[var(--bg)] flex items-center justify-center">
                 {product.photos && product.photos.length > 0 ? (
                   <img src={product.photos[0]} alt={product.title} className="h-full w-full object-contain" />
                 ) : (
@@ -182,7 +188,7 @@ export default function AnuncioDetalhePage() {
             </div>
 
             {/* Info */}
-            <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] shadow-xl">
+            <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] shadow-xl">
               <div className="flex items-center justify-between gap-2 mb-1">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] uppercase tracking-wider font-bold text-surface-400 bg-surface-800 px-2 py-0.5 rounded">
@@ -199,7 +205,7 @@ export default function AnuncioDetalhePage() {
                   <button
                     onClick={user ? handleToggleFavorite : () => setShowLogin(true)}
                     disabled={favoriteLoading}
-                    className="flex items-center justify-center p-2 rounded-xl border border-[#2a2827] bg-[#181615] text-surface-400 hover:text-red-500 hover:border-red-500/30 transition-all cursor-pointer flex-shrink-0"
+                    className="flex items-center justify-center p-2 rounded-xl border border-[var(--line-2)] bg-[var(--panel-2)] text-surface-400 hover:text-red-500 hover:border-red-500/30 transition-all cursor-pointer flex-shrink-0"
                     title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
                   >
                     <HeartStraight
@@ -214,7 +220,7 @@ export default function AnuncioDetalhePage() {
               <p className="text-2xl font-bold text-[#ef7c2c] mt-2">
                 R$ {product.price.toLocaleString("pt-BR")}
               </p>
-              <hr className="border-[#22201e] my-4" />
+              <hr className="border-[var(--line)] my-4" />
               <p className="text-sm text-surface-300 font-body leading-relaxed whitespace-pre-wrap">
                 {product.description}
               </p>
@@ -227,7 +233,7 @@ export default function AnuncioDetalhePage() {
 
           {/* Right: Seller Profile */}
           <div className="md:col-span-5 flex flex-col gap-5">
-            <div className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] shadow-xl sticky top-24">
+            <div className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] shadow-xl sticky top-24">
               <h3 className="text-xs font-bold uppercase tracking-wider text-surface-400 mb-4">Vendedor</h3>
 
               <div className="flex items-center gap-3 mb-4">
@@ -322,13 +328,27 @@ export default function AnuncioDetalhePage() {
                 </div>
               )}
 
-              <Link
-                href={`/vendedor/${product.userId}`}
-                className="mt-4 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 text-xs font-semibold hover:bg-[#ef7c2c]/20 transition-all w-full"
-              >
-                Ver Perfil Completo
-                <ArrowLeft size={14} className="rotate-180" />
-              </Link>
+              <div className="flex flex-col gap-2 mt-4">
+                <Link
+                  href={`/vendedor/${product.userId}`}
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#ef7c2c]/10 text-[#ef7c2c] border border-[#ef7c2c]/20 text-xs font-semibold hover:bg-[#ef7c2c]/20 transition-all w-full"
+                >
+                  Ver Perfil Completo
+                  <ArrowLeft size={14} className="rotate-180" />
+                </Link>
+                <Link
+                  href={`/social/${product.userId}`}
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#ef7c2c]/20 to-[#d4ae12]/20 hover:from-[#ef7c2c]/30 hover:to-[#d4ae12]/30 text-white border border-[#ef7c2c]/30 text-xs font-semibold transition-all w-full"
+                >
+                  Ver Perfil Social
+                </Link>
+              </div>
+
+              {/* Map location */}
+              <div className="mt-5 pt-5 border-t border-surface-850">
+                <span className="block text-[10px] font-bold text-surface-450 uppercase tracking-wider mb-2">Localização</span>
+                <Map city={product.city} state={product.state} className="h-[150px] w-full rounded-xl" zoom={11} />
+              </div>
             </div>
           </div>
 

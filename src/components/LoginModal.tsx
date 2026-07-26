@@ -154,7 +154,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   if (!isOpen) return null;
 
   const inputClasses =
-    "w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
+    "w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
 
   return (
     <div
@@ -164,7 +164,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       tabIndex={-1}
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-3 sm:p-4"
     >
-      <div className="w-full max-w-[90vw] sm:max-w-[420px] bg-[#0c0a09] border border-[#2a2827] rounded-2xl shadow-2xl animate-slide-up overflow-hidden">
+      <div className="w-full max-w-[90vw] sm:max-w-[420px] bg-[var(--bg)] border border-[var(--line-2)] rounded-2xl shadow-2xl animate-slide-up overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-2">
           <h2 className="text-lg font-bold text-white font-heading">
@@ -176,7 +176,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             onClick={onClose}
             id="close-login-modal-btn"
             aria-label="Fechar modal de autenticação"
-            className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[#181615] transition-all"
+            className="h-8 w-8 flex items-center justify-center rounded-lg text-surface-400 hover:text-white hover:bg-[var(--panel-2)] transition-all"
           >
             <X size={18} />
           </button>
@@ -241,9 +241,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </button>
 
               <div className="flex items-center gap-3 my-1">
-                <div className="flex-1 h-px bg-[#2a2827]" />
+                <div className="flex-1 h-px bg-[var(--line-2)]" />
                 <span className="text-xs text-surface-400">ou</span>
-                <div className="flex-1 h-px bg-[#2a2827]" />
+                <div className="flex-1 h-px bg-[var(--line-2)]" />
               </div>
 
               <button
@@ -353,9 +353,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </button>
 
               <div className="flex items-center gap-3 my-1">
-                <div className="flex-1 h-px bg-[#2a2827]" />
+                <div className="flex-1 h-px bg-[var(--line-2)]" />
                 <span className="text-xs text-surface-400">ou</span>
-                <div className="flex-1 h-px bg-[#2a2827]" />
+                <div className="flex-1 h-px bg-[var(--line-2)]" />
               </div>
 
               <button

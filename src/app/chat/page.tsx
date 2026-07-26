@@ -186,7 +186,7 @@ function ChatPageContent() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3 text-surface-400">
           <Circle size={28} className="animate-spin text-[#ef7c2c]" />
           <p className="text-xs">Carregando...</p>
@@ -197,7 +197,7 @@ function ChatPageContent() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3 text-surface-400">
           <Circle size={28} className="animate-spin text-[#ef7c2c]" />
           <p className="text-xs">Redirecionando...</p>
@@ -207,9 +207,9 @@ function ChatPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans flex flex-col h-screen overflow-hidden">
+    <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans flex flex-col h-screen overflow-hidden">
       {/* Header */}
-      <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 flex-shrink-0">
+      <header className="border-b border-[var(--panel-2)]/60 bg-[var(--bg)]/80 backdrop-blur-md sticky top-0 z-50 flex-shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3 w-full">
           <div className="flex items-center gap-3">
             <Link
@@ -220,9 +220,9 @@ function ChatPageContent() {
               <span className="hidden sm:inline">Voltar ao Marketplace</span>
               <span className="sm:hidden">Marketplace</span>
             </Link>
-            <div className="h-5 w-px bg-[#2a2827]" />
+            <div className="h-5 w-px bg-[var(--line-2)]" />
             <img
-              src="/focattolecter.png"
+              src="/vibrattoo.png"
               alt="Logo"
               className="h-7 sm:h-8 w-auto object-contain invert brightness-110 mix-blend-screen"
             />
@@ -245,28 +245,28 @@ function ChatPageContent() {
 
       {/* Main Container */}
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-6 flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 bg-[#141211] rounded-2xl border border-[#22201e] overflow-hidden flex shadow-xl relative">
+        <div className="flex-1 bg-[var(--panel)] rounded-2xl border border-[var(--line)] overflow-hidden flex shadow-xl relative">
           
           {/* Left Panel: Conversations List */}
           <div
-            className={`w-full md:w-[320px] lg:w-[380px] border-r border-[#22201e] flex flex-col bg-[#110f0e] flex-shrink-0 ${
+            className={`w-full md:w-[320px] lg:w-[380px] border-r border-[var(--line)] flex flex-col bg-[var(--panel)] flex-shrink-0 ${
               showMobileChat ? "hidden md:flex" : "flex"
             }`}
           >
-            <div className="p-4 border-b border-[#22201e] flex-shrink-0">
+            <div className="p-4 border-b border-[var(--line)] flex-shrink-0">
               <h2 className="text-sm font-bold uppercase tracking-wider text-surface-200 font-heading">
                 Mensagens
               </h2>
             </div>
 
-            <div className="flex-1 overflow-y-auto divide-y divide-[#1c1a19]/50 scrollbar-thin">
+            <div className="flex-1 overflow-y-auto divide-y divide-[var(--panel-2)]/50 scrollbar-thin">
               {loadingChats ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="p-4 flex gap-3 animate-pulse">
-                    <div className="h-10 w-10 rounded-full bg-[#1c1a19]" />
+                    <div className="h-10 w-10 rounded-full bg-[var(--panel-2)]" />
                     <div className="flex-1 flex flex-col gap-2">
-                      <div className="h-3 w-1/3 bg-[#1c1a19] rounded" />
-                      <div className="h-3 w-2/3 bg-[#1c1a19] rounded" />
+                      <div className="h-3 w-1/3 bg-[var(--panel-2)] rounded" />
+                      <div className="h-3 w-2/3 bg-[var(--panel-2)] rounded" />
                     </div>
                   </div>
                 ))
@@ -290,8 +290,8 @@ function ChatPageContent() {
                     <div
                       key={chat.id}
                       onClick={() => selectChat(chat)}
-                      className={`p-4 flex gap-3 items-center cursor-pointer transition-all hover:bg-[#181615] ${
-                        isActive ? "bg-[#181615] border-l-2 border-l-[#ef7c2c]" : ""
+                      className={`p-4 flex gap-3 items-center cursor-pointer transition-all hover:bg-[var(--panel-2)] ${
+                        isActive ? "bg-[var(--panel-2)] border-l-2 border-l-[#ef7c2c]" : ""
                       }`}
                     >
                       {/* Avatar */}
@@ -341,18 +341,18 @@ function ChatPageContent() {
 
           {/* Right Panel: Chat Messages Screen */}
           <div
-            className={`flex-1 flex flex-col bg-[#141211] overflow-hidden ${
+            className={`flex-1 flex flex-col bg-[var(--panel)] overflow-hidden ${
               !showMobileChat ? "hidden md:flex" : "flex"
             }`}
           >
             {activeChat ? (
               <>
                 {/* Active Chat Header */}
-                <div className="p-3 border-b border-[#22201e] bg-[#110f0e] flex items-center justify-between gap-3 flex-shrink-0">
+                <div className="p-3 border-b border-[var(--line)] bg-[var(--panel)] flex items-center justify-between gap-3 flex-shrink-0">
                   <div className="flex items-center gap-3 min-w-0">
                     <button
                       onClick={handleBackToList}
-                      className="md:hidden p-1.5 rounded-lg text-surface-400 hover:text-white hover:bg-[#181615] flex-shrink-0 cursor-pointer"
+                      className="md:hidden p-1.5 rounded-lg text-surface-400 hover:text-white hover:bg-[var(--panel-2)] flex-shrink-0 cursor-pointer"
                       title="Voltar para a lista"
                     >
                       <ArrowLeft size={16} />
@@ -378,7 +378,7 @@ function ChatPageContent() {
                         )}
                       </h3>
                       <p className="text-[10px] text-surface-400">
-                        {otherUser?.isVerified ? "Vendedor Verificado" : "Membro do Focatto"}
+                        {otherUser?.isVerified ? "Vendedor Verificado" : "Membro do Vibrattoo"}
                       </p>
                     </div>
                   </div>
@@ -400,9 +400,9 @@ function ChatPageContent() {
 
                 {/* Associated Product Bar */}
                 {activeChat.productId && (
-                  <div className="px-4 py-2 border-b border-[#22201e] bg-[#181615]/75 flex items-center justify-between gap-3 flex-shrink-0">
+                  <div className="px-4 py-2 border-b border-[var(--line)] bg-[var(--panel-2)]/75 flex items-center justify-between gap-3 flex-shrink-0">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="h-8 w-8 rounded-lg bg-[#0b0908] border border-[#2a2827] flex items-center justify-center overflow-hidden flex-shrink-0">
+                      <div className="h-8 w-8 rounded-lg bg-[var(--bg)] border border-[var(--line-2)] flex items-center justify-center overflow-hidden flex-shrink-0">
                         {activeChat.productPhoto ? (
                           <img
                             src={activeChat.productPhoto}
@@ -452,7 +452,7 @@ function ChatPageContent() {
                             className={`p-3 rounded-2xl text-xs font-body shadow-md leading-relaxed whitespace-pre-wrap ${
                               isMe
                                 ? "bg-gradient-to-br from-[#ef7c2c] to-[#d4ae12] text-white rounded-tr-none"
-                                : "bg-[#1c1a19] border border-[#2c2a29] text-surface-100 rounded-tl-none"
+                                : "bg-[var(--panel-2)] border border-[#2c2a29] text-surface-100 rounded-tl-none"
                             }`}
                           >
                             {msg.text}
@@ -474,7 +474,7 @@ function ChatPageContent() {
                 {/* Chat Footer Input */}
                 <form
                   onSubmit={handleSend}
-                  className="p-3 border-t border-[#22201e] bg-[#110f0e] flex items-center gap-2.5 flex-shrink-0"
+                  className="p-3 border-t border-[var(--line)] bg-[var(--panel)] flex items-center gap-2.5 flex-shrink-0"
                 >
                   <input
                     type="text"
@@ -482,7 +482,7 @@ function ChatPageContent() {
                     onChange={(e) => setInputText(e.target.value)}
                     placeholder="Digite sua mensagem..."
                     disabled={sending}
-                    className="flex-1 bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
+                    className="flex-1 bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-4 py-2.5 text-xs text-white placeholder-surface-500 outline-none transition-all duration-200 focus:border-[#ef7c2c]"
                   />
                   <button
                     type="submit"
@@ -495,13 +495,13 @@ function ChatPageContent() {
               </>
             ) : (
               // Empty selection screen
-              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center gap-4 bg-[#0c0a09]/10">
-                <div className="h-16 w-16 rounded-3xl bg-[#181615] border border-[#2a2827] flex items-center justify-center text-[#ef7c2c]">
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center gap-4 bg-[var(--bg)]/10">
+                <div className="h-16 w-16 rounded-3xl bg-[var(--panel-2)] border border-[var(--line-2)] flex items-center justify-center text-[#ef7c2c]">
                   <ChatCircleDots size={32} weight="fill" />
                 </div>
                 <div className="max-w-xs">
                   <h3 className="text-sm font-bold text-white font-heading">
-                    Focatto Chat Interno
+                    Vibrattoo Chat Interno
                   </h3>
                   <p className="text-[11px] text-surface-400 mt-2 leading-relaxed font-body">
                     Selecione uma conversa ao lado para negociar instrumentos, tirar dúvidas sobre aulas ou acertar reparos com luthiers.
@@ -520,7 +520,7 @@ export default function ChatPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
+        <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
           <div className="flex flex-col items-center gap-3 text-surface-400">
             <Circle size={28} className="animate-spin text-[#ef7c2c]" />
             <p className="text-xs">Carregando painel de chat...</p>

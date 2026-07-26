@@ -22,7 +22,7 @@ export default function AdminGuard({ children, fallback }: AdminGuardProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0b0908] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 rounded-full border-2 border-[#ef7c2c] border-t-transparent animate-spin" />
           <p className="text-sm text-surface-400">Carregando...</p>

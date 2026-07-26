@@ -91,6 +91,42 @@ service firebase.storage {
       allow delete: if isAdmin();
     }
 
+    // ==========================================
+    // Social: Post images
+    // ==========================================
+    match /social/{userId}/{postId}/{fileName} {
+      // Anyone can view social post images
+      allow read: if true;
+
+      // Only the post owner can upload images (5MB max)
+      allow write: if isAuthenticated() && request.auth.uid == userId && isValidImage(5);
+    }
+
+    // ==========================================
+    // Social: Equipment images
+    // ==========================================
+    match /equipment/{userId}/{fileName} {
+      // Anyone can view equipment images
+      allow read: if true;
+
+      // Only the equipment owner can upload images (5MB max)
+      allow write: if isAuthenticated() && request.auth.uid == userId && isValidImage(5);
+    }
+
+    // ==========================================
+    // Trade proposal images (FIX: regra em falta)
+    // ==========================================
+    match /proposals/{receiverId}/{fileName} {
+      // Authenticated users can read proposal images
+      allow read: if isAuthenticated();
+
+      // Authenticated users can upload proposal images (10MB max)
+      allow create: if isAuthenticated() && isValidImage(10);
+
+      // Only admin can update/delete
+      allow update, delete: if isAdmin();
+    }
+
     // Deny all other access by default
     match /{allPaths=**} {
       allow read, write: if false;

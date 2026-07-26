@@ -2,13 +2,13 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Política de Cookies - Focattolecter",
-  description: "Política de cookies e privacidade da plataforma Focattolecter.",
+  title: "Política de Cookies - Vibrattoo",
+  description: "Política de cookies e privacidade da plataforma Vibrattoo.",
 };
 
 export default function CookiesPage() {
   return (
-    <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
+    <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans">
       <div className="max-w-3xl mx-auto px-6 py-12">
         <Link href="/" className="text-sm text-[#ef7c2c] hover:underline mb-6 inline-block">
           &larr; Voltar ao início
@@ -28,7 +28,7 @@ export default function CookiesPage() {
 
           <section>
             <h2 className="text-lg font-bold text-white mb-2">2. Como Utilizamos Cookies</h2>
-            <p>O Focattolecter utiliza cookies para as seguintes finalidades:</p>
+            <p>O Vibrattoo utiliza cookies para as seguintes finalidades:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
               <li>Autenticação e segurança da sua conta</li>
               <li>Preferências de navegação e personalização</li>

@@ -90,7 +90,7 @@ const htmlTemplate = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Planos de Assinatura - Focatto</title>
+  <title>Planos de Assinatura - Vibrattoo</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -109,9 +109,9 @@ const htmlTemplate = `<!DOCTYPE html>
       --text-secondary: hsl(22, 8%, 75%);
       --text-muted: hsl(22, 6%, 55%);
       
-      --focatto-orange: hsl(25, 95%, 55%);
-      --focatto-orange-glow: hsla(25, 95%, 55%, 0.15);
-      --focatto-gold: hsl(48, 90%, 50%);
+      --vibrattoo-orange: hsl(25, 95%, 55%);
+      --vibrattoo-orange-glow: hsla(25, 95%, 55%, 0.15);
+      --vibrattoo-gold: hsl(48, 90%, 50%);
       
       --font-display: 'Outfit', sans-serif;
       --font-body: 'Plus Jakarta Sans', sans-serif;
@@ -158,7 +158,7 @@ const htmlTemplate = `<!DOCTYPE html>
     }
 
     .logo span {
-      color: var(--focatto-orange);
+      color: var(--vibrattoo-orange);
     }
 
     h1 {
@@ -195,7 +195,7 @@ const htmlTemplate = `<!DOCTYPE html>
     }
 
     .toggle-label.active {
-      color: var(--focatto-orange);
+      color: var(--vibrattoo-orange);
     }
 
     .switch {
@@ -236,7 +236,7 @@ const htmlTemplate = `<!DOCTYPE html>
     }
 
     input:checked + .slider {
-      background-color: var(--focatto-orange);
+      background-color: var(--vibrattoo-orange);
     }
 
     input:checked + .slider:before {
@@ -281,13 +281,13 @@ const htmlTemplate = `<!DOCTYPE html>
     }
 
     .plan-card.highlighted {
-      border-color: var(--focatto-orange);
+      border-color: var(--vibrattoo-orange);
       background-image: radial-gradient(circle at 100% 0%, hsla(25, 95%, 55%, 0.05) 0%, transparent 50%);
       box-shadow: 0 0 30px hsla(25, 95%, 55%, 0.05);
     }
 
     .plan-card.highlighted:hover {
-      box-shadow: 0 20px 40px -15px var(--focatto-orange-glow);
+      box-shadow: 0 20px 40px -15px var(--vibrattoo-orange-glow);
     }
 
     .plan-card.future-plan {
@@ -308,7 +308,7 @@ const htmlTemplate = `<!DOCTYPE html>
     }
 
     .badge-pro {
-      background: linear-gradient(90deg, var(--focatto-orange), var(--focatto-gold));
+      background: linear-gradient(90deg, var(--vibrattoo-orange), var(--vibrattoo-gold));
       color: #0b0908;
       box-shadow: 0 2px 10px rgba(239, 124, 44, 0.3);
     }
@@ -332,12 +332,12 @@ const htmlTemplate = `<!DOCTYPE html>
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--focatto-orange);
+      color: var(--vibrattoo-orange);
       margin-bottom: 20px;
     }
 
     .plan-card.highlighted .plan-icon-wrapper {
-      background: var(--focatto-orange-glow);
+      background: var(--vibrattoo-orange-glow);
       border-color: hsla(25, 95%, 55%, 0.2);
     }
 
@@ -411,7 +411,7 @@ const htmlTemplate = `<!DOCTYPE html>
     }
 
     .check-icon {
-      color: var(--focatto-orange);
+      color: var(--vibrattoo-orange);
       flex-shrink: 0;
       margin-top: 2px;
     }
@@ -433,7 +433,7 @@ const htmlTemplate = `<!DOCTYPE html>
     }
 
     .btn-primary {
-      background: linear-gradient(90deg, var(--focatto-orange), var(--focatto-gold));
+      background: linear-gradient(90deg, var(--vibrattoo-orange), var(--vibrattoo-gold));
       color: #0b0908;
     }
 
@@ -475,9 +475,9 @@ const htmlTemplate = `<!DOCTYPE html>
 
 <div class="container">
   <header>
-    <div class="logo">Focatto<span>.</span></div>
+    <div class="logo">Vibrattoo<span>.</span></div>
     <h1>Nossos Planos de Assinatura</h1>
-    <p class="subtitle">Escolha o plano ideal para impulsionar suas vendas, regulagens ou aulas de música dentro da Focatto.</p>
+    <p class="subtitle">Escolha o plano ideal para impulsionar suas vendas, regulagens ou aulas de música dentro da Vibrattoo.</p>
   </header>
 
   <!-- Billing Toggle -->

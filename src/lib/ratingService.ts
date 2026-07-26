@@ -3,7 +3,27 @@ import {
   query, where, orderBy, Timestamp, limit,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import type { RatingData, SellerStats } from "./roles";
+import type { RatingData, SellerStats, ProposalData } from "./roles";
+
+// Check and get an accepted proposal between a seller and a buyer
+export async function getAcceptedProposal(sellerId: string, userId: string): Promise<ProposalData | null> {
+  try {
+    const q = query(
+      collection(db, "proposals"),
+      where("sellerId", "==", sellerId),
+      where("receiverId", "==", userId),
+      where("status", "==", "accepted"),
+      limit(1)
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+    const found = snap.docs[0];
+    return { id: found.id, ...found.data() } as ProposalData;
+  } catch (err) {
+    console.error("Error in getAcceptedProposal:", err);
+    return null;
+  }
+}
 
 // Add profile rating (defaults to status: "pending")
 export async function addRating(
@@ -12,13 +32,26 @@ export async function addRating(
   userName: string,
   rating: number,
   comment: string,
+  proposalId: string,
 ): Promise<string> {
+  // Validate that the proposal exists, is accepted, and belongs to this seller and user
+  const proposalRef = doc(db, "proposals", proposalId);
+  const proposalSnap = await getDoc(proposalRef);
+  if (!proposalSnap.exists()) {
+    throw new Error("Proposal not found");
+  }
+  const propData = proposalSnap.data();
+  if (propData.status !== "accepted" || propData.sellerId !== sellerId || propData.receiverId !== userId) {
+    throw new Error("Invalid or unaccepted proposal for this rating");
+  }
+
   const docRef = await addDoc(collection(db, "ratings"), {
     sellerId,
     userId,
     userName,
     rating: Math.min(5, Math.max(1, Math.round(rating))),
     comment,
+    proposalId,
     status: "pending",
     createdAt: Date.now(),
   });

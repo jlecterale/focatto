@@ -60,13 +60,13 @@ export default function AdminVerificacoesPage() {
   }
 
   const inputBase =
-    "w-full bg-[#181615] border border-[#2a2827] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
+    "w-full bg-[var(--panel-2)] border border-[var(--line-2)] rounded-xl px-4 py-3 text-sm text-white placeholder-surface-400 outline-none transition-all duration-200 focus:border-[#ef7c2c] focus:shadow-[0_0_0_3px_rgba(239,124,44,0.1)]";
 
   return (
     <AdminGuard>
-      <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans">
+      <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans">
         {/* Header */}
-        <header className="border-b border-[#1c1a19]/60 bg-[#0c0a09]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
+        <header className="border-b border-[var(--panel-2)]/60 bg-[var(--bg)]/80 backdrop-blur-md sticky top-0 z-50 safe-top">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <Link href="/admin" id="admin-verifications-back-btn" className="text-surface-400 hover:text-white transition-colors flex-shrink-0">
@@ -85,7 +85,7 @@ export default function AdminVerificacoesPage() {
             <button
               onClick={logout}
               id="admin-verifications-logout-btn"
-              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[#2a2827] hover:border-[#ef7c2c]/30"
+              className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-white transition-colors py-2 px-3 rounded-lg border border-[var(--line-2)] hover:border-[#ef7c2c]/30"
             >
               <SignOut size={14} />
               Sair
@@ -102,7 +102,7 @@ export default function AdminVerificacoesPage() {
               className={`text-xs font-semibold py-2 px-4 rounded-xl transition-all ${
                 filter === "pending"
                   ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white"
-                  : "bg-[#181615] text-surface-400 border border-[#2a2827]"
+                  : "bg-[var(--panel-2)] text-surface-400 border border-[var(--line-2)]"
               }`}
             >
               Pendentes
@@ -113,7 +113,7 @@ export default function AdminVerificacoesPage() {
               className={`text-xs font-semibold py-2 px-4 rounded-xl transition-all ${
                 filter === "all"
                   ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white"
-                  : "bg-[#181615] text-surface-400 border border-[#2a2827]"
+                  : "bg-[var(--panel-2)] text-surface-400 border border-[var(--line-2)]"
               }`}
             >
               Todas
@@ -134,7 +134,7 @@ export default function AdminVerificacoesPage() {
               {verifications.map((ver) => (
                 <div
                   key={ver.id}
-                  className="bg-[#141211] rounded-2xl p-5 border border-[#22201e] space-y-4"
+                  className="bg-[var(--panel)] rounded-2xl p-5 border border-[var(--line)] space-y-4"
                 >
                   {/* User Info */}
                   <div className="flex items-center justify-between">
@@ -167,7 +167,7 @@ export default function AdminVerificacoesPage() {
                         href={ver.documentPhoto}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block h-32 sm:h-40 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
+                        className="block h-32 sm:h-40 rounded-xl bg-[var(--panel-2)] border border-[var(--line-2)] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
                       >
                         <img loading="lazy" decoding="async"
                           src={ver.documentPhoto}
@@ -182,7 +182,7 @@ export default function AdminVerificacoesPage() {
                         href={ver.facePhoto}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block h-32 sm:h-40 rounded-xl bg-[#181615] border border-[#2a2827] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
+                        className="block h-32 sm:h-40 rounded-xl bg-[var(--panel-2)] border border-[var(--line-2)] overflow-hidden hover:border-[#ef7c2c]/30 transition-colors"
                       >
                         <img loading="lazy" decoding="async"
                           src={ver.facePhoto}
@@ -195,7 +195,7 @@ export default function AdminVerificacoesPage() {
 
                   {/* Review Actions */}
                   {ver.status === "pending" && (
-                    <div className="space-y-3 pt-2 border-t border-[#22201e]">
+                    <div className="space-y-3 pt-2 border-t border-[var(--line)]">
                       <textarea
                         value={adminNotes}
                         onChange={(e) => setAdminNotes(e.target.value)}
@@ -238,7 +238,7 @@ export default function AdminVerificacoesPage() {
 
                   {/* Reviewed Info */}
                   {ver.status !== "pending" && ver.adminNotes && (
-                    <div className="pt-2 border-t border-[#22201e]">
+                    <div className="pt-2 border-t border-[var(--line)]">
                       <p className="text-xs text-surface-400">
                         <span className="text-surface-500">Observações:</span> {ver.adminNotes}
                       </p>

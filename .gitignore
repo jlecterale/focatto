@@ -35,3 +35,6 @@ next-env.d.ts
 *-debug.log
 firebase-debug.log*
 ui-debug.log*
+
+# claude code (local/personal settings — permissions cache)
+.claude/settings.local.json

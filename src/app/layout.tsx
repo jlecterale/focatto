@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit, Playfair_Display } from "next/font/google";
 import "../index.css";
 import AuthProviderWrapper from "../components/AuthProviderWrapper";
+import ThemeToggle from "../components/ThemeToggle";
 import { SITE_URL } from "../lib/seo";
 
 const outfit = Outfit({
@@ -20,7 +21,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Focattolecter - Marketplace de Instrumentos Musicais",
+  title: "Vibrattoo - Marketplace de Instrumentos Musicais",
   description: "Encontre instrumentos musicais e luthiers especializados perto de você.",
 };
 
@@ -30,11 +31,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${outfit.variable} ${playfair.variable}`}>
+    <html lang="pt-BR" data-theme="light" className={`${outfit.variable} ${playfair.variable}`}>
+      <head>
+        {/* Applies the persisted theme before first paint to avoid a flash of
+            the wrong theme. Light is the default when nothing is stored. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('vibrattoo-theme');document.documentElement.dataset.theme=(t==='dark')?'dark':'light';}catch(e){}",
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-surface-950 text-surface-50 antialiased selection:bg-accent/30 selection:text-white noise-overlay">
         <AuthProviderWrapper>
           {children}
         </AuthProviderWrapper>
+        <ThemeToggle />
       </body>
     </html>
   );

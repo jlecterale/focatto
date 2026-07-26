@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Administrar Anúncios - Focattolecter",
-  description: "Revisão, aprovação ou rejeição de anúncios de produtos e serviços dos usuários no Focattolecter.",
+  title: "Administrar Anúncios - Vibrattoo",
+  description: "Revisão, aprovação ou rejeição de anúncios de produtos e serviços dos usuários no Vibrattoo.",
 };
 
 export default function AdminProdutosLayout({

@@ -34,7 +34,7 @@ export default function PlansPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0908] text-surface-50 font-sans relative overflow-x-hidden py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[var(--bg)] text-surface-50 font-sans relative overflow-x-hidden py-12 px-4 sm:px-6 lg:px-8">
       {/* Premium Top Glow */}
       <div className="absolute top-0 left-0 w-full h-[600px] bg-[radial-gradient(ellipse_at_top_left,rgba(239,124,44,0.06),transparent_50%)] pointer-events-none z-0" />
       <div className="absolute top-1/2 right-0 w-full h-[600px] bg-[radial-gradient(ellipse_at_bottom_right,rgba(212,174,18,0.03),transparent_50%)] pointer-events-none z-0" />
@@ -60,7 +60,7 @@ export default function PlansPage() {
             Escolha o Plano Perfeito para Você
           </h1>
           <p className="text-sm sm:text-base text-surface-400 max-w-2xl mx-auto leading-relaxed">
-            Maximize sua presença na Focatto. Anuncie instrumentos, divulgue serviços de luthieria ou agende mais aulas de música com facilidade.
+            Maximize sua presença na Vibrattoo. Anuncie instrumentos, divulgue serviços de luthieria ou agende mais aulas de música com facilidade.
           </p>
         </div>
 
@@ -71,7 +71,7 @@ export default function PlansPage() {
           </span>
           <button 
             onClick={handleToggleBilling}
-            className="w-14 h-8 bg-surface-800 rounded-full p-1 transition-all duration-300 relative border border-[#2a2827] focus:outline-none"
+            className="w-14 h-8 bg-surface-800 rounded-full p-1 transition-all duration-300 relative border border-[var(--line-2)] focus:outline-none"
             aria-label="Alternar ciclo de faturamento"
           >
             <div className={`w-6 h-6 rounded-full bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] shadow-md transition-all duration-300 transform ${billingCycle === "yearly" ? "translate-x-6" : ""}`} />
@@ -94,12 +94,12 @@ export default function PlansPage() {
             return (
               <div 
                 key={plan.id}
-                className={`bg-[#141211]/90 rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 relative ${
+                className={`bg-[var(--panel)]/90 rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 relative ${
                   isHighlighted 
-                    ? "border-[#ef7c2c] shadow-[0_0_25px_rgba(239,124,44,0.15)] bg-gradient-to-b from-[#1d1712] to-[#141211]" 
+                    ? "border-[#ef7c2c] shadow-[0_0_25px_rgba(239,124,44,0.15)] bg-gradient-to-b from-[#1d1712] to-[var(--panel)]" 
                     : isFuture 
-                    ? "border-[#22201e]/60 opacity-95 hover:border-[#2a2827]"
-                    : "border-[#22201e] hover:border-[#2a2827]"
+                    ? "border-[var(--line)]/60 opacity-95 hover:border-[var(--line-2)]"
+                    : "border-[var(--line)] hover:border-[var(--line-2)]"
                 } hover:translate-y-[-4px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)]`}
               >
                 {/* Banner badge */}
@@ -119,7 +119,7 @@ export default function PlansPage() {
                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border mb-6 ${
                       isHighlighted 
                         ? "bg-[#ef7c2c]/10 border-[#ef7c2c]/30" 
-                        : "bg-[#181615] border-[#2a2827]"
+                        : "bg-[var(--panel-2)] border-[var(--line-2)]"
                     }`}>
                       {getIconComponent(plan.icon)}
                     </div>
@@ -128,7 +128,7 @@ export default function PlansPage() {
                   </div>
 
                   {/* Plan Price */}
-                  <div className="mb-8 border-t border-[#22201e] pt-6">
+                  <div className="mb-8 border-t border-[var(--line)] pt-6">
                     <div className="flex items-baseline gap-1">
                       <span className="text-sm font-semibold text-surface-300">R$</span>
                       <span className="text-4xl font-extrabold text-white font-display tracking-tight transition-all">
@@ -159,11 +159,11 @@ export default function PlansPage() {
                 </div>
 
                 {/* Plan Button */}
-                <div className="mt-auto pt-4 border-t border-[#22201e]/60">
+                <div className="mt-auto pt-4 border-t border-[var(--line)]/60">
                   {isFuture ? (
                     <button
                       disabled
-                      className="w-full py-3.5 rounded-xl bg-[#181615] border border-[#2a2827] text-[#ef7c2c]/60 text-xs font-bold cursor-not-allowed opacity-60 flex items-center justify-center gap-2"
+                      className="w-full py-3.5 rounded-xl bg-[var(--panel-2)] border border-[var(--line-2)] text-[#ef7c2c]/60 text-xs font-bold cursor-not-allowed opacity-60 flex items-center justify-center gap-2"
                     >
                       Implementação Futura
                     </button>
@@ -177,7 +177,7 @@ export default function PlansPage() {
                       className={`w-full py-3.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
                         isHighlighted
                           ? "bg-gradient-to-r from-[#ef7c2c] to-[#d4ae12] text-white hover:shadow-[0_4px_20px_rgba(239,124,44,0.3)] hover:scale-[1.02] active:scale-[0.98]"
-                          : "bg-surface-800 border border-[#2a2827] text-white hover:bg-[#181615] hover:border-[#ef7c2c]/30 hover:scale-[1.02] active:scale-[0.98]"
+                          : "bg-surface-800 border border-[var(--line-2)] text-white hover:bg-[var(--panel-2)] hover:border-[#ef7c2c]/30 hover:scale-[1.02] active:scale-[0.98]"
                       }`}
                     >
                       Assinar {plan.name}
@@ -190,7 +190,7 @@ export default function PlansPage() {
         </div>
 
         {/* FAQ or Info note */}
-        <div className="mt-20 text-center border-t border-[#22201e] pt-12">
+        <div className="mt-20 text-center border-t border-[var(--line)] pt-12">
           <p className="text-xs text-surface-500">
             Dúvidas sobre assinaturas? Entre em contato com nosso suporte através da página de <a href="/suporte" className="text-[#ef7c2c] hover:underline font-semibold">Suporte ao Cliente</a>.
           </p>
