@@ -41,6 +41,45 @@ export async function createProduct(
   return docRef.id;
 }
 
+// Atualiza um anúncio existente. As fotos são reconstruídas a partir das que o
+// dono manteve (URLs já no Storage) mais os novos arquivos enviados. Toda edição
+// volta o anúncio para "pending", exigindo nova moderação.
+export async function updateProduct(
+  productId: string,
+  userId: string,
+  data: {
+    title: string;
+    description: string;
+    price: number;
+    category: string;
+    condition: string;
+    city: string;
+    state: string;
+    neighborhood: string;
+    cep: string;
+  },
+  keptPhotos: string[],
+  newPhotoFiles: File[],
+): Promise<void> {
+  const uploadedURLs: string[] = [];
+  for (let i = 0; i < newPhotoFiles.length; i++) {
+    const fileRef = ref(storage, `products/${userId}/${Date.now()}_${i}`);
+    await uploadBytes(fileRef, newPhotoFiles[i]);
+    uploadedURLs.push(await getDownloadURL(fileRef));
+  }
+
+  const productRef = doc(db, "products", productId);
+  await updateDoc(productRef, {
+    ...data,
+    photos: [...keptPhotos, ...uploadedURLs],
+    status: "pending",
+    adminNotes: "",
+    reviewedBy: "",
+    reviewedAt: 0,
+    updatedAt: Date.now(),
+  });
+}
+
 export async function getPendingProducts(): Promise<ProductData[]> {
   try {
     const q = query(
