@@ -5,6 +5,7 @@ import type { User } from "firebase/auth";
 import {
   getUserBands,
   createBand as createBandDoc,
+  subscribeBand,
   subscribeSongs,
   subscribeMembers,
   subscribeEvents,
@@ -12,7 +13,7 @@ import {
   putBandDoc,
   deleteBandDoc,
 } from "@/lib/bandService";
-import type { BandType } from "@/lib/bandTypes";
+import type { Band, BandType } from "@/lib/bandTypes";
 import type { Song, Member, ScaleEvent, Indisponibilidade } from "./agendaTypes";
 
 function genId(): string {
@@ -31,6 +32,7 @@ function genId(): string {
  */
 export function useBandData(user: User | null, type: BandType) {
   const [bandId, setBandId] = useState<string | null>(null);
+  const [band, setBand] = useState<Band | null>(null);
   const [bandName, setBandName] = useState("");
   const [bandCreated, setBandCreated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -70,6 +72,7 @@ export function useBandData(user: User | null, type: BandType) {
   // Realtime subscriptions once a band is known.
   useEffect(() => {
     if (!bandId) {
+      setBand(null);
       setSongs([]);
       setMembers([]);
       setEvents([]);
@@ -77,6 +80,10 @@ export function useBandData(user: User | null, type: BandType) {
       return;
     }
     const unsubs = [
+      subscribeBand(bandId, (b) => {
+        setBand(b);
+        if (b) setBandName(b.name);
+      }),
       subscribeSongs(bandId, (s) => setSongs(s as unknown as Song[])),
       subscribeMembers(bandId, (m) => setMembers(m as unknown as Member[])),
       subscribeEvents(bandId, (e) => setEvents(e as unknown as ScaleEvent[])),
@@ -177,6 +184,7 @@ export function useBandData(user: User | null, type: BandType) {
 
   return {
     bandId,
+    band,
     bandName,
     setBandName,
     bandCreated,

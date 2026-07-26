@@ -19,6 +19,11 @@ export interface Member {
   name: string;
   instrument: string;
   email: string;
+  /** Linked auth uid once the invite is accepted; absent while pending. */
+  uid?: string;
+  /** `invited` while awaiting acceptance, `active` once linked (missing = active). */
+  status?: "invited" | "active";
+  role?: string;
 }
 
 export interface ScaleEvent {
